@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Volatility{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Volatility Analysis</h1>
+    <p>Fluctuation patterns and risk dynamics over time</p>
+</section>
+
+<section class="content">
+    <div class="card">
+        <h2>Research Question</h2>
+        <p>How does volatility evolve over time? Are there clusters of high volatility and how can they be modeled?</p>
+    </div>
+
+    <div class="card">
+        <h2>Historical Volatility</h2>
+        <p>The rolling standard deviation of returns shows clear fluctuations across different market phases:</p>
+        <div class="chart-placeholder">Rolling volatility chart will be inserted here</div>
+    </div>
+
+    <div class="card">
+        <h2>GARCH Modeling</h2>
+        <p>To model conditional variance, we use GARCH(1,1) models:</p>
+        <ul>
+            <li><strong>ARCH Effect:</strong> Past shocks influence current volatility</li>
+            <li><strong>GARCH Effect:</strong> Persistence of volatility over time</li>
+            <li><strong>Leverage Effect:</strong> Negative returns increase volatility more strongly</li>
+        </ul>
+        <div class="chart-placeholder">GARCH conditional volatility will be inserted here</div>
+    </div>
+
+    <div class="card">
+        <h2>Volatility Regimes</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Low Volatility</h3>
+                <p>Stable market phases with low fluctuations. Typical for sustained uptrends.</p>
+            </div>
+            <div class="card">
+                <h3>High Volatility</h3>
+                <p>Crisis periods with strong price movements. Often associated with market crashes or external shocks.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <h3>Key Finding</h3>
+        <p>Volatility occurs in clusters &mdash; periods of high fluctuations tend to follow each other, which can be well captured by GARCH models.</p>
+    </div>
+</section>
+{% endblock %}

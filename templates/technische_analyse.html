@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Technical Analysis{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Technical Analysis</h1>
+    <p>Evaluation of technical indicators and trading strategies</p>
+</section>
+
+<section class="content">
+    <div class="card">
+        <h2>Research Question</h2>
+        <p>Do common technical indicators such as moving averages, RSI, or MACD actually provide actionable trading signals?</p>
+    </div>
+
+    <div class="card">
+        <h2>Moving Averages (SMA/EMA)</h2>
+        <p>Analysis of Simple and Exponential Moving Averages as trend indicators:</p>
+        <div class="chart-placeholder">Price chart with SMA(50) and SMA(200) will be inserted here</div>
+        <ul>
+            <li><strong>Golden Cross:</strong> SMA(50) crosses SMA(200) from below &rarr; Buy signal</li>
+            <li><strong>Death Cross:</strong> SMA(50) crosses SMA(200) from above &rarr; Sell signal</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Relative Strength Index (RSI)</h2>
+        <p>The RSI measures the strength of price movements on a scale from 0 to 100:</p>
+        <div class="chart-placeholder">RSI chart with overbought/oversold zones will be inserted here</div>
+        <ul>
+            <li>RSI &gt; 70: Overbought territory</li>
+            <li>RSI &lt; 30: Oversold territory</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>MACD</h2>
+        <p>Moving Average Convergence Divergence as a momentum indicator:</p>
+        <div class="chart-placeholder">MACD chart with signal line will be inserted here</div>
+    </div>
+
+    <div class="card">
+        <h2>Backtesting Results</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Strategy</th>
+                    <th>Return (p.a.)</th>
+                    <th>Sharpe Ratio</th>
+                    <th>Max Drawdown</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Buy & Hold</td><td>--</td><td>--</td><td>--</td></tr>
+                <tr><td>SMA Crossover</td><td>--</td><td>--</td><td>--</td></tr>
+                <tr><td>RSI Strategy</td><td>--</td><td>--</td><td>--</td></tr>
+                <tr><td>MACD Strategy</td><td>--</td><td>--</td><td>--</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="highlight-box">
+        <h3>Key Finding</h3>
+        <p>Technical indicators can provide useful signals in trending markets but frequently generate false signals in sideways markets.</p>
+    </div>
+</section>
+{% endblock %}

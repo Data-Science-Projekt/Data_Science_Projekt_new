@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>StockInsight</h1>
+    <p>A data science project for systematic stock market analysis &mdash; from returns and volatility to market phases and risk management.</p>
+</section>
+
+<section class="content">
+    <div class="card">
+        <h2>Project Overview</h2>
+        <p>In this project, we investigate various research questions about stock prices using modern data science methods. Our goal is to identify patterns and relationships in historical price data and derive well-founded insights.</p>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <h2>Return Analysis</h2>
+            <p>How are stock returns distributed? Are there systematic differences between sectors and time periods?</p>
+        </div>
+        <div class="card">
+            <h2>Volatility</h2>
+            <p>How do prices fluctuate? Can volatility clusters be identified and predicted?</p>
+        </div>
+        <div class="card">
+            <h2>Market Structure</h2>
+            <p>How are stocks correlated with each other? Are there natural clusters in the market?</p>
+        </div>
+        <div class="card">
+            <h2>Market Phases</h2>
+            <p>Can we systematically identify and characterize bull and bear markets?</p>
+        </div>
+        <div class="card">
+            <h2>Technical Analysis</h2>
+            <p>Do technical indicators like moving averages actually provide actionable signals?</p>
+        </div>
+        <div class="card">
+            <h2>Risk Management</h2>
+            <p>How can portfolio risk be quantified and effectively managed?</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

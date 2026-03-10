@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Return Analysis{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Return Analysis</h1>
+    <p>Research Question: To what extent do the daily log returns of Apple and NVIDIA deviate from a normal distribution?</p>
+</section>
+
+<section class="content">
+    <div class="card" style="padding: 0; overflow: hidden; border-left: none;">
+        <iframe src="http://localhost:8501" style="width: 100%; height: 900px; border: none;"></iframe>
+    </div>
+</section>
+{% endblock %}
