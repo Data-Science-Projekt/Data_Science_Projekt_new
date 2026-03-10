@@ -20,6 +20,7 @@ def start_streamlit(script, port):
 
 
 start_streamlit("return_analysis.py", 8501)
+start_streamlit("range_analysis.py", 8502)
 
 
 @app.route("/")

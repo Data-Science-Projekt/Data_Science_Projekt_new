@@ -3,31 +3,11 @@ import numpy as np
 import plotly.graph_objects as go
 import requests
 from scipy.stats import norm, kurtosis, skew
+from .utils import get_stock_data_compact
 
 AV_API_KEY = "REMOVED_AV_KEY"
 FRED_API_KEY = "REMOVED_FRED_KEY"
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
-
-
-def get_stock_data_compact(symbol):
-    url = (
-        f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY"
-        f"&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}"
-    )
-    r = requests.get(url)
-    data = r.json()
-
-    if "Note" in data:
-        return None, "API rate limit reached. Please wait 60 seconds and reload."
-
-    if "Time Series (Daily)" not in data:
-        return None, "No data found. Check if the market is open or the API key is valid."
-
-    df = pd.DataFrame.from_dict(data["Time Series (Daily)"], orient="index")
-    df.index = pd.to_datetime(df.index)
-    df = df.astype(float).sort_index()
-    df["log_return"] = np.log(df["4. close"] / df["4. close"].shift(1))
-    return df.dropna(), None
 
 
 def get_fred_benchmark(series_id="SP500"):
@@ -53,7 +33,7 @@ def get_fred_benchmark(series_id="SP500"):
 def build_return_analysis(stock_name="Apple", days=100, show_benchmark=True):
     """Run the full return analysis and return results as a dict."""
     symbol = STOCKS.get(stock_name, "AAPL")
-    df_raw, error = get_stock_data_compact(symbol)
+    df_raw, error = get_stock_data_compact(symbol, AV_API_KEY, throttle_seconds=0.1)
 
     if df_raw is None:
         return {"error": error}
