@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import requests
+import time
 from .utils import get_stock_data_compact
 
 AV_API_KEY = "REMOVED_AV_KEY"
