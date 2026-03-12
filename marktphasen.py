@@ -14,7 +14,7 @@ st.set_page_config(page_title="Market Phases Analysis", layout="wide")
 # --- FUNCTION: LOAD DATA (FULL = 20 years) ---
 @st.cache_data(show_spinner="Fetching stock data...")
 def get_stock_data(symbol):
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=full&apikey={AV_API_KEY}'
+    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}'
     try:
         r = requests.get(url)
         data = r.json()
