@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import requests
 
 # --- CONFIGURATION ---
-AV_API_KEY = "YOUR_API_KEY_HERE".strip()
+AV_API_KEY = "HWADCN6IZMPOSQ8O".strip()
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA", "S&P 500": "SPY"}
 
 st.set_page_config(page_title="Market Phases Analysis", layout="wide")
