@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import requests
 
 # --- CONFIGURATION ---
-AV_API_KEY = "REMOVED_AV_KEY".strip()
+AV_API_KEY = "YOUR_API_KEY_HERE".strip()
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA", "S&P 500": "SPY"}
 
 st.set_page_config(page_title="Market Phases Analysis", layout="wide")
@@ -177,6 +177,28 @@ if df_raw is not None:
                 col1, col2 = st.columns(2)
                 col1.metric("Avg. Daily Return", f"{avg_return:.3f}%")
                 col2.metric("Daily Volatility", f"{volatility:.3f}%")
+
+    # Transition Probabilities
+    st.subheader("Transition Probabilities")
+    phases = df_phases['phase'].values
+    transitions = {'Bull': {'Bull': 0, 'Bear': 0, 'Neutral': 0},
+                   'Bear': {'Bull': 0, 'Bear': 0, 'Neutral': 0},
+                   'Neutral': {'Bull': 0, 'Bear': 0, 'Neutral': 0}}
+
+    for i in range(len(phases) - 1):
+        transitions[phases[i]][phases[i + 1]] += 1
+
+    rows = []
+    for from_phase in ['Bull', 'Bear', 'Neutral']:
+        total_from = sum(transitions[from_phase].values())
+        row = {"From / To": from_phase}
+        for to_phase in ['Bull', 'Bear', 'Neutral']:
+            prob = transitions[from_phase][to_phase] / total_from * 100 if total_from > 0 else 0
+            row[to_phase] = f"{prob:.1f}%"
+        rows.append(row)
+
+    trans_df = pd.DataFrame(rows).set_index("From / To")
+    st.dataframe(trans_df, use_container_width=True)
 
     st.subheader("Analysis Summary")
     bull_pct = phase_counts.get('Bull', 0) / total * 100
