@@ -104,17 +104,11 @@ def build_chart(df, stock_name):
 
     # Moving averages
     df['MA50'] = df['close'].rolling(50).mean()
-    df['MA200'] = df['close'].rolling(200).mean()
 
     fig.add_trace(go.Scatter(
         x=df.index, y=df['MA50'],
         mode='lines', name='50-Day MA',
         line=dict(color='orange', width=1, dash='dot')
-    ))
-    fig.add_trace(go.Scatter(
-        x=df.index, y=df['MA200'],
-        mode='lines', name='200-Day MA',
-        line=dict(color='cyan', width=1, dash='dot')
     ))
 
     fig.update_layout(
