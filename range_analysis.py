@@ -5,40 +5,93 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import requests
 import os
+import json
 from scipy.stats import norm, kurtosis, skew, pearsonr
 from scipy import stats as scipy_stats
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # --- CONFIGURATION ---
 AV_API_KEY = "REMOVED_AV_KEY".strip()
+NEWSAPI_KEY = "REMOVED_NEWSAPI_KEY"  # <-- Hier deinen NewsAPI Key einfügen (https://newsapi.org)
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 ALL_STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
 
+# --- FILE-BASED CACHE (survives restarts) ---
+CACHE_DIR = os.path.join(os.path.dirname(__file__), "data", "cache")
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+
+def _cache_path(key):
+    return os.path.join(CACHE_DIR, f"{key}.csv")
+
+
+def _save_to_disk(key, df):
+    """Save DataFrame to disk cache."""
+    try:
+        df.to_csv(_cache_path(key))
+    except Exception:
+        pass
+
+
+def _load_from_disk(key):
+    """Load DataFrame from disk cache if it exists."""
+    path = _cache_path(key)
+    if os.path.exists(path):
+        try:
+            df = pd.read_csv(path, index_col=0, parse_dates=True)
+            return df
+        except Exception:
+            pass
+    return None
+
+
 st.set_page_config(page_title="Financial Analysis: RQ2 - Daily Trading Ranges", layout="wide")
+
 
 # --- FUNCTION: LOAD DATA (ALPHA VANTAGE - COMPACT ONLY) ---
 @st.cache_data(show_spinner="Fetching latest 100 days...")
 def get_stock_data_compact(symbol):
     # 'compact' returns the latest 100 data points (Free Tier limit)
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}'
-    r = requests.get(url)
-    data = r.json()
+    try:
+        r = requests.get(url, timeout=15)
+        data = r.json()
 
-    if "Note" in data:
-        st.error("API rate limit reached. Please wait 60 seconds and reload.")
+        if "Note" in data or "Information" in data:
+            # API limit — try disk cache
+            cached = _load_from_disk(f"stock_{symbol}")
+            if cached is not None:
+                st.warning(f"API limit reached for {symbol}. Using cached data.")
+                return cached
+            st.error(f"API limit reached for {symbol} and no cached data available.")
+            return None
+
+        if "Time Series (Daily)" not in data:
+            cached = _load_from_disk(f"stock_{symbol}")
+            if cached is not None:
+                st.warning(f"No fresh data for {symbol}. Using cached data.")
+                return cached
+            st.error(f"No data found for {symbol}. Check if the market is open or the API key is valid.")
+            return None
+
+        df = pd.DataFrame.from_dict(data["Time Series (Daily)"], orient="index")
+        df.index = pd.to_datetime(df.index)
+        df = df.astype(float).sort_index()
+        df["absolute_range"] = df["2. high"] - df["3. low"]
+        df["relative_range_pct"] = (df["absolute_range"] / df["4. close"]) * 100
+
+        # Save to disk for future fallback
+        _save_to_disk(f"stock_{symbol}", df)
+
+        return df
+    except Exception as e:
+        cached = _load_from_disk(f"stock_{symbol}")
+        if cached is not None:
+            st.warning(f"Connection error for {symbol}. Using cached data.")
+            return cached
+        st.error(f"Connection Error for {symbol}: {e}")
         return None
-
-    if "Time Series (Daily)" not in data:
-        st.error(f"No data found for {symbol}. Check if the market is open or the API key is valid.")
-        return None
-
-    df = pd.DataFrame.from_dict(data["Time Series (Daily)"], orient="index")
-    df.index = pd.to_datetime(df.index)
-    df = df.astype(float).sort_index()
-    df["absolute_range"] = df["2. high"] - df["3. low"]
-    df["relative_range_pct"] = (df["absolute_range"] / df["4. close"]) * 100
-    return df
 
 # --- MAIN APP ---
 st.title("Research Question 2: Daily Trading Ranges")
@@ -160,46 +213,176 @@ st.markdown("""
 #### Methodology
 This analysis examines the relationship between news sentiment and Apple's stock volatility.
 We use:
-- **News headlines** from major financial sources (Nov 2024 – Feb 2025)
-- **VADER sentiment analysis** to score each headline between -1 (negative) and +1 (positive)
-- **Daily volatility** measured as |log return| of AAPL closing prices
+- **NewsAPI.org** for Apple news over the last 30 days (up to 100 articles)
+- **Alpha Vantage NEWS_SENTIMENT API** for recent articles with pre-computed sentiment
+- **VADER sentiment analysis** to score all headlines between -1 (negative) and +1 (positive)
+- **Alpha Vantage daily stock data** for AAPL closing prices and volatility
 - **Correlation analysis** and **event study** to quantify the news-volatility relationship
 """)
 
 
-@st.cache_data
-def load_news_sentiment_data():
-    csv_path = os.path.join(os.path.dirname(__file__), "data", "aapl_news_sentiment.csv")
-    df = pd.read_csv(csv_path)
-    df["date"] = pd.to_datetime(df["date"])
-    return df
+# --- Fetch News from NewsAPI (last 30 days, up to 100 articles) ---
+@st.cache_data(show_spinner="Fetching Apple news from NewsAPI...", ttl=3600)
+def fetch_newsapi_articles():
+    """Fetch Apple-related news from NewsAPI.org (free tier: last 30 days)."""
+    from datetime import datetime, timedelta
+    date_from = (datetime.now() - timedelta(days=28)).strftime("%Y-%m-%d")
+    url = (
+        f"https://newsapi.org/v2/everything?"
+        f"q=Apple+OR+AAPL&from={date_from}&language=en&sortBy=publishedAt"
+        f"&pageSize=100&apiKey={NEWSAPI_KEY}"
+    )
+    try:
+        r = requests.get(url, timeout=30)
+        data = r.json()
+        if data.get("status") != "ok":
+            return None, data.get("message", "NewsAPI error.")
+        records = []
+        for item in data.get("articles", []):
+            try:
+                dt = pd.to_datetime(item["publishedAt"])
+            except Exception:
+                continue
+            records.append({
+                "datetime": dt,
+                "date": dt.date(),
+                "time": dt.strftime("%H:%M"),
+                "headline": item.get("title", ""),
+                "summary": item.get("description", ""),
+                "source": item.get("source", {}).get("name", ""),
+                "api_source": "NewsAPI",
+            })
+        if not records:
+            return None, "No articles found from NewsAPI."
+        return pd.DataFrame(records), None
+    except Exception as e:
+        return None, str(e)
 
 
-@st.cache_data
-def recompute_vader_sentiment(headlines):
-    """Recompute VADER sentiment on headlines for transparency."""
+# --- Fetch News from Alpha Vantage NEWS_SENTIMENT API ---
+@st.cache_data(show_spinner="Fetching Apple news from Alpha Vantage...", ttl=3600)
+def fetch_av_news(ticker="AAPL", limit=50):
+    """Fetch news articles with sentiment from Alpha Vantage NEWS_SENTIMENT endpoint."""
+    url = (
+        f"https://www.alphavantage.co/query?function=NEWS_SENTIMENT"
+        f"&tickers={ticker}&limit={limit}&apikey={AV_API_KEY}"
+    )
+    try:
+        r = requests.get(url, timeout=30)
+        data = r.json()
+
+        if "Note" in data or "Information" in data:
+            return None, data.get("Note", data.get("Information", "API limit reached."))
+
+        if "feed" not in data:
+            return None, "No 'feed' in API response."
+
+        records = []
+        for item in data["feed"]:
+            aapl_sentiment = None
+            for ts in item.get("ticker_sentiment", []):
+                if ts["ticker"] == ticker:
+                    aapl_sentiment = float(ts["ticker_sentiment_score"])
+                    break
+
+            time_str = item.get("time_published", "")
+            try:
+                dt = pd.to_datetime(time_str, format="%Y%m%dT%H%M%S")
+            except Exception:
+                continue
+
+            records.append({
+                "datetime": dt,
+                "date": dt.date(),
+                "time": dt.strftime("%H:%M"),
+                "headline": item.get("title", ""),
+                "summary": item.get("summary", ""),
+                "source": item.get("source", ""),
+                "av_sentiment": aapl_sentiment if aapl_sentiment is not None else float(
+                    item.get("overall_sentiment_score", 0)),
+                "api_source": "Alpha Vantage",
+            })
+
+        if not records:
+            return None, "No relevant articles found."
+
+        return pd.DataFrame(records), None
+    except Exception as e:
+        return None, str(e)
+
+
+# --- Combine both news sources ---
+@st.cache_data(show_spinner="Combining news from NewsAPI + Alpha Vantage...", ttl=3600)
+def fetch_combined_news():
+    """Fetch and combine news from both APIs, deduplicate, and score with VADER."""
+    all_articles = []
+    sources_used = []
+
+    # 1. NewsAPI (main source: 30 days, up to 100 articles)
+    newsapi_df, newsapi_err = fetch_newsapi_articles()
+    if newsapi_df is not None:
+        all_articles.append(newsapi_df)
+        sources_used.append(f"NewsAPI ({len(newsapi_df)} articles)")
+
+    # 2. Alpha Vantage (supplementary: recent articles with pre-computed sentiment)
+    av_df, av_err = fetch_av_news()
+    if av_df is not None:
+        all_articles.append(av_df)
+        sources_used.append(f"Alpha Vantage ({len(av_df)} articles)")
+
+    if not all_articles:
+        errors = []
+        if newsapi_err:
+            errors.append(f"NewsAPI: {newsapi_err}")
+        if av_err:
+            errors.append(f"Alpha Vantage: {av_err}")
+        return None, " | ".join(errors), []
+
+    combined = pd.concat(all_articles, ignore_index=True)
+
+    # Deduplicate by headline similarity (exact match)
+    combined = combined.drop_duplicates(subset=["headline"], keep="first")
+
+    # Compute VADER sentiment for all articles
     analyzer = SentimentIntensityAnalyzer()
-    scores = []
-    for headline in headlines:
-        vs = analyzer.polarity_scores(str(headline))
-        scores.append(vs["compound"])
-    return scores
+    combined["vader_score"] = combined["headline"].apply(
+        lambda h: analyzer.polarity_scores(str(h))["compound"]
+    )
+
+    # Use AV sentiment where available, otherwise VADER
+    if "av_sentiment" in combined.columns:
+        combined["sentiment_score"] = combined["av_sentiment"].fillna(combined["vader_score"])
+    else:
+        combined["sentiment_score"] = combined["vader_score"]
+
+    combined = combined.sort_values("datetime", ascending=False).reset_index(drop=True)
+
+    return combined, None, sources_used
 
 
-# Load data
-news_df = load_news_sentiment_data()
+# --- Reuse AAPL daily prices already fetched above (RQ2) ---
+def get_aapl_prices_from_cache():
+    """Reuse the AAPL data already fetched for RQ2 above, avoiding a second API call."""
+    if "Apple" in stock_data:
+        df = stock_data["Apple"].copy()
+    else:
+        # Fallback: fetch AAPL if not selected in RQ2
+        df = get_stock_data_compact("AAPL")
+    if df is None:
+        return None, "Could not load AAPL price data."
+    df["log_return"] = np.log(df["4. close"] / df["4. close"].shift(1))
+    df["abs_volatility"] = df["log_return"].abs()
+    return df.dropna(), None
 
-# Recompute VADER sentiment for verification
-news_df["vader_score"] = recompute_vader_sentiment(news_df["headline"].tolist())
 
-# Classify news sentiment
-news_df["sentiment_label"] = pd.cut(
-    news_df["vader_score"],
-    bins=[-1.01, -0.25, 0.25, 1.01],
-    labels=["Negative", "Neutral", "Positive"],
-)
+# --- VADER for secondary sentiment scoring ---
+@st.cache_data
+def compute_vader_scores(headlines):
+    analyzer = SentimentIntensityAnalyzer()
+    return [analyzer.polarity_scores(str(h))["compound"] for h in headlines]
 
-# Sidebar controls for this section
+
+# Sidebar controls
 st.sidebar.divider()
 st.sidebar.header("News Sentiment Settings")
 sentiment_threshold = st.sidebar.slider(
@@ -208,35 +391,106 @@ sentiment_threshold = st.sidebar.slider(
     help="Absolute sentiment score above this threshold is considered high-impact news",
 )
 
-news_df["is_high_impact"] = news_df["vader_score"].abs() >= sentiment_threshold
-news_df["abs_volatility"] = news_df["daily_volatility"].abs()
+# --- Load Data ---
+news_combined, news_err, sources_used = fetch_combined_news()
+price_df, price_err = get_aapl_prices_from_cache()
 
-high_impact = news_df[news_df["is_high_impact"]]
-low_impact = news_df[~news_df["is_high_impact"]]
+if news_err:
+    st.error(f"Could not fetch news: {news_err}")
+    st.stop()
+if price_err:
+    st.error(f"Could not fetch AAPL prices: {price_err}")
+    st.stop()
+
+st.info(f"**Data Sources:** {' + '.join(sources_used)}")
+
+news_filtered = news_combined.copy()
+
+# Aggregate: average sentiment per day (multiple articles per day)
+daily_news = news_filtered.groupby("date").agg(
+    avg_sentiment=("sentiment_score", "mean"),
+    avg_vader_sentiment=("vader_score", "mean"),
+    num_articles=("headline", "count"),
+    top_headline=("headline", "first"),
+    top_source=("source", "first"),
+).reset_index()
+daily_news["date"] = pd.to_datetime(daily_news["date"])
+
+# Prepare price data for merge
+price_df_reset = price_df.reset_index().rename(columns={"index": "date"})
+price_df_reset["date"] = price_df_reset["date"].dt.normalize()
+
+# Map news dates to nearest trading day (forward-fill for weekends/holidays)
+trading_dates = price_df_reset["date"].sort_values().values
+def map_to_trading_day(news_date):
+    """Map a news date to the nearest trading day (same day or next)."""
+    nd = pd.Timestamp(news_date)
+    # Try same day first
+    if nd in trading_dates:
+        return nd
+    # Find next trading day
+    future = trading_dates[trading_dates >= nd]
+    if len(future) > 0:
+        return pd.Timestamp(future[0])
+    # Fallback: previous trading day
+    past = trading_dates[trading_dates <= nd]
+    if len(past) > 0:
+        return pd.Timestamp(past[-1])
+    return pd.NaT
+
+daily_news["trading_date"] = daily_news["date"].apply(map_to_trading_day)
+daily_news = daily_news.dropna(subset=["trading_date"])
+
+# Re-aggregate in case multiple news days map to same trading day
+daily_news = daily_news.groupby("trading_date").agg(
+    avg_sentiment=("avg_sentiment", "mean"),
+    avg_vader_sentiment=("avg_vader_sentiment", "mean"),
+    num_articles=("num_articles", "sum"),
+    top_headline=("top_headline", "first"),
+    top_source=("top_source", "first"),
+).reset_index().rename(columns={"trading_date": "date"})
+
+# Merge with price data
+merged = pd.merge(daily_news, price_df_reset[["date", "4. close", "log_return", "abs_volatility", "5. volume"]],
+                   on="date", how="inner")
+merged.rename(columns={"4. close": "close_price", "5. volume": "volume"}, inplace=True)
+merged = merged.sort_values("date").reset_index(drop=True)
+
+if len(merged) < 5:
+    st.warning(f"Only {len(merged)} days with both news and price data. Need at least 5 for analysis.")
+    st.stop()
+
+# Sentiment label classification
+merged["sentiment_label"] = pd.cut(
+    merged["avg_sentiment"],
+    bins=[-1.01, -0.15, 0.15, 1.01],
+    labels=["Negative", "Neutral", "Positive"],
+)
+merged["is_high_impact"] = merged["avg_sentiment"].abs() >= sentiment_threshold
+
+high_impact = merged[merged["is_high_impact"]]
 
 # --- Overview Metrics ---
 st.subheader("Dataset Overview")
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Total Trading Days", len(news_df))
-c2.metric("High-Impact News Days", len(high_impact))
-c3.metric("Avg Sentiment Score", f"{news_df['vader_score'].mean():.3f}")
-c4.metric("Avg Daily Volatility", f"{news_df['abs_volatility'].mean():.4f}")
+c1.metric("Trading Days with News", len(merged))
+c2.metric("Total Articles Fetched", len(news_filtered))
+c3.metric("High-Impact Days", len(high_impact))
+c4.metric("Avg Daily Volatility", f"{merged['abs_volatility'].mean():.4f}")
 
 # --- Chart 1: Timeline with News Markers ---
 st.subheader("1. AAPL Price Timeline with News Events")
 
 fig_timeline = go.Figure()
 
-# Price line
 fig_timeline.add_trace(go.Scatter(
-    x=news_df["date"], y=news_df["close_price"],
+    x=merged["date"], y=merged["close_price"],
     mode="lines", name="AAPL Close",
     line=dict(color="#1f77b4", width=2),
 ))
 
-# Positive news markers
-pos_news = news_df[(news_df["vader_score"] >= sentiment_threshold)]
-neg_news = news_df[(news_df["vader_score"] <= -sentiment_threshold)]
+pos_news = merged[merged["avg_sentiment"] >= sentiment_threshold]
+neg_news = merged[merged["avg_sentiment"] <= -sentiment_threshold]
 
 if len(pos_news) > 0:
     fig_timeline.add_trace(go.Scatter(
@@ -244,9 +498,9 @@ if len(pos_news) > 0:
         mode="markers", name="Positive News",
         marker=dict(size=10, color="#2ca02c", symbol="triangle-up",
                     line=dict(width=1, color="white")),
-        text=pos_news["headline"],
-        hovertemplate="<b>%{text}</b><br>Price: $%{y:.2f}<br>Sentiment: %{customdata:.2f}<extra></extra>",
-        customdata=pos_news["vader_score"],
+        text=pos_news["top_headline"],
+        hovertemplate="<b>%{text}</b><br>Price: $%{y:.2f}<br>Sentiment: %{customdata:.3f}<extra></extra>",
+        customdata=pos_news["avg_sentiment"],
     ))
 
 if len(neg_news) > 0:
@@ -255,9 +509,9 @@ if len(neg_news) > 0:
         mode="markers", name="Negative News",
         marker=dict(size=10, color="#d62728", symbol="triangle-down",
                     line=dict(width=1, color="white")),
-        text=neg_news["headline"],
-        hovertemplate="<b>%{text}</b><br>Price: $%{y:.2f}<br>Sentiment: %{customdata:.2f}<extra></extra>",
-        customdata=neg_news["vader_score"],
+        text=neg_news["top_headline"],
+        hovertemplate="<b>%{text}</b><br>Price: $%{y:.2f}<br>Sentiment: %{customdata:.3f}<extra></extra>",
+        customdata=neg_news["avg_sentiment"],
     ))
 
 fig_timeline.update_layout(
@@ -271,8 +525,8 @@ st.plotly_chart(fig_timeline, use_container_width=True)
 # --- Chart 2: Scatter Plot — Sentiment vs Volatility ---
 st.subheader("2. Scatter Plot: News Sentiment vs Daily Volatility")
 
-x_sent = news_df["vader_score"].values
-y_vol = news_df["abs_volatility"].values
+x_sent = merged["avg_sentiment"].values
+y_vol = merged["abs_volatility"].values
 
 corr_sv, p_sv = pearsonr(x_sent, y_vol)
 slope_sv, intercept_sv, r_sv, p_reg_sv, std_err_sv = scipy_stats.linregress(x_sent, y_vol)
@@ -281,17 +535,18 @@ r2_sv = r_sv ** 2
 fig_scatter = go.Figure()
 
 for label, color in [("Negative", "#d62728"), ("Neutral", "#999999"), ("Positive", "#2ca02c")]:
-    subset = news_df[news_df["sentiment_label"] == label]
+    subset = merged[merged["sentiment_label"] == label]
+    if len(subset) == 0:
+        continue
     fig_scatter.add_trace(go.Scatter(
-        x=subset["vader_score"], y=subset["abs_volatility"] * 100,
+        x=subset["avg_sentiment"], y=subset["abs_volatility"] * 100,
         mode="markers", name=label,
         marker=dict(size=8, color=color, opacity=0.7,
                     line=dict(width=1, color="white")),
-        text=subset["headline"],
-        hovertemplate="<b>%{text}</b><br>Sentiment: %{x:.2f}<br>Volatility: %{y:.2f}%<extra></extra>",
+        text=subset["top_headline"],
+        hovertemplate="<b>%{text}</b><br>Sentiment: %{x:.3f}<br>Volatility: %{y:.2f}%<extra></extra>",
     ))
 
-# Regression line
 x_line = np.linspace(x_sent.min(), x_sent.max(), 100)
 y_line = (slope_sv * x_line + intercept_sv) * 100
 fig_scatter.add_trace(go.Scatter(
@@ -301,7 +556,7 @@ fig_scatter.add_trace(go.Scatter(
 ))
 
 fig_scatter.update_layout(
-    xaxis_title="VADER Sentiment Score",
+    xaxis_title="Sentiment Score (VADER + AV combined)",
     yaxis_title="Daily Volatility |log return| (%)",
     template="plotly_white", height=500,
     legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
@@ -311,9 +566,9 @@ st.plotly_chart(fig_scatter, use_container_width=True)
 # --- Chart 3: Event Study — Avg Volatility by Sentiment Category ---
 st.subheader("3. Event Study: Average Volatility by Sentiment Category")
 
-event_stats = news_df.groupby("sentiment_label", observed=True).agg(
+event_stats = merged.groupby("sentiment_label", observed=True).agg(
     avg_volatility=("abs_volatility", "mean"),
-    avg_abs_return=("daily_return", lambda x: x.abs().mean()),
+    avg_abs_return=("log_return", lambda x: x.abs().mean()),
     count=("abs_volatility", "count"),
 ).reset_index()
 
@@ -343,12 +598,13 @@ st.subheader("4. Volatility & Sentiment Over Time")
 
 fig_vol_sent = make_subplots(specs=[[{"secondary_y": True}]])
 
+avg_vol = merged["abs_volatility"].mean()
 fig_vol_sent.add_trace(
     go.Bar(
-        x=news_df["date"], y=news_df["abs_volatility"] * 100,
+        x=merged["date"], y=merged["abs_volatility"] * 100,
         name="Daily Volatility (%)",
-        marker_color=["#d62728" if v > news_df["abs_volatility"].mean() * 100
-                       else "#1f77b4" for v in news_df["abs_volatility"] * 100],
+        marker_color=["#d62728" if v > avg_vol else "#1f77b4"
+                       for v in merged["abs_volatility"]],
         opacity=0.6,
     ),
     secondary_y=False,
@@ -356,7 +612,7 @@ fig_vol_sent.add_trace(
 
 fig_vol_sent.add_trace(
     go.Scatter(
-        x=news_df["date"], y=news_df["vader_score"],
+        x=merged["date"], y=merged["avg_sentiment"],
         name="Sentiment Score", mode="lines+markers",
         line=dict(color="#ff7f0e", width=1.5),
         marker=dict(size=4),
@@ -369,27 +625,28 @@ fig_vol_sent.update_layout(
     legend=dict(yanchor="top", y=1.15, xanchor="center", x=0.5, orientation="h"),
 )
 fig_vol_sent.update_yaxes(title_text="Daily Volatility (%)", secondary_y=False)
-fig_vol_sent.update_yaxes(title_text="VADER Sentiment Score", secondary_y=True)
+fig_vol_sent.update_yaxes(title_text="Sentiment Score", secondary_y=True)
 
 st.plotly_chart(fig_vol_sent, use_container_width=True)
 
 # --- Statistical Results ---
 st.subheader("5. Statistical Results")
 
-# Correlation: sentiment vs volatility
-# Also compute correlation using absolute sentiment (news magnitude)
-news_df["abs_sentiment"] = news_df["vader_score"].abs()
-corr_abs, p_abs = pearsonr(news_df["abs_sentiment"].values, y_vol)
+merged["abs_sentiment"] = merged["avg_sentiment"].abs()
+corr_abs, p_abs = pearsonr(merged["abs_sentiment"].values, y_vol)
+
+# VADER comparison
+corr_vader, p_vader = pearsonr(merged["avg_vader_sentiment"].values, y_vol)
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Pearson r (Sentiment vs Volatility)", f"{corr_sv:.4f}")
-col2.metric("Pearson r (|Sentiment| vs Volatility)", f"{corr_abs:.4f}")
+col1.metric("Pearson r (Sentiment vs Vol.)", f"{corr_sv:.4f}")
+col2.metric("Pearson r (|Sentiment| vs Vol.)", f"{corr_abs:.4f}")
 col3.metric("p-value (|Sentiment|)", f"{p_abs:.4f}")
 
 col4, col5, col6 = st.columns(3)
 col4.metric("R²", f"{r2_sv:.4f}")
-col5.metric("Regression Slope (β₁)", f"{slope_sv:.6f}")
-col6.metric("Regression p-value", f"{p_reg_sv:.4f}")
+col5.metric("VADER-only r", f"{corr_vader:.4f}")
+col6.metric("Regression Slope (β₁)", f"{slope_sv:.6f}")
 
 st.markdown("**Linear Regression Model:**")
 st.latex(
@@ -397,9 +654,8 @@ st.latex(
     rf"\times \text{{Sentiment}} \quad (p = {p_reg_sv:.4f})"
 )
 
-# Absolute sentiment regression
 slope_abs, intercept_abs, r_abs, p_reg_abs, _ = scipy_stats.linregress(
-    news_df["abs_sentiment"].values, y_vol
+    merged["abs_sentiment"].values, y_vol
 )
 st.markdown("**Absolute Sentiment Model (News Magnitude):**")
 st.latex(
@@ -408,27 +664,36 @@ st.latex(
 )
 
 # --- Detailed News Table ---
-with st.expander("View Full News Dataset"):
-    display = news_df[[
-        "date", "headline", "source", "vader_score",
-        "sentiment_label", "close_price", "daily_return", "abs_volatility",
+with st.expander("View All Fetched Articles"):
+    article_cols = ["datetime", "headline", "source", "sentiment_score", "vader_score"]
+    article_names = ["Published", "Headline", "Source", "Sentiment Score", "VADER Score"]
+    if "api_source" in news_filtered.columns:
+        article_cols.append("api_source")
+        article_names.append("API Source")
+    article_display = news_filtered[article_cols].copy()
+    article_display.columns = article_names
+    st.dataframe(article_display.sort_values("Published", ascending=False),
+                 use_container_width=True, hide_index=True)
+
+with st.expander("View Merged Daily Dataset"):
+    daily_display = merged[[
+        "date", "top_headline", "num_articles", "avg_sentiment",
+        "avg_vader_sentiment", "close_price", "log_return", "abs_volatility",
     ]].copy()
-    display["abs_volatility"] = (display["abs_volatility"] * 100).round(4)
-    display["daily_return"] = (display["daily_return"] * 100).round(4)
-    display.columns = [
-        "Date", "Headline", "Source", "Sentiment Score",
-        "Category", "Close ($)", "Return (%)", "Volatility (%)",
+    daily_display["abs_volatility"] = (daily_display["abs_volatility"] * 100).round(4)
+    daily_display["log_return"] = (daily_display["log_return"] * 100).round(4)
+    daily_display.columns = [
+        "Date", "Top Headline", "# Articles", "Avg AV Sentiment",
+        "Avg VADER", "Close ($)", "Return (%)", "Volatility (%)",
     ]
-    st.dataframe(display, use_container_width=True, hide_index=True)
+    st.dataframe(daily_display, use_container_width=True, hide_index=True)
 
 # --- Interpretation ---
 st.subheader("6. Interpretation")
 
 sig_level = 0.05
 is_sig_abs = p_abs < sig_level
-is_sig_dir = p_sv < sig_level
 
-# Event study results
 neg_vol = event_stats[event_stats["sentiment_label"] == "Negative"]["avg_volatility"].values
 pos_vol = event_stats[event_stats["sentiment_label"] == "Positive"]["avg_volatility"].values
 neutral_vol = event_stats[event_stats["sentiment_label"] == "Neutral"]["avg_volatility"].values
@@ -459,7 +724,12 @@ if len(neg_vol) > 0 and len(pos_vol) > 0:
     {"Negative news appears to drive higher volatility than positive news, consistent with the well-documented 'negativity bias' in financial markets." if neg_v > pos_v else "Positive and negative news show similar volatility impact."}
     """)
 
-st.markdown("""
+st.markdown(f"""
+**Data Sources:**
+- **{len(news_filtered)} articles** fetched live from {' + '.join(sources_used)}
+- **{len(merged)} trading days** with matched price data from Alpha Vantage TIME_SERIES_DAILY
+- Sentiment scores: VADER (headline-based) + Alpha Vantage (where available)
+
 **Key Findings:**
 - **Asymmetric impact:** Negative news tends to produce larger volatility spikes than
   positive news of similar magnitude, reflecting the market's loss aversion.
@@ -469,6 +739,6 @@ st.markdown("""
   (e.g., earnings expectations), reducing the observed volatility response.
 - **Confounding factors:** Volatility is also driven by macro events (Fed decisions,
   geopolitical tensions), sector rotation, and options expiration — not just company-specific news.
-- **VADER limitations:** Financial-specific sentiment may not be fully captured by
-  VADER's general-purpose lexicon. FinBERT or domain-specific models could improve accuracy.
+- **AV vs VADER:** Alpha Vantage provides ticker-specific sentiment (more accurate for AAPL),
+  while VADER offers a general-purpose baseline for comparison.
 """)
