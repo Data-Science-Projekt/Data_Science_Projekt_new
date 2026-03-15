@@ -18,11 +18,12 @@ def start_streamlit(script, port):
              "--browser.gatherUsageStats", "false"],
         )
 
-
 start_streamlit("return_analysis.py", 8501)
 start_streamlit("range_analysis.py", 8502)
 start_streamlit("marktphasen.py", 8503)
-
+start_streamlit("marktstruktur.py", 8504)
+start_streamlit("technische_analyse.py", 8505)
+start_streamlit("risikomanagement.py", 8506)
 
 @app.route("/")
 def home():
