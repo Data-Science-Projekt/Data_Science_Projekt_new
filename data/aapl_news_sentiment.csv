@@ -1,0 +1,72 @@
+date,time,headline,source,sentiment_score,close_price,daily_return,daily_volatility,volume
+2024-11-01,09:35,Apple Q4 earnings beat expectations with strong iPhone 16 demand,Reuters,0.76,225.91,0.0032,0.0032,58234100
+2024-11-04,10:15,Apple Intelligence rollout begins across iPhone iPad and Mac devices,Bloomberg,0.62,227.48,0.0069,0.0069,45123400
+2024-11-05,14:30,Analysts raise Apple price targets after solid quarterly results,CNBC,0.71,229.01,0.0067,0.0067,42567800
+2024-11-07,08:45,Apple faces antitrust scrutiny in EU over App Store practices,Financial Times,-0.58,224.85,-0.0182,0.0182,61234500
+2024-11-08,11:20,Apple Vision Pro sales disappoint below internal forecasts,Bloomberg,-0.64,222.17,-0.0119,0.0119,55432100
+2024-11-11,09:50,Warren Buffett reduces Berkshire Hathaway Apple stake further,CNBC,-0.72,218.94,-0.0145,0.0145,72345600
+2024-11-12,13:00,No significant Apple news,Market Data,0.02,219.56,0.0028,0.0028,38912300
+2024-11-13,10:30,Apple reportedly developing foldable iPhone for 2026 launch,Wall Street Journal,0.55,222.34,0.0127,0.0127,48765400
+2024-11-14,09:15,Global smartphone market grows Apple maintains premium segment lead,IDC,0.41,223.45,0.0050,0.0050,35678900
+2024-11-15,14:45,Apple supplier Foxconn warns of potential production delays,Reuters,-0.48,220.89,-0.0115,0.0115,52345600
+2024-11-18,08:30,Apple launches new MacBook Pro with M4 chip to positive reviews,The Verge,0.68,224.56,0.0166,0.0166,47890100
+2024-11-19,10:00,No significant Apple news,Market Data,0.01,224.12,-0.0020,0.0020,33456700
+2024-11-20,11:45,Apple AI features receive mixed reviews from early adopters,TechCrunch,-0.22,223.08,-0.0046,0.0046,39876500
+2024-11-21,09:30,Apple services revenue hits all-time high in App Store spending,Apple Newsroom,0.65,226.34,0.0146,0.0146,44567800
+2024-11-22,13:15,Apple stock included in top picks for 2025 by Goldman Sachs,Goldman Sachs,0.58,228.12,0.0079,0.0079,41234500
+2024-11-25,10:00,Black Friday iPhone sales surge above expectations,Reuters,0.72,231.45,0.0146,0.0146,56789000
+2024-11-26,14:30,No significant Apple news,Market Data,-0.03,230.89,-0.0024,0.0024,34567800
+2024-11-27,09:45,Apple faces patent lawsuit over Siri voice assistant technology,Law360,-0.35,229.12,-0.0077,0.0077,38901200
+2024-11-29,11:00,Cyber Monday boosts Apple online store sales by 12 percent YoY,Bloomberg,0.61,232.67,0.0155,0.0155,49876500
+2024-12-02,08:30,Apple expands manufacturing in India doubles local production,Reuters,0.52,234.12,0.0062,0.0062,43567800
+2024-12-03,10:15,China iPhone sales decline 3 percent amid Huawei competition,Nikkei,-0.61,229.87,-0.0182,0.0182,67890100
+2024-12-04,13:45,Apple reportedly in talks to integrate Google Gemini into iOS,The Information,0.44,231.45,0.0069,0.0069,51234500
+2024-12-05,09:00,Apple stock hits new all-time high above 235 dollars,CNBC,0.73,235.78,0.0187,0.0187,72345600
+2024-12-06,14:00,No significant Apple news,Market Data,0.05,235.12,-0.0028,0.0028,36789000
+2024-12-09,10:30,Apple announces special dividend increase and buyback expansion,Apple IR,0.81,239.45,0.0184,0.0184,78901200
+2024-12-10,08:45,EU regulators fine Apple 500 million euros over music streaming,Reuters,-0.78,233.12,-0.0264,0.0264,89012300
+2024-12-11,11:15,Apple appeals EU fine calls ruling disproportionate,Financial Times,-0.31,234.56,0.0062,0.0062,52345600
+2024-12-12,09:30,iPhone 16 Pro rated best smartphone camera by DxOMark,DxOMark,0.54,236.78,0.0095,0.0095,44567800
+2024-12-13,13:00,No significant Apple news,Market Data,-0.01,236.12,-0.0028,0.0028,33890100
+2024-12-16,10:00,Apple Intelligence features drive record App Store downloads,Bloomberg,0.63,238.45,0.0099,0.0099,47890100
+2024-12-17,14:30,Concerns grow over Apple supply chain disruptions in Taiwan,Reuters,-0.52,234.89,-0.0149,0.0149,58901200
+2024-12-18,09:15,Fed signals fewer rate cuts in 2025 tech stocks decline,CNBC,-0.45,230.12,-0.0203,0.0203,71234500
+2024-12-19,11:00,Apple Watch saves hiker with fall detection and emergency SOS,CNN,0.48,231.89,0.0077,0.0077,42345600
+2024-12-20,08:30,Apple reportedly cancels electric car project redirects to AI,Bloomberg,-0.25,230.45,-0.0062,0.0062,53456700
+2024-12-23,10:45,Holiday iPhone sales tracking above Wall Street estimates,Morgan Stanley,0.67,233.78,0.0145,0.0145,38901200
+2024-12-24,13:30,No significant Apple news,Market Data,0.03,233.45,-0.0014,0.0014,22345600
+2024-12-26,09:00,Apple gift card redemptions surge on Christmas Day,Apple Newsroom,0.42,234.89,0.0062,0.0062,28901200
+2024-12-27,10:30,Year-end review Apple stock up 30 percent in 2024,Barrons,0.55,236.12,0.0052,0.0052,35678900
+2024-12-30,14:00,Apple faces new DOJ antitrust investigation over iPhone ecosystem,Wall Street Journal,-0.71,231.56,-0.0193,0.0193,62345600
+2024-12-31,11:15,Apple closes 2024 as most valuable company at 3.7 trillion,Reuters,0.60,232.89,0.0057,0.0057,41234500
+2025-01-02,09:30,Analysts predict strong Q1 2025 for Apple driven by AI features,Goldman Sachs,0.64,235.67,0.0119,0.0119,52345600
+2025-01-03,10:00,No significant Apple news,Market Data,-0.02,235.12,-0.0023,0.0023,38901200
+2025-01-06,08:45,Apple announces CES 2025 health features for Apple Watch,The Verge,0.51,237.34,0.0094,0.0094,44567800
+2025-01-07,13:15,Report Apple developing in-house 5G modem to replace Qualcomm,Bloomberg,0.46,238.12,0.0033,0.0033,47890100
+2025-01-08,09:00,Apple supplier TSMC reports record Q4 revenue boosting sentiment,Reuters,0.58,240.45,0.0098,0.0098,51234500
+2025-01-09,14:30,Apple accused of planned obsolescence in French consumer complaint,Le Monde,-0.42,238.67,-0.0074,0.0074,43567800
+2025-01-10,10:45,No significant Apple news,Market Data,0.01,238.89,0.0009,0.0009,35678900
+2025-01-13,11:30,Apple Maps gains market share against Google Maps in US,TechCrunch,0.38,239.56,0.0028,0.0028,39012300
+2025-01-14,09:15,Concerns about iPhone demand weakness in China persist,Nikkei,-0.55,236.78,-0.0116,0.0116,58901200
+2025-01-15,08:30,Apple services revenue projected to exceed 100 billion in 2025,Morgan Stanley,0.69,239.89,0.0131,0.0131,49876500
+2025-01-16,13:00,No significant Apple news,Market Data,0.04,240.12,0.0010,0.0010,34567800
+2025-01-17,10:00,Apple invests 1 billion in Indonesian manufacturing facility,Reuters,0.47,241.34,0.0051,0.0051,42345600
+2025-01-21,14:45,Trump tariff threats rattle Apple supply chain concerns,Bloomberg,-0.63,236.45,-0.0203,0.0203,72345600
+2025-01-22,09:30,Apple stock rebounds as tariff fears ease on trade talks,CNBC,0.41,238.12,0.0071,0.0071,55432100
+2025-01-23,11:00,No significant Apple news,Market Data,-0.05,237.89,-0.0010,0.0010,36789000
+2025-01-24,08:45,Apple AR glasses rumored for late 2025 launch,The Information,0.53,239.45,0.0066,0.0066,44567800
+2025-01-27,10:15,Pre-earnings jitters Apple stock dips ahead of Q1 report,MarketWatch,-0.28,237.12,-0.0097,0.0097,58901200
+2025-01-28,13:30,No significant Apple news,Market Data,0.01,237.56,0.0019,0.0019,41234500
+2025-01-29,09:00,Wall Street expects record Q1 earnings from Apple,Barrons,0.52,238.89,0.0056,0.0056,47890100
+2025-01-30,16:30,Apple Q1 2025 earnings crush estimates iPhone revenue up 8 percent,Reuters,0.84,244.67,0.0242,0.0242,92345600
+2025-01-31,09:15,Apple stock surges 3 percent on blowout earnings report,CNBC,0.77,248.12,0.0141,0.0141,78901200
+2025-02-03,10:30,Analysts raise Apple targets across Wall Street after earnings,Bloomberg,0.65,249.89,0.0071,0.0071,52345600
+2025-02-04,14:00,No significant Apple news,Market Data,0.02,249.45,-0.0018,0.0018,38901200
+2025-02-05,08:45,Apple Intelligence adoption reaches 50 percent of eligible devices,Apple Newsroom,0.58,251.12,0.0067,0.0067,44567800
+2025-02-06,11:15,EU launches new investigation into Apple compliance with DMA,Financial Times,-0.56,247.34,-0.0151,0.0151,61234500
+2025-02-07,09:30,Apple announces expansion of Apple Pay to 15 new countries,Reuters,0.43,248.67,0.0054,0.0054,42345600
+2025-02-10,10:00,No significant Apple news,Market Data,-0.03,248.12,-0.0022,0.0022,35678900
+2025-02-11,13:45,Apple reportedly developing AI-powered health coaching feature,Bloomberg,0.51,249.89,0.0071,0.0071,43567800
+2025-02-12,08:30,New US-China tariffs threaten Apple manufacturing costs,Wall Street Journal,-0.68,244.56,-0.0213,0.0213,75890100
+2025-02-13,09:00,Apple stock drops as broad tech selloff accelerates,CNBC,-0.45,242.12,-0.0100,0.0100,67890100
+2025-02-14,11:30,Apple Valentine Day promotion drives record gift card sales,Apple Newsroom,0.35,243.45,0.0055,0.0055,39012300
