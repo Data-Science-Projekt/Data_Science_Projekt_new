@@ -8,7 +8,6 @@ import requests
 AV_API_KEY = "REMOVED_AV_KEY".strip()
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
-st.set_page_config(page_title="VaR & CVaR Analysis", layout="wide")
 
 
 @st.cache_data

@@ -8,7 +8,6 @@ import requests
 AV_API_KEY = "REMOVED_AV_KEY".strip()
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA", "S&P 500": "SPY"}
 
-st.set_page_config(page_title="Market Phases Analysis", layout="wide")
 
 
 # --- FUNCTION: LOAD DATA ---

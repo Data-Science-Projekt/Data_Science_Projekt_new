@@ -11,7 +11,6 @@ SECTORS = {
     "Financial": ["JPM", "GS", "BAC"]
 }
 
-st.set_page_config(page_title="Volume Sector Analysis", layout="wide")
 
 
 # --- DATA FETCHING ---

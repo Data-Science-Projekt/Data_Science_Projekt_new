@@ -13,7 +13,6 @@ AV_API_KEY = "REMOVED_AV_KEY".strip()
 FRED_API_KEY = "REMOVED_FRED_KEY".strip()
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
-st.set_page_config(page_title="Financial Analysis: RQ1", layout="wide")
 
 
 # --- FUNCTION: LOAD DATA (ALPHA VANTAGE - COMPACT ONLY) ---

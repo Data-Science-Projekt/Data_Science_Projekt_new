@@ -41,8 +41,6 @@ def _load_from_disk(key):
     return None
 
 
-st.set_page_config(page_title="Financial Analysis: RQ2 - Daily Trading Ranges", layout="wide")
-
 
 # --- FUNCTION: LOAD DATA (ALPHA VANTAGE - COMPACT ONLY) ---
 _av_last_call = [0.0]  # track last API call time for rate limiting

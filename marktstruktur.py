@@ -9,7 +9,6 @@ AV_API_KEY = "REMOVED_AV_KEY".strip()
 FRED_API_KEY = "REMOVED_FRED_KEY".strip()
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
-st.set_page_config(page_title="Market Reaction Analysis", layout="wide")
 
 
 # --- DATA FETCHING ---

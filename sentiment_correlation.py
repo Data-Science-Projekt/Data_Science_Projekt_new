@@ -41,7 +41,6 @@ def _load_from_disk(key):
     return None
 
 
-st.set_page_config(page_title="RQ8: Sentiment Correlation", layout="wide")
 
 # --- FETCH STOCK DATA ---
 _av_last_call = [0.0]

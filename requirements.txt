@@ -1,8 +1,6 @@
-flask
 streamlit
 pandas
 numpy
 plotly
 requests
 scipy
-vaderSentiment
