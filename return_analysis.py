@@ -9,7 +9,7 @@ from scipy import stats as scipy_stats
 import os
 
 # --- CONFIGURATION ---
-AV_API_KEY = st.secrets["AV_API_KEY"]
+AV_API_KEY = st.secrets.get("AV_API_KEY", "")
 FRED_API_KEY = st.secrets["FRED_API_KEY"]
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
