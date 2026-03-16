@@ -8,9 +8,7 @@ import requests
 AV_API_KEY = st.secrets.get("AV_API_KEY", "")
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
-
-
-@st.cache_data
+@st.cache_data(show_spinner="Lade Risk-Daten...")
 def get_stock_returns(symbol):
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}'
     try:
@@ -18,96 +16,47 @@ def get_stock_returns(symbol):
         if "Time Series (Daily)" in r:
             df = pd.DataFrame.from_dict(r['Time Series (Daily)'], orient='index').astype(float).sort_index()
             return df['4. close'].pct_change().dropna()
+        elif "Note" in r:
+            st.warning(f"API Limit erreicht für {symbol}. Bitte kurz warten.")
+            return None
     except:
         return None
     return None
 
+# --- SIDEBAR ---
+st.sidebar.header("Risk Settings")
+conf_level = st.sidebar.slider("Confidence Level (%)", 90.0, 99.0, 95.0, 0.5) / 100
+st.sidebar.divider()
 
-# --- SIDEBAR (Stil wie gewünscht) ---
-with st.sidebar:
-    st.header("Risk Settings")
-
-    # Der Slider für das Confidence Level
-    conf_level = st.slider("Confidence Level (%)", 90.0, 99.0, 95.0, 0.5) / 100
-
-    st.markdown("---")
-
-    # Auswahlmenü im gewünschten Stil
-    st.write("**Asset Selection:**")
-    show_apple = st.checkbox("Show Apple (AAPL)", value=True)
-    show_nvidia = st.checkbox("Show NVIDIA (NVDA)", value=True)
-
-    selected_assets = []
-    if show_apple: selected_assets.append("Apple")
-    if show_nvidia: selected_assets.append("NVIDIA")
+st.sidebar.write("**Asset Selection:**")
+# Variablen direkt zuweisen
+show_apple = st.sidebar.checkbox("Show Apple (AAPL)", value=True)
+show_nvidia = st.sidebar.checkbox("Show NVIDIA (NVDA)", value=True)
 
 st.title("Value-at-Risk (VaR) & Expected Shortfall")
-st.markdown(f"**Current Analysis:** {conf_level:.1%} Confidence Interval")
+st.write(f"Analyse bei {conf_level:.1%} Confidence Interval")
 
-# Daten laden
-ret_a = get_stock_returns(STOCKS["Apple"]) if show_apple else None
-ret_n = get_stock_returns(STOCKS["NVIDIA"]) if show_nvidia else None
+# Logik-Check: Erst wenn die Variablen feststehen, Daten laden
+if show_apple or show_nvidia:
+    ret_a = get_stock_returns(STOCKS["Apple"]) if show_apple else None
+    ret_n = get_stock_returns(STOCKS["NVIDIA"]) if show_nvidia else None
 
-if ret_a is not None or ret_n is not None:
-    fig = go.Figure()
+    if ret_a is not None or ret_n is not None:
+        fig = go.Figure()
+        
+        if ret_a is not None:
+            v_a = np.percentile(ret_a, (1 - conf_level) * 100)
+            fig.add_trace(go.Histogram(x=ret_a, name="Apple", marker_color='#1f77b4', opacity=0.6))
+            fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4")
 
-    # --- APPLE DATA ---
-    if ret_a is not None:
-        v_a = np.percentile(ret_a, (1 - conf_level) * 100)
-        e_a = ret_a[ret_a <= v_a].mean()
+        if ret_n is not None:
+            v_n = np.percentile(ret_n, (1 - conf_level) * 100)
+            fig.add_trace(go.Histogram(x=ret_n, name="NVIDIA", marker_color='#ff7f0e', opacity=0.6))
+            fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e")
 
-        fig.add_trace(go.Histogram(
-            x=ret_a, name="Apple", marker_color='#1f77b4', opacity=0.6,
-            xbins=dict(size=0.005),
-            hovertemplate="Return: %{x:.2%}<br>Days: %{y}<extra></extra>"
-        ))
-        fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4", annotation_text=f"VaR: {v_a:.2%}")
-
-    # --- NVIDIA DATA ---
-    if ret_n is not None:
-        v_n = np.percentile(ret_n, (1 - conf_level) * 100)
-        e_n = ret_n[ret_n <= v_n].mean()
-
-        fig.add_trace(go.Histogram(
-            x=ret_n, name="NVIDIA", marker_color='#ff7f0e', opacity=0.6,
-            xbins=dict(size=0.005),
-            hovertemplate="Return: %{x:.2%}<br>Days: %{y}<extra></extra>"
-        ))
-        fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", annotation_text=f"VaR: {v_n:.2%}",
-                      annotation_position="top left")
-
-    # Layout
-    fig.update_layout(
-        barmode='overlay',
-        template="plotly_white",
-        xaxis_title="Daily Return (0.01 = 1%)",
-        yaxis_title="Frequency (Days)",
-        hovermode="x",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    fig.update_xaxes(tickformat=".1%")
-    st.plotly_chart(fig, use_container_width=True)
-
-    # --- METRICS ---
-    c1, c2 = st.columns(2)
-
-    if ret_a is not None:
-        with c1:
-            st.subheader("Apple Risk Metrics")
-            st.metric("Value-at-Risk", f"{v_a:.2%}")
-            st.metric("Expected Shortfall", f"{e_a:.2%}")
-
-    if ret_n is not None:
-        with c2:
-            st.subheader("NVIDIA Risk Metrics")
-            st.metric("Value-at-Risk", f"{v_n:.2%}")
-            st.metric("Expected Shortfall", f"{e_n:.2%}")
-
-    # --- INFO BOX ---
-    st.info(f"""
-    **Interpretation:** A VaR of e.g. -3.0% means that with {conf_level:.1%} certainty, the daily loss will not exceed 3.0%. 
-    The CVaR (Expected Shortfall) shows the average loss in those cases where the VaR is actually breached.
-    """)
-
+        fig.update_layout(barmode='overlay', template="plotly_dark")
+        st.plotly_chart(fig, width='stretch')
+    else:
+        st.info("Warte auf API-Daten... Falls dies länger dauert, wurde das Rate-Limit erreicht.")
 else:
-    st.warning("Please select at least one asset in the sidebar to start the analysis.")
+    st.warning("Bitte wählen Sie mindestens eine Aktie in der Sidebar aus.")
