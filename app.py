@@ -1,33 +1,24 @@
 import streamlit as st
 import os
 
-# Konfiguration der Seite - Dies darf NUR hier stehen
-st.set_page_config(page_title="Financial Analysis Dashboard", layout="wide")
+# Seite konfigurieren
+st.set_page_config(page_title="Financial Dashboard", layout="wide")
 
-# API Keys sicher laden
+# API Keys
 AV_API_KEY = st.secrets.get("AV_API_KEY", "")
 FRED_API_KEY = st.secrets.get("FRED_API_KEY", "")
 
 # Sidebar Navigation
-st.sidebar.title("Projekt Navigation")
+st.sidebar.title("Navigation")
 page = st.sidebar.radio(
-    "Gehe zu:",
-    [
-        "Home",
-        "Renditeanalyse",
-        "Marktphasen",
-        "Marktstruktur",
-        "Range Analysis",
-        "Risikomanagement",
-        "Technische Analyse",
-        "Sentiment Correlation"
-    ]
+    "Auswahl:",
+    ["Home", "Renditeanalyse", "Marktphasen", "Marktstruktur", "Range Analysis", "Risikomanagement", "Technische Analyse", "Sentiment Correlation"]
 )
 
-# Routing Logik
+# Routing
 if page == "Home":
-    st.title("Data Science Projekt: Finanzmarktanalyse")
-    st.write("Willkommen! Waehle links eine Analyse aus.")
+    st.title("Data Science Projekt")
+    st.write("Willkommen. Bitte waehle eine Analyse in der Sidebar.")
 
 elif page == "Renditeanalyse":
     import return_analysis
