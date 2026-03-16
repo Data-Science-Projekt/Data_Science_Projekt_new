@@ -14,8 +14,8 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # --- CONFIGURATION ---
 AV_API_KEY = "REMOVED_AV_KEY".strip()
 NEWSAPI_KEY = "REMOVED_NEWSAPI_KEY"  # <-- Hier deinen NewsAPI Key einfügen (https://newsapi.org)
-TECH_STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
-FINANCIAL_STOCKS = {"J.P. Morgan": "JPM"}
+TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
+FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 ALL_STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
 
 # --- FILE-BASED CACHE (survives restarts) ---
