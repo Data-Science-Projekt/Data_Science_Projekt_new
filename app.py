@@ -1,48 +1,23 @@
 import streamlit as st
-import os
 
-# Seite konfigurieren
-st.set_page_config(
-    page_title="Financial Dashboard", 
-    page_icon="📈", 
-    layout="wide"
-)
+st.set_page_config(page_title="StockInsight Dashboard", layout="wide", page_icon="📈")
 
-# API Keys
-AV_API_KEY = st.secrets.get("AV_API_KEY", "")
-FRED_API_KEY = st.secrets.get("FRED_API_KEY", "")
+# Navigation Definition
+pages = [
+    st.Page("pages/home.py", title="Home", default=True),
+    st.Page("return_analysis.py", title="Return Analysis"),
+    st.Page("range_analysis.py", title="Volatility"),
+    st.Page("marktstruktur.py", title="Market Structure"),
+    st.Page("marktphasen.py", title="Market Phases"),
+    st.Page("technische_analyse.py", title="Technical Analysis"),
+    st.Page("risikomanagement.py", title="Risk Management"),
+    st.Page("sentiment_correlation.py", title="Sentiment Correlation"),
+    st.Page("pages/team.py", title="Team"),
+]
 
-# Sidebar Navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.radio(
-    "Auswahl:",
-    ["Home", "Renditeanalyse", "Marktphasen", "Marktstruktur", "Range Analysis", "Risikomanagement", "Technische Analyse", "Sentiment Correlation"]
-)
-
-# Routing
-if page == "Home":
-    st.title("Finanzmarktanalyse Dashboard")
-    st.markdown("---")
-    st.write("Die Anwendung wurde erfolgreich geladen.")
-    st.info("Bitte waehlen Sie eine Analyse in der linken Sidebar aus.")
-
-elif page == "Renditeanalyse":
-    import return_analysis
-
-elif page == "Marktphasen":
-    import marktphasen
-
-elif page == "Marktstruktur":
-    import marktstruktur
-
-elif page == "Range Analysis":
-    import range_analysis
-
-elif page == "Risikomanagement":
-    import risikomanagement
-
-elif page == "Technische Analyse":
-    import technische_analyse
-
-elif page == "Sentiment Correlation":
-    import sentiment_correlation
+# Navigation ausführen
+try:
+    nav = st.navigation(pages)
+    nav.run()
+except Exception as e:
+    st.error(f"Kritischer Fehler in der Navigation: {e}")
