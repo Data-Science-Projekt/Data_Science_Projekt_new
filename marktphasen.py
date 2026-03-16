@@ -141,8 +141,8 @@ with st.sidebar:
 df_raw = get_stock_data(STOCKS[selected_stock])
 
 if df_raw is not None:
-    df_phases = identify_phases(df_raw, bear_threshold / 100, bull_threshold / 100, window)
-    fig, df_phases = build_chart(df_phases, selected_stock)
+    df_phases = identify_phases(df_raw.copy(), bear_threshold / 100, bull_threshold / 100, window)
+fig, df_phases = build_chart(df_phases.copy(), selected_stock)
 
     st.plotly_chart(fig, use_container_width=True)
 
