@@ -1,85 +1,51 @@
-import subprocess
-import sys
+import streamlit as st
+import os
 
-from flask import Flask, render_template
+# Konfiguration der Seite
+st.set_page_config(page_title="Financial Analysis Dashboard", layout="wide")
 
-app = Flask(__name__)
+# API Keys sicher laden
+AV_API_KEY = st.secrets.get("AV_API_KEY", os.getenv("AV_API_KEY", ""))
+FRED_API_KEY = st.secrets.get("FRED_API_KEY", os.getenv("FRED_API_KEY", ""))
 
-# Start Streamlit apps as background processes
-streamlit_processes = {}
+# Sidebar Navigation
+st.sidebar.title("Projekt Navigation")
+page = st.sidebar.radio(
+    "Gehe zu:",
+    [
+        "Home",
+        "Renditeanalyse",
+        "Marktphasen",
+        "Marktstruktur",
+        "Range Analysis",
+        "Risikomanagement",
+        "Technische Analyse",
+        "Sentiment Correlation"
+    ]
+)
 
+# Routing Logik
+if page == "Home":
+    st.title("Data Science Projekt: Finanzmarktanalyse")
+    st.write("Willkommen! Waehle links eine Analyse aus.")
 
-def start_streamlit(script, port):
-    if script not in streamlit_processes or streamlit_processes[script].poll() is not None:
-        streamlit_processes[script] = subprocess.Popen(
-            [sys.executable, "-m", "streamlit", "run", script,
-             "--server.port", str(port),
-             "--server.headless", "true",
-             "--browser.gatherUsageStats", "false"],
-        )
+elif page == "Renditeanalyse":
+    import return_analysis
 
-start_streamlit("return_analysis.py", 8501)
-start_streamlit("range_analysis.py", 8502)
-start_streamlit("marktphasen.py", 8503)
-start_streamlit("marktstruktur.py", 8504)
-start_streamlit("technische_analyse.py", 8505)
-start_streamlit("risikomanagement.py", 8506)
-start_streamlit("sentiment_correlation.py", 8507)
+elif page == "Marktphasen":
+    import marktphasen
 
-@app.route("/")
-def home():
-    return render_template("home.html")
+elif page == "Marktstruktur":
+    import marktstruktur
 
+elif page == "Range Analysis":
+    import range_analysis
 
-@app.route("/daten-methodik")
-def daten_methodik():
-    return render_template("daten_methodik.html")
+elif page == "Risikomanagement":
+    import risikomanagement
 
+elif page == "Technische Analyse":
+    import technische_analyse
 
-@app.route("/renditeanalyse")
-def renditeanalyse():
-    return render_template("renditeanalyse.html")
-
-
-@app.route("/volatilitaet")
-def volatilitaet():
-    return render_template("volatilitaet.html")
-
-
-@app.route("/marktstruktur")
-def marktstruktur():
-    return render_template("marktstruktur.html")
-
-
-@app.route("/marktphasen")
-def marktphasen():
-    return render_template("marktphasen.html")
-
-
-@app.route("/technische-analyse")
-def technische_analyse():
-    return render_template("technische_analyse.html")
-
-
-@app.route("/risikomanagement")
-def risikomanagement():
-    return render_template("risikomanagement.html")
-
-
-@app.route("/sentiment-correlation")
-def sentiment_correlation():
-    return render_template("sentiment_correlation.html")
-
-
-@app.route("/fazit")
-def fazit():
-    return render_template("fazit.html")
-
-
-@app.route("/team")
-def team():
-    return render_template("team.html")
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5002)
+elif page == "Sentiment Correlation":
+    import sentiment_correlation
