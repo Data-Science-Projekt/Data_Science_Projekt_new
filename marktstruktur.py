@@ -6,7 +6,7 @@ import requests
 
 # --- CONFIGURATION ---
 AV_API_KEY = st.secrets.get("AV_API_KEY", "")
-FRED_API_KEY = st.secrets["FRED_API_KEY"]
+FRED_API_KEY = st.secrets.get("FRED_API_KEY", "")
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
 
