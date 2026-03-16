@@ -7,7 +7,7 @@ import os
 import time
 
 # --- CONFIGURATION ---
-AV_API_KEY = st.secrets["AV_API_KEY"]
+AV_API_KEY = st.secrets.get("AV_API_KEY", "")
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 ALL_STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
