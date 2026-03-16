@@ -11,7 +11,7 @@ STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA", "S&P 500": "SPY"}
 st.set_page_config(page_title="Market Phases Analysis", layout="wide")
 
 
-# --- FUNCTION: LOAD DATA (FULL = 20 years) ---
+# --- FUNCTION: LOAD DATA ---
 @st.cache_data(show_spinner="Fetching stock data...")
 def get_stock_data(symbol):
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}'
@@ -38,22 +38,17 @@ def get_stock_data(symbol):
 
 
 # --- FUNCTION: IDENTIFY MARKET PHASES ---
-def identify_phases(df, bear_threshold=-0.20, bull_threshold=0.20, window=60):
-    """
-    Identifies Bull and Bear market phases based on rolling peak/trough method.
-    - Bear: price drops >= 20% from rolling peak
-    - Bull: price rises >= 20% from rolling trough
-    """
-    df = df.copy()
+# NOTE: Takes raw values (not a DataFrame) so cache keys change with window/thresholds
+@st.cache_data
+def identify_phases(close_values, index_values, bear_threshold=-0.20, bull_threshold=0.20, window=60):
+    df = pd.DataFrame({'close': close_values}, index=pd.to_datetime(index_values))
     df['rolling_max'] = df['close'].rolling(window=window, min_periods=1).max()
     df['rolling_min'] = df['close'].rolling(window=window, min_periods=1).min()
     df['drawdown'] = (df['close'] - df['rolling_max']) / df['rolling_max']
     df['rally'] = (df['close'] - df['rolling_min']) / df['rolling_min']
-
     df['phase'] = 'Neutral'
     df.loc[df['drawdown'] <= bear_threshold, 'phase'] = 'Bear'
     df.loc[df['rally'] >= bull_threshold, 'phase'] = 'Bull'
-
     return df
 
 
@@ -61,23 +56,20 @@ def identify_phases(df, bear_threshold=-0.20, bull_threshold=0.20, window=60):
 def build_chart(df, stock_name):
     fig = go.Figure()
 
-    # Price line
     fig.add_trace(go.Scatter(
         x=df.index, y=df['close'],
         mode='lines',
         name=f'{stock_name} Price',
-        line=dict(color='white', width=1.5),
-        zorder=2
+        line=dict(color='white', width=1.5)
     ))
 
-    # Highlight Bull phases
     bull_mask = df['phase'] == 'Bull'
     bear_mask = df['phase'] == 'Bear'
 
     def add_phase_shading(fig, df, mask, color, name):
         in_phase = False
         start = None
-        for i, (idx, val) in enumerate(mask.items()):
+        for idx, val in mask.items():
             if val and not in_phase:
                 start = idx
                 in_phase = True
@@ -102,9 +94,8 @@ def build_chart(df, stock_name):
     add_phase_shading(fig, df, bull_mask, "green", "Bull")
     add_phase_shading(fig, df, bear_mask, "red", "Bear")
 
-    # Moving averages
+    df = df.copy()
     df['MA50'] = df['close'].rolling(50).mean()
-
     fig.add_trace(go.Scatter(
         x=df.index, y=df['MA50'],
         mode='lines', name='50-Day MA',
@@ -141,8 +132,14 @@ with st.sidebar:
 df_raw = get_stock_data(STOCKS[selected_stock])
 
 if df_raw is not None:
-    df_phases = identify_phases(df_raw.copy(), bear_threshold / 100, bull_threshold / 100, window)
-    fig, df_phases = build_chart(df_phases.copy(), selected_stock)
+    df_phases = identify_phases(
+        df_raw['close'].tolist(),
+        df_raw.index.tolist(),
+        bear_threshold / 100,
+        bull_threshold / 100,
+        window
+    )
+    fig, df_phases = build_chart(df_phases, selected_stock)
 
     st.plotly_chart(fig, use_container_width=True)
 
@@ -200,7 +197,7 @@ if df_raw is not None:
     st.write(
         f"Based on the rolling window method, **{selected_stock}** spent **{bull_pct:.1f}%** of trading days in a bull market "
         f"and **{bear_pct:.1f}%** in a bear market. "
-        f"The 50-day and 200-day moving averages serve as additional confirmation signals — "
-        f"a **Golden Cross** (50MA crossing above 200MA) typically marks the start of a bull phase, "
+        f"The 50-day moving average serves as an additional confirmation signal — "
+        f"a **Golden Cross** typically marks the start of a bull phase, "
         f"while a **Death Cross** signals a bear phase."
     )
