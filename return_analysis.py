@@ -9,8 +9,8 @@ from scipy import stats as scipy_stats
 import os
 
 # --- CONFIGURATION ---
-AV_API_KEY = "REMOVED_AV_KEY".strip()
-FRED_API_KEY = "REMOVED_FRED_KEY".strip()
+AV_API_KEY = st.secrets["AV_API_KEY"]
+FRED_API_KEY = st.secrets["FRED_API_KEY"]
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
 

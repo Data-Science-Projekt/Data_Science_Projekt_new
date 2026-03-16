@@ -5,7 +5,8 @@ import requests
 import time
 from .utils import get_stock_data_compact
 
-AV_API_KEY = "REMOVED_AV_KEY"
+import os
+AV_API_KEY = os.environ.get("AV_API_KEY", "")
 
 # Stocks for range analysis
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}

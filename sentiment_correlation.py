@@ -10,8 +10,8 @@ from scipy.stats import pearsonr, spearmanr
 from scipy import stats as scipy_stats
 
 # --- CONFIGURATION ---
-AV_API_KEY = "REMOVED_AV_KEY".strip()
-FRED_API_KEY = "REMOVED_FRED_KEY"
+AV_API_KEY = st.secrets["AV_API_KEY"]
+FRED_API_KEY = st.secrets["FRED_API_KEY"]
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 

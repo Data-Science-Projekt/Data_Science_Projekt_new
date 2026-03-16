@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import requests
 
 # --- CONFIGURATION ---
-AV_API_KEY = "REMOVED_AV_KEY".strip()
+AV_API_KEY = st.secrets["AV_API_KEY"]
 SECTORS = {
     "Tech": ["AAPL", "MSFT", "NVDA"],
     "Financial": ["JPM", "GS", "BAC"]

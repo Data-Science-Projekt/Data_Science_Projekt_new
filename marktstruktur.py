@@ -5,8 +5,8 @@ import plotly.graph_objects as go
 import requests
 
 # --- CONFIGURATION ---
-AV_API_KEY = "REMOVED_AV_KEY".strip()
-FRED_API_KEY = "REMOVED_FRED_KEY".strip()
+AV_API_KEY = st.secrets["AV_API_KEY"]
+FRED_API_KEY = st.secrets["FRED_API_KEY"]
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
 

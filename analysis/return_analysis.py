@@ -5,8 +5,9 @@ import requests
 from scipy.stats import norm, kurtosis, skew
 from .utils import get_stock_data_compact
 
-AV_API_KEY = "REMOVED_AV_KEY"
-FRED_API_KEY = "REMOVED_FRED_KEY"
+import os
+AV_API_KEY = os.environ.get("AV_API_KEY", "")
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
 
