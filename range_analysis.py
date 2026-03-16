@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 import requests
 import os
 import json
+import time
 from scipy.stats import norm, kurtosis, skew, pearsonr
 from scipy import stats as scipy_stats
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -50,8 +51,16 @@ st.set_page_config(page_title="Financial Analysis: RQ2 - Daily Trading Ranges", 
 
 
 # --- FUNCTION: LOAD DATA (ALPHA VANTAGE - COMPACT ONLY) ---
+_av_last_call = [0.0]  # track last API call time for rate limiting
+
 @st.cache_data(show_spinner="Fetching latest 100 days...")
 def get_stock_data_compact(symbol):
+    # Rate limit: wait if last API call was less than 15s ago
+    elapsed = time.time() - _av_last_call[0]
+    if elapsed < 15:
+        time.sleep(15 - elapsed)
+    _av_last_call[0] = time.time()
+
     # 'compact' returns the latest 100 data points (Free Tier limit)
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}'
     try:
@@ -227,36 +236,40 @@ def fetch_newsapi_articles():
     """Fetch Apple-related news from NewsAPI.org (free tier: last 30 days)."""
     from datetime import datetime, timedelta
     date_from = (datetime.now() - timedelta(days=28)).strftime("%Y-%m-%d")
-    url = (
-        f"https://newsapi.org/v2/everything?"
-        f"q=Apple+OR+AAPL&from={date_from}&language=en&sortBy=publishedAt"
-        f"&pageSize=100&apiKey={NEWSAPI_KEY}"
-    )
-    try:
-        r = requests.get(url, timeout=30)
-        data = r.json()
-        if data.get("status") != "ok":
-            return None, data.get("message", "NewsAPI error.")
-        records = []
-        for item in data.get("articles", []):
-            try:
-                dt = pd.to_datetime(item["publishedAt"])
-            except Exception:
+    all_records = []
+    # Fetch with both sortBy modes to maximize date coverage
+    # (free tier with publishedAt only returns last 1-2 days)
+    for sort_mode in ["relevancy", "publishedAt"]:
+        url = (
+            f"https://newsapi.org/v2/everything?"
+            f"q=Apple+AAPL+stock&from={date_from}&language=en&sortBy={sort_mode}"
+            f"&pageSize=100&apiKey={NEWSAPI_KEY}"
+        )
+        try:
+            r = requests.get(url, timeout=30)
+            data = r.json()
+            if data.get("status") != "ok":
                 continue
-            records.append({
-                "datetime": dt,
-                "date": dt.date(),
-                "time": dt.strftime("%H:%M"),
-                "headline": item.get("title", ""),
-                "summary": item.get("description", ""),
-                "source": item.get("source", {}).get("name", ""),
-                "api_source": "NewsAPI",
-            })
-        if not records:
-            return None, "No articles found from NewsAPI."
-        return pd.DataFrame(records), None
-    except Exception as e:
-        return None, str(e)
+            for item in data.get("articles", []):
+                try:
+                    dt = pd.to_datetime(item["publishedAt"])
+                except Exception:
+                    continue
+                all_records.append({
+                    "datetime": dt,
+                    "date": dt.date(),
+                    "time": dt.strftime("%H:%M"),
+                    "headline": item.get("title", ""),
+                    "summary": item.get("description", ""),
+                    "source": item.get("source", {}).get("name", ""),
+                    "api_source": "NewsAPI",
+                })
+        except Exception:
+            continue
+    if not all_records:
+        return None, "No articles found from NewsAPI."
+    df = pd.DataFrame(all_records).drop_duplicates(subset=["headline"], keep="first")
+    return df, None
 
 
 # --- Fetch News from Alpha Vantage NEWS_SENTIMENT API ---
@@ -421,21 +434,21 @@ price_df_reset = price_df.reset_index().rename(columns={"index": "date"})
 price_df_reset["date"] = price_df_reset["date"].dt.normalize()
 
 # Map news dates to nearest trading day (forward-fill for weekends/holidays)
-trading_dates = price_df_reset["date"].sort_values().values
+trading_dates = pd.to_datetime(price_df_reset["date"]).sort_values().reset_index(drop=True)
 def map_to_trading_day(news_date):
     """Map a news date to the nearest trading day (same day or next)."""
-    nd = pd.Timestamp(news_date)
+    nd = pd.Timestamp(news_date).normalize()
     # Try same day first
-    if nd in trading_dates:
+    if nd in trading_dates.values:
         return nd
     # Find next trading day
     future = trading_dates[trading_dates >= nd]
     if len(future) > 0:
-        return pd.Timestamp(future[0])
+        return future.iloc[0]
     # Fallback: previous trading day
     past = trading_dates[trading_dates <= nd]
     if len(past) > 0:
-        return pd.Timestamp(past[-1])
+        return past.iloc[-1]
     return pd.NaT
 
 daily_news["trading_date"] = daily_news["date"].apply(map_to_trading_day)
@@ -449,6 +462,10 @@ daily_news = daily_news.groupby("trading_date").agg(
     top_headline=("top_headline", "first"),
     top_source=("top_source", "first"),
 ).reset_index().rename(columns={"trading_date": "date"})
+
+# Normalize dates to ensure matching types (both tz-naive, midnight-aligned)
+daily_news["date"] = pd.to_datetime(daily_news["date"]).dt.normalize()
+price_df_reset["date"] = pd.to_datetime(price_df_reset["date"]).dt.normalize()
 
 # Merge with price data
 merged = pd.merge(daily_news, price_df_reset[["date", "4. close", "log_return", "abs_volatility", "5. volume"]],
