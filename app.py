@@ -1,12 +1,12 @@
 import streamlit as st
 import os
 
-# Konfiguration der Seite
+# Konfiguration der Seite - Dies darf NUR hier stehen
 st.set_page_config(page_title="Financial Analysis Dashboard", layout="wide")
 
 # API Keys sicher laden
-AV_API_KEY = st.secrets.get("AV_API_KEY", os.getenv("AV_API_KEY", ""))
-FRED_API_KEY = st.secrets.get("FRED_API_KEY", os.getenv("FRED_API_KEY", ""))
+AV_API_KEY = st.secrets.get("AV_API_KEY", "")
+FRED_API_KEY = st.secrets.get("FRED_API_KEY", "")
 
 # Sidebar Navigation
 st.sidebar.title("Projekt Navigation")
