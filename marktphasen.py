@@ -18,11 +18,9 @@ def get_stock_data(symbol):
     try:
         r = requests.get(url)
         data = r.json()
-
         if "Note" in data:
             st.error("API Rate Limit reached. Please wait 60 seconds.")
             return None
-
         if "Time Series (Daily)" in data:
             df = pd.DataFrame.from_dict(data['Time Series (Daily)'], orient='index')
             df.index = pd.to_datetime(df.index)
@@ -38,10 +36,10 @@ def get_stock_data(symbol):
 
 
 # --- FUNCTION: IDENTIFY MARKET PHASES ---
-# NOTE: Takes raw values (not a DataFrame) so cache keys change with window/thresholds
 @st.cache_data
-def identify_phases(close_values, index_values, bear_threshold=-0.20, bull_threshold=0.20, window=60):
+def identify_phases(close_values, index_values, bear_threshold=-0.20, bull_threshold=0.20):
     df = pd.DataFrame({'close': close_values}, index=pd.to_datetime(index_values))
+    window = 20  # fixed window based on 100 days of data
     df['rolling_max'] = df['close'].rolling(window=window, min_periods=1).max()
     df['rolling_min'] = df['close'].rolling(window=window, min_periods=1).min()
     df['drawdown'] = (df['close'] - df['rolling_max']) / df['rolling_max']
@@ -78,7 +76,7 @@ def build_chart(df, stock_name):
                     x0=start, x1=idx,
                     fillcolor=color, opacity=0.25,
                     layer="below", line_width=0,
-                    annotation_text=name if (df.index.get_loc(idx) - df.index.get_loc(start)) > 30 else "",
+                    annotation_text=name if (df.index.get_loc(idx) - df.index.get_loc(start)) > 5 else "",
                     annotation_position="top left",
                     annotation_font_size=10,
                     annotation_font_color=color
@@ -124,7 +122,6 @@ with st.sidebar:
     selected_stock = st.selectbox("Select stock:", list(STOCKS.keys()))
     bear_threshold = st.slider("Bear Market Threshold (%)", min_value=-40, max_value=-5, value=-20, step=5)
     bull_threshold = st.slider("Bull Market Threshold (%)", min_value=5, max_value=50, value=20, step=5)
-    window = st.slider("Rolling Window (days)", min_value=20, max_value=120, value=60, step=10)
     st.divider()
     st.info("Bear: price falls ≥ threshold from rolling peak\nBull: price rises ≥ threshold from rolling trough")
 
@@ -136,17 +133,21 @@ if df_raw is not None:
         df_raw['close'].tolist(),
         df_raw.index.tolist(),
         bear_threshold / 100,
-        bull_threshold / 100,
-        window
+        bull_threshold / 100
     )
-    fig, df_phases = build_chart(df_phases, selected_stock)
 
+    # --- DAYS SLIDER ---
+    total_days = len(df_phases)
+    days_to_show = st.slider("Show last N days:", min_value=10, max_value=total_days, value=total_days, step=5)
+    df_view = df_phases.tail(days_to_show)
+
+    fig, df_view = build_chart(df_view, selected_stock)
     st.plotly_chart(fig, use_container_width=True)
 
     # Phase statistics
     st.subheader("Phase Statistics")
-    phase_counts = df_phases['phase'].value_counts()
-    total = len(df_phases)
+    phase_counts = df_view['phase'].value_counts()
+    total = len(df_view)
 
     c1, c2, c3 = st.columns(3)
     c1.metric("🟢 Bull Market Days", phase_counts.get('Bull', 0),
@@ -159,7 +160,7 @@ if df_raw is not None:
     # Characteristic features per phase
     st.subheader("Characteristic Features per Phase")
     for phase, color in [("Bull", "🟢"), ("Bear", "🔴"), ("Neutral", "⚪")]:
-        subset = df_phases[df_phases['phase'] == phase]
+        subset = df_view[df_view['phase'] == phase]
         if len(subset) > 1:
             returns = subset['close'].pct_change().dropna()
             avg_return = returns.mean() * 100
@@ -171,7 +172,7 @@ if df_raw is not None:
 
     # Transition Probabilities
     st.subheader("Transition Probabilities")
-    phases = df_phases['phase'].values
+    phases = df_view['phase'].values
     transitions = {'Bull': {'Bull': 0, 'Bear': 0, 'Neutral': 0},
                    'Bear': {'Bull': 0, 'Bear': 0, 'Neutral': 0},
                    'Neutral': {'Bull': 0, 'Bear': 0, 'Neutral': 0}}
