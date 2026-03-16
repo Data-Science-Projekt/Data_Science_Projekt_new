@@ -24,6 +24,7 @@ start_streamlit("marktphasen.py", 8503)
 start_streamlit("marktstruktur.py", 8504)
 start_streamlit("technische_analyse.py", 8505)
 start_streamlit("risikomanagement.py", 8506)
+start_streamlit("sentiment_correlation.py", 8507)
 
 @app.route("/")
 def home():
@@ -63,6 +64,11 @@ def technische_analyse():
 @app.route("/risikomanagement")
 def risikomanagement():
     return render_template("risikomanagement.html")
+
+
+@app.route("/sentiment-correlation")
+def sentiment_correlation():
+    return render_template("sentiment_correlation.html")
 
 
 @app.route("/fazit")
