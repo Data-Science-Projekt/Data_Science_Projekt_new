@@ -3,12 +3,14 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import requests
+import os
 
 # --- CONFIGURATION ---
-AV_API_KEY = st.secrets["AV_API_KEY"]
+# Nutze .get() um Abstuerze bei fehlenden Keys zu verhindern
+AV_API_KEY = st.secrets.get("AV_API_KEY", "")
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA", "S&P 500": "SPY"}
 
-
+# Hinweis: st.set_page_config wurde entfernt, da es zentral in app.py steht.
 
 # --- FUNCTION: LOAD DATA ---
 @st.cache_data(show_spinner="Fetching stock data...")
@@ -33,12 +35,11 @@ def get_stock_data(symbol):
         st.error(f"Connection Error: {e}")
         return None
 
-
 # --- FUNCTION: IDENTIFY MARKET PHASES ---
 @st.cache_data
 def identify_phases(close_values, index_values, bear_threshold=-0.20, bull_threshold=0.20):
     df = pd.DataFrame({'close': close_values}, index=pd.to_datetime(index_values))
-    window = 20  # fixed window based on 100 days of data
+    window = 20
     df['rolling_max'] = df['close'].rolling(window=window, min_periods=1).max()
     df['rolling_min'] = df['close'].rolling(window=window, min_periods=1).min()
     df['drawdown'] = (df['close'] - df['rolling_max']) / df['rolling_max']
@@ -47,7 +48,6 @@ def identify_phases(close_values, index_values, bear_threshold=-0.20, bull_thres
     df.loc[df['drawdown'] <= bear_threshold, 'phase'] = 'Bear'
     df.loc[df['rally'] >= bull_threshold, 'phase'] = 'Bull'
     return df
-
 
 # --- FUNCTION: BUILD CHART ---
 def build_chart(df, stock_name):
@@ -100,7 +100,7 @@ def build_chart(df, stock_name):
     ))
 
     fig.update_layout(
-        title=f"Market Phases: {stock_name}  🟢 Bull  🔴 Bear",
+        title=f"Market Phases: {stock_name} (Green: Bull, Red: Bear)",
         xaxis_title="Date",
         yaxis_title="Price (USD)",
         template="plotly_dark",
@@ -111,10 +111,9 @@ def build_chart(df, stock_name):
 
     return fig, df
 
-
 # --- UI ---
 st.title("Market Phase Analysis")
-st.markdown("**Research Question:** Can market phases (bull and bear markets) be systematically identified and what are their characteristic features?")
+st.markdown("Research Question: Can market phases (bull and bear markets) be systematically identified and what are their characteristic features?")
 
 with st.sidebar:
     st.header("Settings")
@@ -122,7 +121,7 @@ with st.sidebar:
     bear_threshold = st.slider("Bear Market Threshold (%)", min_value=-40, max_value=-5, value=-20, step=5)
     bull_threshold = st.slider("Bull Market Threshold (%)", min_value=5, max_value=50, value=20, step=5)
     st.divider()
-    st.info("Bear: price falls ≥ threshold from rolling peak\nBull: price rises ≥ threshold from rolling trough")
+    st.info("Bear: price falls >= threshold from rolling peak\nBull: price rises >= threshold from rolling trough")
 
 # Load & process
 df_raw = get_stock_data(STOCKS[selected_stock])
@@ -135,13 +134,13 @@ if df_raw is not None:
         bull_threshold / 100
     )
 
-    # --- DAYS SLIDER ---
     total_days = len(df_phases)
     days_to_show = st.slider("Show last N days:", min_value=10, max_value=total_days, value=total_days, step=5)
     df_view = df_phases.tail(days_to_show)
 
     fig, df_view = build_chart(df_view, selected_stock)
-    st.plotly_chart(fig, use_container_width=True)
+    # Nutzt width='stretch' statt use_container_width
+    st.plotly_chart(fig, width='stretch')
 
     # Phase statistics
     st.subheader("Phase Statistics")
@@ -149,25 +148,12 @@ if df_raw is not None:
     total = len(df_view)
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("🟢 Bull Market Days", phase_counts.get('Bull', 0),
+    c1.metric("Bull Market Days", phase_counts.get('Bull', 0),
               f"{phase_counts.get('Bull', 0) / total * 100:.1f}% of time")
-    c2.metric("🔴 Bear Market Days", phase_counts.get('Bear', 0),
+    c2.metric("Bear Market Days", phase_counts.get('Bear', 0),
               f"{phase_counts.get('Bear', 0) / total * 100:.1f}% of time")
-    c3.metric("⚪ Neutral Days", phase_counts.get('Neutral', 0),
+    c3.metric("Neutral Days", phase_counts.get('Neutral', 0),
               f"{phase_counts.get('Neutral', 0) / total * 100:.1f}% of time")
-
-    # Characteristic features per phase
-    st.subheader("Characteristic Features per Phase")
-    for phase, color in [("Bull", "🟢"), ("Bear", "🔴"), ("Neutral", "⚪")]:
-        subset = df_view[df_view['phase'] == phase]
-        if len(subset) > 1:
-            returns = subset['close'].pct_change().dropna()
-            avg_return = returns.mean() * 100
-            volatility = returns.std() * 100
-            with st.expander(f"{color} {phase} Market — {len(subset)} days"):
-                col1, col2 = st.columns(2)
-                col1.metric("Avg. Daily Return", f"{avg_return:.3f}%")
-                col2.metric("Daily Volatility", f"{volatility:.3f}%")
 
     # Transition Probabilities
     st.subheader("Transition Probabilities")
@@ -189,15 +175,10 @@ if df_raw is not None:
         rows.append(row)
 
     trans_df = pd.DataFrame(rows).set_index("From / To")
-    st.dataframe(trans_df, use_container_width=True)
+    st.dataframe(trans_df, width='stretch')
 
     st.subheader("Analysis Summary")
-    bull_pct = phase_counts.get('Bull', 0) / total * 100
-    bear_pct = phase_counts.get('Bear', 0) / total * 100
     st.write(
-        f"Based on the rolling window method, **{selected_stock}** spent **{bull_pct:.1f}%** of trading days in a bull market "
-        f"and **{bear_pct:.1f}%** in a bear market. "
-        f"The 50-day moving average serves as an additional confirmation signal — "
-        f"a **Golden Cross** typically marks the start of a bull phase, "
-        f"while a **Death Cross** signals a bear phase."
+        f"Based on the rolling window method, {selected_stock} spent {phase_counts.get('Bull', 0) / total * 100:.1f}% "
+        f"of trading days in a bull market and {phase_counts.get('Bear', 0) / total * 100:.1f}% in a bear market."
     )
