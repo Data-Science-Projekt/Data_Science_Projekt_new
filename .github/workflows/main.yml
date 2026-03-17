@@ -2,14 +2,14 @@ name: Financial Data Update Bot
 
 on:
   schedule:
-    - [cite_start]cron: '0 7 * * *' # Täglich um 07:00 Uhr UTC [cite: 13]
-  [cite_start]workflow_dispatch: # Ermöglicht den manuellen Start [cite: 14]
+    - cron: '0 7 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      [cite_start]contents: write # Erlaubt dem Bot, die CSVs zurück ins Repo zu pushen [cite: 14]
+      contents: write
       
     steps:
       - uses: actions/checkout@v3
@@ -17,16 +17,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          [cite_start]python-version: '3.10' [cite: 14]
+          python-version: '3.10'
           
       - name: Install dependencies
-        [cite_start]run: pip install pandas requests [cite: 14]
+        run: pip install pandas requests
         
       - name: Run Update Script
         env:
-          [cite_start]AV_API_KEY: ${{ secrets.AV_API_KEY }} # Holt die Keys aus den Secrets [cite: 19]
+          AV_API_KEY: ${{ secrets.AV_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        [cite_start]run: python data_update.py # Führt euer Backend-Skript aus [cite: 14]
+        run: python data_update.py
         
       - name: Commit and Push changes
         run: |
@@ -34,4 +34,4 @@ jobs:
           git config --local user.name "GitHub Action Bot"
           git add data/*.csv
           git commit -m "Auto-update financial data [skip ci]" || exit 0
-          git push # Schreibt die Ergebnisse in das GitHub Repository [cite: 14]
+          git push
