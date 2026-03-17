@@ -4,24 +4,31 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 
-# --- KONFIGURATION ---
-# Keine API-Keys mehr erforderlich, da wir lokal lesen.
-STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA", "Microsoft": "MSFT", "J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
+# --- CONFIGURATION ---
+# No API keys required as we are reading data locally.
+STOCKS = {
+    "Apple": "AAPL", 
+    "NVIDIA": "NVDA", 
+    "Microsoft": "MSFT", 
+    "J.P. Morgan": "JPM", 
+    "Goldman Sachs": "GS", 
+    "Bank of America": "BAC"
+}
 
-@st.cache_data(show_spinner="Lade lokale Daten...")
+@st.cache_data(show_spinner="Loading local data...")
 def get_stock_data(symbol):
-    """Liest die vom Bot erstellte CSV-Datei aus dem data-Ordner."""
+    """Reads the CSV file created by the bot from the data folder."""
     file_path = f"data/stock_{symbol}.csv"
     
     if not os.path.exists(file_path):
         return None
         
     try:
-        # Einlesen der CSV (Index ist das Datum)
+        # Read CSV (Index is the date)
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-        # Sortieren, damit das älteste Datum oben steht (wichtig für rolling windows)
+        # Sort so the oldest date is at the top (crucial for rolling windows)
         df = df.sort_index()
-        # Umbenennen der Alpha Vantage Spalte '4. close' zu 'close'
+        # Rename Alpha Vantage column '4. close' to 'close'
         if '4. close' in df.columns:
             df.rename(columns={"4. close": "close"}, inplace=True)
         return df[["close"]]
@@ -29,13 +36,13 @@ def get_stock_data(symbol):
         return None
 
 def identify_phases(df_input):
-    """Berechnet Marktphasen basierend auf 20-Tage Rolling Window."""
+    """Calculates market phases based on a 20-day rolling window."""
     df = df_input.copy()
-    # Rolling Max/Min für die Phasen-Logik
+    # Rolling Max/Min for phase logic
     df['rolling_max'] = df['close'].rolling(window=20, min_periods=1).max()
     df['rolling_min'] = df['close'].rolling(window=20, min_periods=1).min()
 
-    # Logik: -20% vom Hoch = Bear / +20% vom Tief = Bull
+    # Logic: -20% from high = Bear / +20% from low = Bull
     df['phase'] = np.select(
         [
             (df['close'] - df['rolling_max']) / df['rolling_max'] <= -0.2,
@@ -48,9 +55,9 @@ def identify_phases(df_input):
 
 # --- UI ---
 st.title("Market Phase Analysis")
-st.write("Identifikation von Bull-, Bear- und Neutral-Phasen mittels Rolling-Window-Ansatz.")
+st.write("Identification of Bull, Bear, and Neutral phases using a rolling window approach.")
 
-selected_stock = st.sidebar.selectbox("Asset auswählen:", list(STOCKS.keys()))
+selected_stock = st.sidebar.selectbox("Select Asset:", list(STOCKS.keys()))
 df_raw = get_stock_data(STOCKS[selected_stock])
 
 if df_raw is not None:
@@ -58,70 +65,74 @@ if df_raw is not None:
 
     # Chart
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df_view.index, y=df_view['close'], name='Preis'))
-    fig.update_layout(template="plotly_dark", xaxis_title="Datum", yaxis_title="Preis")
+    fig.add_trace(go.Scatter(x=df_view.index, y=df_view['close'], name='Price'))
+    fig.update_layout(
+        template="plotly_dark", 
+        xaxis_title="Date", 
+        yaxis_title="Price ($)"
+    )
     st.plotly_chart(fig, use_container_width=True)
 
-    # Phasen-Verteilung
-    st.subheader("Verteilung der Marktphasen")
+    # Phase Distribution
+    st.subheader("Market Phase Distribution")
     counts = df_view['phase'].value_counts()
     percentages = (counts / len(df_view) * 100).round(2)
 
     dist_df = pd.DataFrame({
-        "Tage": counts,
-        "Anteil (prozent)": percentages
+        "Days": counts,
+        "Share (%)": percentages
     })
     st.table(dist_df)
 
     # --- Interpretation ---
     st.markdown("---")
-    st.subheader("Interpretation und Einblicke")
+    st.subheader("Interpretation and Insights")
 
     bull_pct = percentages.get("Bull", 0)
     bear_pct = percentages.get("Bear", 0)
     neutral_pct = percentages.get("Neutral", 0)
 
     st.markdown(f"""
-### Analyse-Ergebnisse
+### Analysis Results
 
-**1. Markt-Regime Uebersicht**
-- Das Asset verbrachte **{bull_pct}%** der Zeit in einer Bull-Phase.
-- **{bear_pct}%** in einer Bear-Phase.
-- **{neutral_pct}%** in einer neutralen Phase.
+**1. Market Regime Overview**
+- The asset spent **{bull_pct}%** of the time in a Bull phase.
+- **{bear_pct}%** in a Bear phase.
+- **{neutral_pct}%** in a neutral phase.
 
-Dies ermoeglicht ein direktes Verstaendnis der dominanten Marktumgebung im betrachteten Zeitraum.
-
----
-
-**2. Trendstaerke**
-- Ein hoher Bull-Anteil deutet auf starke Aufwaertsdynamik hin.
-- Ein hoher Bear-Anteil weist auf laengere Korrekturen oder Abschwuenge hin.
-- Ein hoher Neutral-Anteil signalisiert Seitwaertsbewegungen oder Konsolidierungen.
+This provides a direct understanding of the dominant market environment during the observed period.
 
 ---
 
-**3. Volatilitaet und Verhalten**
-- Aktien wie NVIDIA wechseln Phasen oft haeufiger aufgrund hoeherer Volatilitaet.
-- Etablierte Titel zeigen oft stabilere und laengere Trends.
+**2. Trend Strength**
+- A high Bull share indicates strong upward momentum.
+- A high Bear share points to longer corrections or downturns.
+- A high Neutral share signals sideways movements or consolidations.
 
 ---
 
-**4. Strategische Implikationen**
-- Bull-Phasen: Trendfolgende Strategien sind oft vorteilhaft.
-- Bear-Phasen: Risikomanagement und defensive Positionierung sind entscheidend.
-- Neutral-Phasen: Range-Trading oder das Warten auf Ausbrueche ist oft effektiver.
+**3. Volatility and Behavior**
+- Stocks like NVIDIA often switch phases more frequently due to higher volatility.
+- Established blue-chip titles often show more stable and prolonged trends.
 
 ---
 
-**5. Methodischer Hinweis**
-Dieses Modell nutzt ein 20-Tage-Fenster:
-- 20 prozent Abfall vom letzten Hoch -> Bear
-- 20 prozent Anstieg vom letzten Tief -> Bull
+**4. Strategic Implications**
+- **Bull Phases:** Trend-following strategies are often advantageous.
+- **Bear Phases:** Risk management and defensive positioning are crucial.
+- **Neutral Phases:** Range trading or waiting for breakouts is often more effective.
 
-Dies ist eine vereinfachte, aber in der Finanzanalyse weit verbreitete Definition von Marktzyklen.
+---
+
+**5. Methodological Note**
+This model uses a 20-day window:
+- 20% drop from the recent high -> Bear
+- 20% rise from the recent low -> Bull
+
+This is a simplified but widely used definition of market cycles in financial analysis.
 """)
 
-    st.caption("Methodik: Rolling 20-Tage Fenster Analyse der Preisbewegungen.")
+    st.caption("Methodology: Rolling 20-day window analysis of price movements.")
 
 else:
-    st.error("Daten konnten nicht geladen werden. Bitte sicherstellen, dass die CSV-Dateien im data-Ordner vorhanden sind.")
+    st.error("Data could not be loaded. Please ensure that the CSV files are present in the 'data' folder.")
