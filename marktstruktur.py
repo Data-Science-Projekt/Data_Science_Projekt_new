@@ -73,14 +73,14 @@ if df_stock is not None and df_vix is not None:
     fig.add_trace(go.Scatter(
         x=combined.index, y=combined['4. close'],
         name=f"{selected_stock} Price", yaxis="y1",
-        line=dict(color='#1f77b4', width=2)
+        line=dict(color='#1f77b4', width=4)
     ))
 
     # VIX (Y2 - Right)
     fig.add_trace(go.Scatter(
         x=combined.index, y=combined['VIX'],
         name="VIX Index", yaxis="y2",
-        line=dict(color='gray', dash='dot', width=1),
+        line=dict(color='purple', dash='dot', width=4),
         opacity=0.5
     ))
 
