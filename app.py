@@ -23,6 +23,9 @@ pages = {
     "Sentiment & Macro": [
         st.Page("sentiment_correlation.py", title="Sentiment Correlation"),
     ],
+    "Fundamentals": [
+        st.Page("company_fundamentals.py", title="Company Fundamentals"),
+    ],
     "About": [
         st.Page("pages/about_project.py", title="About the Project"),
         st.Page("pages/fazit.py", title="Conclusion"),
