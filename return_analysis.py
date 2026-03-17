@@ -5,28 +5,28 @@ import plotly.figure_factory as ff
 import plotly.graph_objects as go
 import os
 
-# --- KONFIGURATION ---
-# Wir nutzen die vom Bot bereitgestellten Daten im data-Ordner
+# --- CONFIGURATION ---
+# We use the data provided by the bot in the data folder
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
 
-# --- FUNKTION: DATEN LADEN (LOKAL) ---
-@st.cache_data(show_spinner="Lade Marktdaten...")
+# --- FUNCTION: LOAD DATA (LOCAL) ---
+@st.cache_data(show_spinner="Loading market data...")
 def get_stock_data_local(symbol):
-    """Liest die Aktiendaten aus dem lokalen data-Ordner."""
+    """Reads stock data from the local data folder."""
     file_path = f"data/stock_{symbol}.csv"
     
     if not os.path.exists(file_path):
         return None
         
     try:
-        # Einlesen der vom Bot erstellten CSV
+        # Read CSV created by the bot
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-        # Sortieren fuer chronologische Renditeberechnung
+        # Sort for chronological calculations
         df = df.astype(float).sort_index()
         
-        # Berechnung der Handelsspanne (fuer die statistische Tabelle unten)
+        # Calculate trading range (for statistical table below)
         df["abs_range"] = df["2. high"] - df["3. low"]
         df["rel_range_pct"] = (df["abs_range"] / df["4. close"]) * 100
         
@@ -36,20 +36,23 @@ def get_stock_data_local(symbol):
 
 # --- UI ---
 st.title("Daily Trading Ranges")
-st.write("Vergleich der Volatilitaet zwischen Tech- und Finanz-Aktien.")
+st.write("Comparison of volatility between tech and financial stocks.")
 
-# Sidebar fuer Auswahl
-selected_tech = st.sidebar.multiselect("Tech-Aktien", list(TECH_STOCKS.keys()), default=["Apple"])
-selected_fin = st.sidebar.multiselect("Finanz-Aktien", list(FINANCIAL_STOCKS.keys()), default=["J.P. Morgan"])
+# Sidebar for selection
+selected_tech = st.sidebar.multiselect("Tech stocks", list(TECH_STOCKS.keys()), default=["Apple"])
+selected_fin = st.sidebar.multiselect("Financial stocks", list(FINANCIAL_STOCKS.keys()), default=["J.P. Morgan"])
 
-# Kombination der Auswahl
-all_selected = {**{k: TECH_STOCKS[k] for k in selected_tech}, **{k: FINANCIAL_STOCKS[k] for k in selected_fin}}
+# Combine selections
+all_selected = {
+    **{k: TECH_STOCKS[k] for k in selected_tech},
+    **{k: FINANCIAL_STOCKS[k] for k in selected_fin}
+}
 
 if not all_selected:
-    st.warning("Bitte waehlen Sie mindestens eine Aktie aus.")
+    st.warning("Please select at least one stock.")
     st.stop()
 
-# Daten laden
+# Load data
 stock_data = {}
 for name, symbol in all_selected.items():
     df = get_stock_data_local(symbol)
@@ -57,54 +60,57 @@ for name, symbol in all_selected.items():
         stock_data[name] = df
 
 if stock_data:
-    # Boxplot der Volatilitaet
+    # Boxplot of volatility
     fig_box = go.Figure()
     for name, df in stock_data.items():
         fig_box.add_trace(go.Box(y=df["rel_range_pct"], name=name))
 
     fig_box.update_layout(
-        title="Relative Handelsspanne in Prozent",
+        title="Relative trading range (%)",
         template="plotly_dark",
-        yaxis_title="Spanne (%)"
+        yaxis_title="Range (%)"
     )
     st.plotly_chart(fig_box, use_container_width=True)
 
-    # Statistik-Tabelle
-    st.subheader("Statistische Uebersicht")
+    # Statistical table
+    st.subheader("Statistical Overview")
     stats = []
     for name, df in stock_data.items():
         stats.append({
-            "Aktie": name,
-            "Durchschnitt (%)": round(df["rel_range_pct"].mean(), 2),
+            "Stock": name,
+            "Average (%)": round(df["rel_range_pct"].mean(), 2),
             "Maximum (%)": round(df["rel_range_pct"].max(), 2)
         })
     st.table(pd.DataFrame(stats))
 
     # --- INTERPRETATION ---
     st.markdown("---")
-    st.subheader("Analyse und Interpretation")
+    st.subheader("Analysis and Interpretation")
 
     st.info("""
-    Forschungsfrage: Untersuchung der Unterschiede in den taeglichen Handelsspannen (Intraday-Volatilitaet) 
-    zwischen Technologie-Aktien und Finanz-Aktien.
+    Research question: Analysis of differences in daily trading ranges (intraday volatility)  
+    between technology stocks and financial stocks.
     """)
 
     st.markdown("""
-    ### Zentrale Erkenntnisse:
+    ### Key Insights:
 
-    * **Sektor-Unterschiede:** Tech-Aktien (z. B. Apple, Microsoft, NVIDIA) tendieren zu einer hoeheren Volatilitaet in den taeglichen Handelsspannen im Vergleich zu traditionellen Finanz-Aktien (z. B. J.P. Morgan, Bank of America). 
-        Dies spiegelt das hoehere Wachstumspotenzial, aber auch das hoehere Risikoprofil des Tech-Sektors wider.
+    * **Sector Differences:** Tech stocks (e.g., Apple, Microsoft, NVIDIA) tend to exhibit higher volatility in daily trading ranges compared to traditional financial stocks (e.g., J.P. Morgan, Bank of America).  
+      This reflects the higher growth potential but also the higher risk profile of the tech sector.
 
-    * **Asymmetrische Auswirkungen:** Unsere Analyse deutet darauf hin, dass negative Nachrichten typischerweise groessere Volatilitaetsspitzen erzeugen als positive Nachrichten aehnlicher Groessenordnung. Dies deckt sich mit dem dokumentierten Negativity Bias an den Finanzmaerkten.
+    * **Asymmetric Effects:** The analysis suggests that negative news typically generates larger volatility spikes than positive news of similar magnitude.  
+      This aligns with the well-documented negativity bias in financial markets.
 
-    * **Bedeutung der Nachrichtenstaerke:** Die Intensitaet eines Nachrichten-Sentiments ist oft aussagekraeftiger fuer einen Volatilitaetsstrom als die reine Richtung (positiv/negativ).
+    * **Importance of News Intensity:** The strength of news sentiment is often more impactful for volatility than the direction (positive/negative) alone.
 
-    * **Markteffizienz:** Viele Nachrichtenereignisse sind bereits teilweise eingepreist (z. B. Analystenerwartungen vor Quartalszahlen). Die beobachtete Volatilitaet resultiert daher oft aus der Differenz zwischen tatsaechlichen Ergebnissen und Markterwartungen.
+    * **Market Efficiency:** Many news events are partially priced in (e.g., analyst expectations before earnings releases).  
+      Observed volatility often results from the gap between actual outcomes and market expectations.
 
-    * **Einflussfaktoren:** Taegliche Handelsspannen werden nicht nur durch unternehmensspezifische News getrieben, sondern auch durch makrooekonomische Ereignisse (Fed-Entscheidungen, Inflationsdaten), Sektor-Rotationen und geopolitische Spannungen.
+    * **Drivers of Volatility:** Daily trading ranges are influenced not only by firm-specific news but also by macroeconomic events (Fed decisions, inflation data), sector rotations, and geopolitical developments.
     """)
 
     st.caption(
-        "Datenquelle: Alpha Vantage (TIME_SERIES_DAILY). Die relative Spanne berechnet sich als: ((High - Low) / Close) * 100.")
+        "Data source: Alpha Vantage (TIME_SERIES_DAILY). Relative range is calculated as: ((High - Low) / Close) * 100."
+    )
 else:
-    st.error("Es konnten keine lokalen Daten gefunden werden. Bitte sicherstellen, dass der Daten-Bot erfolgreich gelaufen ist.")
+    st.error("No local data could be found. Please ensure that the data bot has run successfully.")
