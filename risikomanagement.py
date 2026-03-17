@@ -79,7 +79,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     st.download_button(
         label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig),
-        file_name="marktphasen.png",
+        file_name="riskmanagement.png",
         mime="application/png"
     )
 

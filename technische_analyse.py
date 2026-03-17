@@ -137,7 +137,7 @@ if df_tech is not None and df_fin is not None:
     st.download_button(
         label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig),
-        file_name="marktphasen.png",
+        file_name="technical_analysis.png",
         mime="application/png"
     )
 

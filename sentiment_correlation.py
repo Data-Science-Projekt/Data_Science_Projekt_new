@@ -148,7 +148,7 @@ st.plotly_chart(fig_rolling, use_container_width=True)
 st.download_button(
     label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_rolling),
-    file_name="marktphasen.png",
+    file_name="sentiment_correlation.png",
     mime="application/png"
 )
 

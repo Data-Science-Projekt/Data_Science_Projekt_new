@@ -79,7 +79,7 @@ if stock_data:
     st.download_button(
         label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig_box),
-        file_name="marktphasen.png",
+        file_name="return_analysis.png",
         mime="application/png"
     )
 

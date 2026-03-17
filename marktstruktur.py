@@ -110,7 +110,7 @@ if df_stock is not None and df_vix is not None:
     st.download_button(
         label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig),
-        file_name="marktphasen.png",
+        file_name="marktstruktur.png",
         mime="application/png"
     )
 
