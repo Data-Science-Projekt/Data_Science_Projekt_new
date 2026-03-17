@@ -44,7 +44,7 @@ def get_vix_data():
 # --- UI ---
 render_page_header(
     "Market Structure",
-    "How does the correlation between J.P. Morgan and Goldman Sachs change during stable market periods compared to crisis periods (bear markets)?",
+    "How do Apple and NVIDIA stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold of 30)?",
 )
 
 with st.sidebar:
