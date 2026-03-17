@@ -4,6 +4,16 @@ from pathlib import Path
 st.title("Our Team")
 st.markdown("The people behind the project")
 
+st.markdown("""
+<style>
+    [data-testid="stImage"] img {
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.divider()
 
 img_dir = Path(__file__).parent.parent / "static" / "img"
