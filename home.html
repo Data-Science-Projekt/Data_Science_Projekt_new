@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>StockInsight</h1>
+    <p>A data science project for systematic stock market analysis &mdash; exploring behavior, environment, risk, and fundamentals.</p>
+</section>
+
+<section class="content">
+    <div class="card">
+        <h2>Project Overview</h2>
+        <p>This project investigates the dynamics of the stock market using modern data science methods. We analyze historical data from tech giants and financial institutions to uncover patterns in returns, risks, and market reactions.</p>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="role" style="color: #e94560; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">CATEGORY 1</div>
+            <h3>Stock Behavior</h3>
+            <p>Analysis of return distributions and price ranges. How do Apple and NVIDIA compare in terms of daily volatility and volume patterns?</p>
+        </div>
+
+        <div class="card">
+            <div class="role" style="color: #e94560; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">CATEGORY 2</div>
+            <h3>Market Environment</h3>
+            <p>How do stocks react to extreme market stress (VIX > 30)? Exploring the correlation dynamics between Apple and Nvidia.</p>
+        </div>
+
+        <div class="card">
+            <div class="role" style="color: #e94560; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">CATEGORY 3</div>
+            <h3>Risk Analysis</h3>
+            <p>Quantifying potential losses using Value-at-Risk (VaR) models. A direct risk comparison between high-growth tech and established sectors.</p>
+        </div>
+
+        <div class="card">
+            <div class="role" style="color: #e94560; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">CATEGORY 4</div>
+            <h3>Sentiment & Macro</h3>
+            <p>Does news sentiment drive Apple's volatility? We analyze the correlation between consumer sentiment index and stock returns.</p>
+        </div>
+
+        <div class="card">
+            <div class="role" style="color: #e94560; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">CATEGORY 5</div>
+            <h3>Company Fundamentals</h3>
+            <p>Investigating product-to-stock interdependence. How do iPhone sales figures impact Apple's long-term stock performance?</p>
+        </div>
+
+        <div class="card" style="border: 1px dashed #e94560;">
+            <h3>Approach</h3>
+            <p>Learn more about our data sources, cleaning processes, and the statistical models used in this research.</p>
+            <a href="{{ url_for('daten_methodik') }}" style="color: #e94560; font-weight: 600;">View Methodology →</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

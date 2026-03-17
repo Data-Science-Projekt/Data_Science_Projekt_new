@@ -1,116 +1,129 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.figure_factory as ff
 import plotly.graph_objects as go
+import requests
+from scipy.stats import norm, kurtosis, skew
 import os
 
 # --- CONFIGURATION ---
-# We use the data provided by the bot in the data folder
-TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
-FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
-STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
+STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
-# --- FUNCTION: LOAD DATA (LOCAL) ---
-@st.cache_data(show_spinner="Loading market data...")
+
+# --- FUNCTION: LOAD DATA (LOCAL CSV) ---
+@st.cache_data(show_spinner="Loading stock data...")
 def get_stock_data_local(symbol):
-    """Reads stock data from the local data folder."""
-    file_path = f"data/stock_{symbol}.csv"
-    
+    file_path = os.path.join(os.path.dirname(__file__), "data", f"stock_{symbol}.csv")
     if not os.path.exists(file_path):
+        st.warning(f"No data file found for {symbol}.")
         return None
-        
     try:
-        # Read CSV created by the bot
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-        # Sort for chronological calculations
         df = df.astype(float).sort_index()
-        
-        # Calculate trading range (for statistical table below)
-        df["abs_range"] = df["2. high"] - df["3. low"]
-        df["rel_range_pct"] = (df["abs_range"] / df["4. close"]) * 100
-        
-        return df
+        df['log_return'] = np.log(df['4. close'] / df['4. close'].shift(1))
+        return df.dropna()
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None
+
+
+# --- FUNCTION: FRED BENCHMARK ---
+@st.cache_data
+def get_fred_benchmark(series_id="SP500"):
+    if not FRED_API_KEY:
+        return None
+    url = "https://api.stlouisfed.org/fred/series/observations"
+    params = {"series_id": series_id, "api_key": FRED_API_KEY, "file_type": "json"}
+    try:
+        r = requests.get(url, params=params)
+        data = r.json()
+        df = pd.DataFrame(data['observations'])
+        df['date'] = pd.to_datetime(df['date'])
+        df['value'] = pd.to_numeric(df['value'], errors='coerce')
+        df = df.set_index('date').dropna()
+        df['log_return'] = np.log(df['value'] / df['value'].shift(1))
+        return df.dropna()
     except Exception:
         return None
 
-# --- UI ---
-st.title("Daily Trading Ranges")
-st.write("Comparison of volatility between tech and financial stocks.")
 
-# Sidebar for selection
-selected_tech = st.sidebar.multiselect("Tech stocks", list(TECH_STOCKS.keys()), default=["Apple"])
-selected_fin = st.sidebar.multiselect("Financial stocks", list(FINANCIAL_STOCKS.keys()), default=["J.P. Morgan"])
+# --- UI LAYOUT ---
+st.title("Return Distribution Analysis")
+st.markdown("**Research Question 1:** How do recent daily log-returns deviate from a normal distribution?")
 
-# Combine selections
-all_selected = {
-    **{k: TECH_STOCKS[k] for k in selected_tech},
-    **{k: FINANCIAL_STOCKS[k] for k in selected_fin}
-}
+with st.sidebar:
+    st.header("Settings")
+    selected_stock = st.selectbox("Select stock:", list(STOCKS.keys()))
 
-if not all_selected:
-    st.warning("Please select at least one stock.")
-    st.stop()
+    days_to_show = st.slider("Lookback Period (last X trading days):",
+                             min_value=5,
+                             max_value=500,
+                             value=100)
 
-# Load data
-stock_data = {}
-for name, symbol in all_selected.items():
-    df = get_stock_data_local(symbol)
-    if df is not None:
-        stock_data[name] = df
+    show_benchmark = st.checkbox("Show S&P 500 (FRED)", value=True)
 
-if stock_data:
-    # Boxplot of volatility
-    fig_box = go.Figure()
-    for name, df in stock_data.items():
-        fig_box.add_trace(go.Box(y=df["rel_range_pct"], name=name))
+# Fetch data
+df_stock_raw = get_stock_data_local(STOCKS[selected_stock])
 
-    fig_box.update_layout(
-        title="Relative trading range (%)",
-        template="plotly_dark",
-        yaxis_title="Range (%)"
-    )
-    st.plotly_chart(fig_box, use_container_width=True)
+if df_stock_raw is not None:
+    # Slice the data based on slider
+    df_filtered = df_stock_raw.tail(days_to_show)
+    returns = df_filtered['log_return']
 
-    # Statistical table
-    st.subheader("Statistical Overview")
-    stats = []
-    for name, df in stock_data.items():
-        stats.append({
-            "Stock": name,
-            "Average (%)": round(df["rel_range_pct"].mean(), 2),
-            "Maximum (%)": round(df["rel_range_pct"].max(), 2)
-        })
-    st.table(pd.DataFrame(stats))
-
-    # --- INTERPRETATION ---
-    st.markdown("---")
-    st.subheader("Analysis and Interpretation")
-
-    st.info("""
-    Research question: Analysis of differences in daily trading ranges (intraday volatility)  
-    between technology stocks and financial stocks.
-    """)
-
-    st.markdown("""
-    ### Key Insights:
-
-    * **Sector Differences:** Tech stocks (e.g., Apple, Microsoft, NVIDIA) tend to exhibit higher volatility in daily trading ranges compared to traditional financial stocks (e.g., J.P. Morgan, Bank of America).  
-      This reflects the higher growth potential but also the higher risk profile of the tech sector.
-
-    * **Asymmetric Effects:** The analysis suggests that negative news typically generates larger volatility spikes than positive news of similar magnitude.  
-      This aligns with the well-documented negativity bias in financial markets.
-
-    * **Importance of News Intensity:** The strength of news sentiment is often more impactful for volatility than the direction (positive/negative) alone.
-
-    * **Market Efficiency:** Many news events are partially priced in (e.g., analyst expectations before earnings releases).  
-      Observed volatility often results from the gap between actual outcomes and market expectations.
-
-    * **Drivers of Volatility:** Daily trading ranges are influenced not only by firm-specific news but also by macroeconomic events (Fed decisions, inflation data), sector rotations, and geopolitical developments.
-    """)
-
+    # Date Info
     st.caption(
-        "Data source: Alpha Vantage (TIME_SERIES_DAILY). Relative range is calculated as: ((High - Low) / Close) * 100."
+        f"Showing last {len(df_filtered)} days from {df_filtered.index.min().date()} to {df_filtered.index.max().date()}")
+
+    # Plotting
+    fig = go.Figure()
+
+    # 1. Stock Histogram
+    fig.add_trace(go.Histogram(
+        x=returns, nbinsx=30, name=f'{selected_stock}',
+        histnorm='probability density', marker_color='#1f77b4', opacity=0.6
+    ))
+
+    # 2. FRED Benchmark
+    if show_benchmark:
+        df_fred_all = get_fred_benchmark()
+        if df_fred_all is not None:
+            df_fred = df_fred_all[df_fred_all.index >= df_filtered.index.min()]
+            fig.add_trace(go.Histogram(
+                x=df_fred['log_return'], nbinsx=30, name='S&P 500',
+                histnorm='probability density', marker_color='#ff7f0e', opacity=0.4
+            ))
+
+    # 3. Normal Distribution Reference
+    mu, std = norm.fit(returns)
+    x_range = np.linspace(returns.min(), returns.max(), 100)
+    y_norm = norm.pdf(x_range, mu, std)
+    fig.add_trace(
+        go.Scatter(x=x_range, y=y_norm, mode='lines', name='Normal Dist.', line=dict(color='red', dash='dash')))
+
+    fig.update_layout(
+        title=f"Distribution of Log-Returns: {selected_stock}",
+        barmode='overlay',
+        template="plotly_white",
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
     )
-else:
-    st.error("No local data could be found. Please ensure that the data bot has run successfully.")
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Metrics Board
+    k_val = kurtosis(returns)  # Excess Kurtosis
+    s_val = skew(returns)
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Excess Kurtosis", f"{k_val:.2f}")
+    c2.metric("Skewness", f"{s_val:.2f}")
+    c3.metric("Volatility", f"{std:.4f}")
+    c4.metric("Mean", f"{mu:.5f}")
+
+    # Short Analysis
+    st.subheader("Analysis Summary")
+    if k_val > 0.5:
+        st.write(
+            f"The log-returns of {selected_stock} show signs of **Leptokurtosis** (Excess Kurtosis = {k_val:.2f} > 0), indicating 'fatter tails' than a normal distribution. Extreme price movements occur more frequently than a Gaussian model would predict.")
+    else:
+        st.write(f"Over this period, the distribution of {selected_stock} remains relatively close to the normal model (Excess Kurtosis = {k_val:.2f}).")
