@@ -7,9 +7,10 @@ st.markdown("The people behind the project")
 st.markdown("""
 <style>
     [data-testid="stImage"] img {
-        height: 300px;
+        aspect-ratio: 3 / 4;
         object-fit: cover;
         border-radius: 8px;
+        width: 100%;
     }
 </style>
 """, unsafe_allow_html=True)
