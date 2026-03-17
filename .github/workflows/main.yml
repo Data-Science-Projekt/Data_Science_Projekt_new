@@ -1,15 +1,15 @@
 name: Financial Data Update Bot
+
 on:
   schedule:
-    - cron: '0 7 * * *' # Startet täglich um 07:00 Uhr UTC
-  workflow_dispatch: # Erlaubt uns, den Bot jetzt sofort manuell zu testen
+    - [cite_start]cron: '0 7 * * *' # Täglich um 07:00 Uhr UTC [cite: 13]
+  [cite_start]workflow_dispatch: # Ermöglicht den manuellen Start [cite: 14]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Erlaubt dem Bot, Dateien in das Repository zu schreiben (wichtig!)
     permissions:
-      contents: write
+      [cite_start]contents: write # Erlaubt dem Bot, die CSVs zurück ins Repo zu pushen [cite: 14]
       
     steps:
       - uses: actions/checkout@v3
@@ -17,16 +17,16 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          [cite_start]python-version: '3.10' [cite: 14]
           
       - name: Install dependencies
-        run: pip install pandas requests
+        [cite_start]run: pip install pandas requests [cite: 14]
         
       - name: Run Update Script
         env:
-          AV_API_KEY: ${{ secrets.AV_API_KEY }}
+          [cite_start]AV_API_KEY: ${{ secrets.AV_API_KEY }} # Holt die Keys aus den Secrets [cite: 19]
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        run: python data_update.py
+        [cite_start]run: python data_update.py # Führt euer Backend-Skript aus [cite: 14]
         
       - name: Commit and Push changes
         run: |
@@ -34,40 +34,4 @@ jobs:
           git config --local user.name "GitHub Action Bot"
           git add data/*.csv
           git commit -m "Auto-update financial data [skip ci]" || exit 0
-          git pushname: Financial Data Update Bot
-on:
-  schedule:
-    - cron: '0 7 * * *' # Startet täglich um 07:00 Uhr UTC
-  workflow_dispatch: # Erlaubt uns, den Bot jetzt sofort manuell zu testen
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    # Erlaubt dem Bot, Dateien in das Repository zu schreiben (wichtig!)
-    permissions:
-      contents: write
-      
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          
-      - name: Install dependencies
-        run: pip install pandas requests
-        
-      - name: Run Update Script
-        env:
-          AV_API_KEY: ${{ secrets.AV_API_KEY }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        run: python data_update.py
-        
-      - name: Commit and Push changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action Bot"
-          git add data/*.csv
-          git commit -m "Auto-update financial data [skip ci]" || exit 0
-          git push
+          git push # Schreibt die Ergebnisse in das GitHub Repository [cite: 14]
