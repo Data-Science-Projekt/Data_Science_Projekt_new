@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import requests
 from scipy.stats import norm, kurtosis, skew
 import os
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
@@ -109,6 +110,13 @@ if df_stock_raw is not None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="return_analysis.png",
+        mime="application/png"
+    )
 
     # Metrics Board
     k_val = kurtosis(returns)  # Excess Kurtosis
