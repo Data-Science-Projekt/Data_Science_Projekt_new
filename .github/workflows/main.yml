@@ -1,0 +1,73 @@
+name: Financial Data Update Bot
+on:
+  schedule:
+    - cron: '0 7 * * *' # Startet täglich um 07:00 Uhr UTC
+  workflow_dispatch: # Erlaubt uns, den Bot jetzt sofort manuell zu testen
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Erlaubt dem Bot, Dateien in das Repository zu schreiben (wichtig!)
+    permissions:
+      contents: write
+      
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: pip install pandas requests
+        
+      - name: Run Update Script
+        env:
+          AV_API_KEY: ${{ secrets.AV_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python data_update.py
+        
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add data/*.csv
+          git commit -m "Auto-update financial data [skip ci]" || exit 0
+          git pushname: Financial Data Update Bot
+on:
+  schedule:
+    - cron: '0 7 * * *' # Startet täglich um 07:00 Uhr UTC
+  workflow_dispatch: # Erlaubt uns, den Bot jetzt sofort manuell zu testen
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Erlaubt dem Bot, Dateien in das Repository zu schreiben (wichtig!)
+    permissions:
+      contents: write
+      
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: pip install pandas requests
+        
+      - name: Run Update Script
+        env:
+          AV_API_KEY: ${{ secrets.AV_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python data_update.py
+        
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add data/*.csv
+          git commit -m "Auto-update financial data [skip ci]" || exit 0
+          git push
