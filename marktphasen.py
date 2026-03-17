@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 STOCKS = {
@@ -89,8 +91,10 @@ def add_phase_shading(fig, df):
 
 
 # --- UI ---
-st.title("Market Phase Analysis")
-st.write("Identification of Bull, Bear, and Neutral phases using a rolling window approach.")
+render_page_header(
+    "Market Phases",
+    "How does the correlation between selected technology stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) change during stable market periods compared to crisis periods (bear markets)?",
+)
 
 # Sidebar controls
 selected_stock = st.sidebar.selectbox("Select Asset:", list(STOCKS.keys()))
@@ -171,6 +175,13 @@ if df_raw is not None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="marktphasen.png",
+        mime="application/png"
+    )
 
     # Phase Distribution
     st.subheader("Market Phase Distribution")

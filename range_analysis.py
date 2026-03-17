@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 # No API keys or local cache folder required anymore.
@@ -34,10 +36,10 @@ def get_stock_data_local(symbol):
         return None
 
 # --- MAIN APP ---
-st.title("Research Question 2: Daily Trading Ranges")
-st.markdown("""
-**Research Question:** What differences exist in the daily trading range between selected Tech stocks (Apple, Microsoft, NVIDIA) and Financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?
-""")
+render_page_header(
+    "Volatility",
+    "What are the differences in the daily trading range between selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
+)
 
 # Sidebar for controls
 st.sidebar.header("Analysis Parameters")
@@ -83,6 +85,14 @@ for name, df in stock_data.items():
 fig_box.update_layout(yaxis_title="Relative Trading Range (%)", template="plotly_white")
 st.plotly_chart(fig_box, use_container_width=True)
 
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_box),
+    file_name="volatility_boxplot.png",
+    mime="application/png",
+    key="download_volatility_box"
+)
+
 # Time Series
 st.subheader("Trading Range Trend Over Time")
 fig_ts = go.Figure()
@@ -92,6 +102,14 @@ for i, (name, df) in enumerate(stock_data.items()):
     fig_ts.add_trace(go.Scatter(x=df.index, y=df["relative_range_pct"], mode="lines", name=name, line=dict(color=colors[i % len(colors)], width=1.5)))
 fig_ts.update_layout(xaxis_title="Date", yaxis_title="Relative Trading Range (%)", template="plotly_white")
 st.plotly_chart(fig_ts, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_ts),
+    file_name="volatility_timeseries.png",
+    mime="application/png",
+    key="download_volatility_ts"
+)
 
 # Statistics Table
 st.subheader("Statistical Metrics per Stock")

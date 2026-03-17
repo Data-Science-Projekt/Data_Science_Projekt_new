@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIG ---
 # Data sources are now loaded locally from the folder maintained by the bot
@@ -33,8 +35,10 @@ st.sidebar.divider()
 show_apple = st.sidebar.checkbox("Show Apple (AAPL)", value=True, key="risk_a")
 show_nvidia = st.sidebar.checkbox("Show NVIDIA (NVDA)", value=True, key="risk_n")
 
-st.title("Value-at-Risk (VaR) and Expected Shortfall")
-st.write("Quantifying potential losses and tail risks for individual assets.")
+render_page_header(
+    "Risk Management",
+    "What is the maximum expected loss (at a 95% confidence level) for Apple compared to NVIDIA over a 1-day horizon?",
+)
 
 # --- DATA LOADING ---
 ret_a = None
@@ -71,6 +75,13 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     st.plotly_chart(fig, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="riskmanagement.png",
+        mime="application/png"
+    )
 
     # Metrics below the chart
     c1, c2 = st.columns(2)

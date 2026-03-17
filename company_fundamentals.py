@@ -5,30 +5,33 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.stats import pearsonr, spearmanr
 import os
+from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 # Path to the static data file in the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+
 
 @st.cache_data(show_spinner="Loading fundamental data...")
 def load_iphone_sales():
     """Reads the manually maintained iPhone sales figures."""
     # Path adjustment in case the script is in a 'pages' subfolder
     path = os.path.join("data", "iphone_sales.csv")
-    
+
     if not os.path.exists(path):
         return pd.DataFrame()
-        
+
     try:
         df = pd.read_csv(path, parse_dates=["earnings_date"])
         df = df.sort_values("earnings_date").reset_index(drop=True)
-        
+
         # Calculation of price reaction (30 days after earnings vs. earnings day)
         if "price_on_earnings" in df.columns and "price_30d_after" in df.columns:
             df["price_change_pct"] = (
-                (df["price_30d_after"] - df["price_on_earnings"]) / df["price_on_earnings"] * 100
+                    (df["price_30d_after"] - df["price_on_earnings"]) / df["price_on_earnings"] * 100
             )
-        
+
         # Calculation of growth rates
         df["revenue_growth"] = df["iphone_revenue_billion"].pct_change() * 100
         df["units_growth"] = df["iphone_units_million"].pct_change() * 100
@@ -36,12 +39,12 @@ def load_iphone_sales():
     except Exception:
         return pd.DataFrame()
 
+
 # --- MAIN PAGE ---
-st.title("Research Question 9: Corporate Fundamentals")
-st.markdown("""
-**Research Question:** How do iPhone sales figures influence Apple's long-term stock performance? 
-Do quarterly surprises in the iPhone segment drive price movements following earnings announcements?
-""")
+render_page_header(
+    "Company Fundamentals",
+    "How does the quarterly sales volume of iPhone units statistically correlate with Apple's stock price returns in the month following the earnings release?",
+)
 
 st.markdown("""
 #### Methodology
@@ -89,6 +92,14 @@ fig_sales.update_yaxes(title_text="Revenue ($ Billion)", secondary_y=False)
 fig_sales.update_yaxes(title_text="Units Sold (Millions)", secondary_y=True)
 st.plotly_chart(fig_sales, use_container_width=True)
 
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_sales),
+    file_name="fundamentals_sales.png",
+    mime="application/png",
+    key="download_fundamentals_sales"
+)
+
 # --- 2. PRICE REACTION ---
 st.subheader("2. Stock Price Movement Post-Earnings (30 Days)")
 
@@ -111,6 +122,14 @@ if "price_change_pct" in df.columns:
         height=400,
     )
     st.plotly_chart(fig_reaction, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig_reaction),
+        file_name="fundamentals_reaction.png",
+        mime="application/png",
+        key="download_fundamentals_reaction"
+    )
 
 # --- 3. CORRELATION ---
 st.subheader("3. Correlation Analysis")
@@ -167,6 +186,14 @@ fig_seasonal.add_trace(
 )
 fig_seasonal.update_layout(template="plotly_white", height=400)
 st.plotly_chart(fig_seasonal, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_seasonal),
+    file_name="fundamentals_seasonal.png",
+    mime="application/png",
+    key="download_fundamentals_seasonal"
+)
 
 # --- 5. KEY FINDINGS ---
 st.subheader("5. Key Insights")

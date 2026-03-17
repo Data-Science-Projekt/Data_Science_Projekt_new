@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
@@ -40,8 +42,10 @@ def get_vix_data():
         return None
 
 # --- UI ---
-st.title("Market Reaction: Stocks vs. VIX")
-st.markdown("Analysis of stock reactions during periods of increased market volatility (VIX).")
+render_page_header(
+    "Market Structure",
+    "How do Apple and NVIDIA stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold of 30)?",
+)
 
 with st.sidebar:
     st.header("Settings")
@@ -69,14 +73,14 @@ if df_stock is not None and df_vix is not None:
     fig.add_trace(go.Scatter(
         x=combined.index, y=combined['4. close'],
         name=f"{selected_stock} Price", yaxis="y1",
-        line=dict(color='#1f77b4', width=2)
+        line=dict(color='#1f77b4', width=4)
     ))
 
     # VIX (Y2 - Right)
     fig.add_trace(go.Scatter(
         x=combined.index, y=combined['VIX'],
         name="VIX Index", yaxis="y2",
-        line=dict(color='gray', dash='dot', width=1),
+        line=dict(color='purple', dash='dot', width=4),
         opacity=0.5
     ))
 
@@ -102,6 +106,13 @@ if df_stock is not None and df_vix is not None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="marktstruktur.png",
+        mime="application/png"
+    )
 
     # --- STATISTICS ---
     st.subheader("Statistical Impact")

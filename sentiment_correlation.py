@@ -4,6 +4,8 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 from scipy.stats import pearsonr, spearmanr
+from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
@@ -41,11 +43,10 @@ def get_sentiment_local():
         return None
 
 # --- UI ---
-st.title("Research Question 8: Sentiment Correlation")
-st.markdown("""
-**Research Question:** How does the Consumer Sentiment Index (University of Michigan) 
-correlate with selected tech stocks and financial stocks?
-""")
+render_page_header(
+    "Sentiment Correlation",
+    "How does the broader Consumer Sentiment Index correlate with selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
+)
 
 # Sidebar
 st.sidebar.header("Analysis Parameters")
@@ -143,6 +144,13 @@ fig_rolling.update_layout(
     template="plotly_white", height=500
 )
 st.plotly_chart(fig_rolling, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_rolling),
+    file_name="sentiment_correlation.png",
+    mime="application/png"
+)
 
 # --- 5. KEY INSIGHTS ---
 st.subheader("5. Key Insights")
