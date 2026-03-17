@@ -6,14 +6,14 @@ from plotly.subplots import make_subplots
 from scipy.stats import pearsonr, spearmanr
 import os
 
-# --- KONFIGURATION ---
-# Pfad zur statischen Datendatei im data-Ordner
+# --- CONFIGURATION ---
+# Path to the static data file in the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
-@st.cache_data(show_spinner="Lade fundamentale Daten...")
+@st.cache_data(show_spinner="Loading fundamental data...")
 def load_iphone_sales():
-    """Liest die manuell gepflegten iPhone-Verkaufszahlen ein."""
-    # Pfad-Anpassung, falls das Skript im Unterordner 'pages' liegt
+    """Reads the manually maintained iPhone sales figures."""
+    # Path adjustment in case the script is in a 'pages' subfolder
     path = os.path.join("data", "iphone_sales.csv")
     
     if not os.path.exists(path):
@@ -23,51 +23,51 @@ def load_iphone_sales():
         df = pd.read_csv(path, parse_dates=["earnings_date"])
         df = df.sort_values("earnings_date").reset_index(drop=True)
         
-        # Berechnung der Kursreaktion (30 Tage nach Earnings vs. Earnings-Tag)
+        # Calculation of price reaction (30 days after earnings vs. earnings day)
         if "price_on_earnings" in df.columns and "price_30d_after" in df.columns:
             df["price_change_pct"] = (
                 (df["price_30d_after"] - df["price_on_earnings"]) / df["price_on_earnings"] * 100
             )
         
-        # Berechnung der Wachstumsraten
+        # Calculation of growth rates
         df["revenue_growth"] = df["iphone_revenue_billion"].pct_change() * 100
         df["units_growth"] = df["iphone_units_million"].pct_change() * 100
         return df
     except Exception:
         return pd.DataFrame()
 
-# --- HAUPTSEITE ---
-st.title("Forschungsfrage 9: Unternehmens-Fundamentaldaten")
+# --- MAIN PAGE ---
+st.title("Research Question 9: Corporate Fundamentals")
 st.markdown("""
-**Forschungsfrage:** Wie beeinflussen die iPhone-Verkaufszahlen die langfristige Aktienperformance von Apple? 
-Treiben Quartals-Ueberraschungen im iPhone-Segment die Kursbewegungen nach den Earnings?
+**Research Question:** How do iPhone sales figures influence Apple's long-term stock performance? 
+Do quarterly surprises in the iPhone segment drive price movements following earnings announcements?
 """)
 
 st.markdown("""
-#### Methodik
-- **iPhone-Absatz und Umsatz:** Daten aus den Quartalsberichten von Apple.
-- **Aktienkurs-Reaktion:** Vergleich des Kurses am Tag der Bekanntgabe vs. 30 Tage danach.
-- **Korrelationsanalyse:** Zusammenhang zwischen Umsatz/Stueckzahlen und Kursreaktion.
-- **Saisonalitaet:** Identifikation von Mustern ueber die Fiskalquartale hinweg.
+#### Methodology
+- **iPhone Volume and Revenue:** Data sourced from Apple's quarterly reports.
+- **Stock Price Reaction:** Comparison of the price on the announcement day vs. 30 days later.
+- **Correlation Analysis:** Relationship between revenue/unit numbers and price reaction.
+- **Seasonality:** Identification of patterns across fiscal quarters.
 """)
 
 df = load_iphone_sales()
 
 if df.empty:
-    st.error("Die Datei data/iphone_sales.csv wurde nicht gefunden oder ist leer. Bitte Daten manuell pflegen.")
+    st.error("The file data/iphone_sales.csv was not found or is empty. Please maintain data manually.")
     st.stop()
 
-st.write(f"**Analyse-Zeitraum:** {df['quarter'].iloc[0]} bis {df['quarter'].iloc[-1]} ({len(df)} Quartale)")
+st.write(f"**Analysis Period:** {df['quarter'].iloc[0]} to {df['quarter'].iloc[-1]} ({len(df)} quarters)")
 
-# --- 1. UMSATZ & STUECKZAHLEN ---
-st.subheader("1. iPhone-Umsatz und Absatzzahlen im Zeitverlauf")
+# --- 1. REVENUE & UNIT SALES ---
+st.subheader("1. iPhone Revenue and Unit Sales Over Time")
 
 fig_sales = make_subplots(specs=[[{"secondary_y": True}]])
 fig_sales.add_trace(
     go.Bar(
         x=df["quarter"],
         y=df["iphone_revenue_billion"],
-        name="Umsatz ($ Mrd.)",
+        name="Revenue ($ bn)",
         marker_color="#1f77b4",
         opacity=0.7,
     ),
@@ -77,7 +77,7 @@ fig_sales.add_trace(
     go.Scatter(
         x=df["quarter"],
         y=df["iphone_units_million"],
-        name="Einheiten (Mio.)",
+        name="Units (Millions)",
         mode="lines+markers",
         line=dict(color="#e94560", width=2),
         marker=dict(size=6),
@@ -85,12 +85,12 @@ fig_sales.add_trace(
     secondary_y=True,
 )
 fig_sales.update_layout(template="plotly_white", height=450)
-fig_sales.update_yaxes(title_text="Umsatz ($ Mrd.)", secondary_y=False)
-fig_sales.update_yaxes(title_text="Verkaufte Einheiten (Mio.)", secondary_y=True)
+fig_sales.update_yaxes(title_text="Revenue ($ Billion)", secondary_y=False)
+fig_sales.update_yaxes(title_text="Units Sold (Millions)", secondary_y=True)
 st.plotly_chart(fig_sales, use_container_width=True)
 
-# --- 2. KURSREAKTION ---
-st.subheader("2. Aktienkurs-Bewegung nach Earnings (30 Tage)")
+# --- 2. PRICE REACTION ---
+st.subheader("2. Stock Price Movement Post-Earnings (30 Days)")
 
 if "price_change_pct" in df.columns:
     colors = ["#2ca02c" if x >= 0 else "#d62728" for x in df["price_change_pct"]]
@@ -106,14 +106,14 @@ if "price_change_pct" in df.columns:
     )
     fig_reaction.add_hline(y=0, line_dash="dash", line_color="gray")
     fig_reaction.update_layout(
-        yaxis_title="Kursveraenderung (%)",
+        yaxis_title="Price Change (%)",
         template="plotly_white",
         height=400,
     )
     st.plotly_chart(fig_reaction, use_container_width=True)
 
-# --- 3. KORRELATION ---
-st.subheader("3. Korrelations-Analyse")
+# --- 3. CORRELATION ---
+st.subheader("3. Correlation Analysis")
 
 clean = df[["iphone_revenue_billion", "iphone_units_million", "price_change_pct"]].dropna()
 
@@ -123,20 +123,20 @@ if len(clean) >= 3:
 
     corr_table = pd.DataFrame([
         {
-            "Metrik": "iPhone-Umsatz",
+            "Metric": "iPhone Revenue",
             "Pearson r": f"{rev_pearson_r:.4f}",
-            "P-Wert": f"{rev_pearson_p:.4f}",
+            "P-Value": f"{rev_pearson_p:.4f}",
         },
         {
-            "Metrik": "iPhone-Einheiten",
+            "Metric": "iPhone Units",
             "Pearson r": f"{unit_pearson_r:.4f}",
-            "P-Wert": f"{unit_pearson_p:.4f}",
+            "P-Value": f"{unit_pearson_p:.4f}",
         },
     ])
     st.table(corr_table)
 
-# --- 4. SAISONALITAET ---
-st.subheader("4. Saisonale Muster nach Fiskalquartal")
+# --- 4. SEASONALITY ---
+st.subheader("4. Seasonal Patterns by Fiscal Quarter")
 
 df["fiscal_q"] = df["quarter"].str[:2]
 seasonal = df.groupby("fiscal_q").agg(
@@ -149,7 +149,7 @@ fig_seasonal.add_trace(
     go.Bar(
         x=seasonal["fiscal_q"],
         y=seasonal["avg_revenue"],
-        name="Durchschn. Umsatz ($ Mrd.)",
+        name="Avg. Revenue ($ bn)",
         marker_color="#1f77b4",
         opacity=0.7,
     ),
@@ -159,7 +159,7 @@ fig_seasonal.add_trace(
     go.Scatter(
         x=seasonal["fiscal_q"],
         y=seasonal["avg_price_change"],
-        name="Durchschn. Kursreaktion (%)",
+        name="Avg. Price Reaction (%)",
         mode="lines+markers",
         line=dict(color="#e94560", width=2),
     ),
@@ -168,21 +168,21 @@ fig_seasonal.add_trace(
 fig_seasonal.update_layout(template="plotly_white", height=400)
 st.plotly_chart(fig_seasonal, use_container_width=True)
 
-# --- 5. ZENTRALE ERKENNTNISSE ---
-st.subheader("5. Zentrale Erkenntnisse")
+# --- 5. KEY FINDINGS ---
+st.subheader("5. Key Insights")
 
 positive_rate = (df["price_change_pct"] >= 0).mean() * 100
 summary = f"""
-**Analyse von {len(df)} Quartalen:**
+**Analysis of {len(df)} Quarters:**
 
-- **Erfolgsquote:** In {positive_rate:.0f}% der Quartale reagierte die Aktie 30 Tage nach den Earnings positiv.
-- **Saisonalitaet:** Das Quartal Q1 (Feiertagsquartal) liefert konsistent die hoechsten Umsaetze.
-- **Statistische Signifikanz:** """
+- **Success Rate:** In {positive_rate:.0f}% of quarters, the stock responded positively 30 days after earnings.
+- **Seasonality:** Fiscal Q1 (Holiday Quarter) consistently delivers the highest revenues.
+- **Statistical Significance:** """
 
 if len(clean) >= 3 and rev_pearson_p < 0.05:
-    summary += "Es besteht ein statistisch signifikanter Zusammenhang zwischen dem iPhone-Umsatz und der Kursreaktion."
+    summary += "There is a statistically significant correlation between iPhone revenue and stock price reaction."
 else:
-    summary += "Der Zusammenhang ist statistisch nicht signifikant. Dies deutet darauf hin, dass der Markt Erwartungen bereits einpreist und nur Abweichungen von diesen Erwartungen den Kurs treiben."
+    summary += "The correlation is not statistically significant. This suggests that the market already prices in expectations, and only deviations from these expectations drive the price."
 
 st.markdown(summary)
-st.caption("Datenquelle: Apple Investor Relations / Statista. Manuelle Pflege in data/iphone_sales.csv erforderlich.")
+st.caption("Data source: Apple Investor Relations / Statista. Manual updates required in data/iphone_sales.csv.")
