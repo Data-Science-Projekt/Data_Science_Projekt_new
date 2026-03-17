@@ -4,5 +4,5 @@ numpy
 plotly
 requests
 scipy
-kaleido
+kaleido==0.2.1
 pypdf
