@@ -10,22 +10,26 @@ TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 ALL_STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
 
-# --- DATA LOADING ---
-@st.cache_data
+# --- DATA LOADING (LOCAL) ---
+@st.cache_data(show_spinner="Loading local market data...")
 def get_monthly_data_local(symbol):
     file_path = f"data/stock_{symbol}.csv"
-    if not os.path.exists(file_path): return None
+    if not os.path.exists(file_path):
+        return None
     try:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True).sort_index()
+        # Resample to monthly to match sentiment data frequency
         monthly = df[["4. close"]].resample("MS").last()
         monthly[f"{symbol}_return"] = monthly["4. close"].pct_change()
         return monthly[[f"{symbol}_return"]].dropna()
-    except: return None
+    except Exception:
+        return None
 
-@st.cache_data
+@st.cache_data(show_spinner="Loading consumer sentiment...")
 def get_sentiment_local():
     file_path = "data/consumer_sentiment.csv"
-    if not os.path.exists(file_path): return None
+    if not os.path.exists(file_path):
+        return None
     try:
         df = pd.read_csv(file_path)
         df['date'] = pd.to_datetime(df['date'])
@@ -33,82 +37,130 @@ def get_sentiment_local():
         df = df.rename(columns={"value": "sentiment"})
         df['sentiment'] = pd.to_numeric(df['sentiment'], errors='coerce')
         return df.set_index('date')[['sentiment']].dropna()
-    except: return None
+    except Exception:
+        return None
 
-# --- UI PREPARATION ---
+# --- UI ---
 st.title("Research Question 8: Sentiment Correlation")
+st.markdown("""
+**Research Question:** How does the Consumer Sentiment Index (University of Michigan) 
+correlate with selected tech stocks and financial stocks?
+""")
 
+# Sidebar
+st.sidebar.header("Analysis Parameters")
+# Lookback slider: Controls how many of the AVAILABLE months are shown
+lookback_months = st.sidebar.slider("Lookback period (months)", 3, 48, 24)
+# Rolling window: Must be smaller than the available data
+rolling_window = st.sidebar.slider("Rolling correlation window (months)", 2, 12, 6)
+
+# Load data
 sentiment_df = get_sentiment_local()
 stock_returns = {}
+
 if sentiment_df is not None:
     for name, symbol in ALL_STOCKS.items():
         data = get_monthly_data_local(symbol)
-        if data is not None: stock_returns[name] = data.rename(columns={f"{symbol}_return": name})
+        if data is not None:
+            stock_returns[name] = data.rename(columns={f"{symbol}_return": name})
 
-# Check if we have any data at all
 if sentiment_df is None or not stock_returns:
-    st.error("No data found in /data. Please run the GitHub Bot first.")
+    st.error("Data files not found in /data folder. Please ensure the bot has run successfully.")
     st.stop()
 
-# Merge and determine available months
+# Merge datasets
 merged_all = sentiment_df.copy()
 for name, ret_df in stock_returns.items():
     merged_all = merged_all.join(ret_df, how="inner")
 
-available_months = len(merged_all)
+# --- APPLY SLIDER FILTERS ---
+# 1. Filter the data based on the lookback slider
+merged = merged_all.tail(lookback_months).dropna()
 
-# --- SIDEBAR WITH DYNAMIC LIMITS ---
-st.sidebar.header("Analysis Parameters")
-st.sidebar.info(f"Total months available in CSV: {available_months}")
+if len(merged) < rolling_window:
+    st.warning(f"Not enough data for a {rolling_window}-month window. Currently showing all {len(merged)} available months.")
+    # Adjust window if necessary to prevent empty charts
+    effective_window = max(2, len(merged))
+else:
+    effective_window = rolling_window
 
-# Lookback slider - cannot be larger than available data
-lookback = st.sidebar.slider("Lookback period (months)", 
-                             min_value=2, 
-                             max_value=max(2, available_months), 
-                             value=min(24, available_months))
+st.write(f"**Analysis Period:** {merged.index.min().strftime('%Y-%m')} to {merged.index.max().strftime('%Y-%m')} ({len(merged)} months)")
 
-# Rolling window - cannot be larger than the selected lookback
-rolling_window = st.sidebar.slider("Rolling correlation window (months)", 
-                                   min_value=2, 
-                                   max_value=max(2, lookback), 
-                                   value=min(6, lookback))
-
-# --- FILTERING ---
-merged = merged_all.tail(lookback)
-
-# --- VISUALIZATION ---
-st.write(f"**Current View:** Analyzing {len(merged)} months of data.")
-
-# 1. Sentiment Chart
+# --- 1. SENTIMENT VISUALIZATION ---
+st.subheader("1. Consumer Sentiment Index Over Time")
 fig_sent = go.Figure()
-fig_sent.add_trace(go.Scatter(x=merged.index, y=merged["sentiment"], mode="lines+markers", name="Sentiment"))
-fig_sent.update_layout(title="Consumer Sentiment Index", template="plotly_white", height=300)
+fig_sent.add_trace(go.Scatter(
+    x=merged.index, y=merged["sentiment"],
+    mode="lines+markers", name="Consumer Sentiment",
+    line=dict(color="#1f77b4", width=2)
+))
+fig_sent.update_layout(yaxis_title="Sentiment Index", template="plotly_white", height=400)
 st.plotly_chart(fig_sent, use_container_width=True)
 
-# 2. Statistics & Correlation
-st.subheader("Correlation Analysis")
+# --- 2. CORRELATION MATRIX ---
+st.subheader("2. Correlation Matrix")
+stock_names = list(stock_returns.keys())
+corr_matrix = merged[["sentiment"] + stock_names].corr()
+
+fig_heatmap = go.Figure(data=go.Heatmap(
+    z=corr_matrix.values,
+    x=corr_matrix.columns,
+    y=corr_matrix.index,
+    colorscale="RdBu_r",
+    zmid=0,
+    text=np.round(corr_matrix.values, 3),
+    texttemplate="%{text}"
+))
+fig_heatmap.update_layout(template="plotly_white", height=500)
+st.plotly_chart(fig_heatmap, use_container_width=True)
+
+# --- 3. DETAILED STATISTICS ---
+st.subheader("3. Detailed Correlation Statistics")
 corr_results = []
-for name in stock_returns.keys():
-    if len(merged) > 2:
-        r_p, _ = pearsonr(merged["sentiment"], merged[name])
-        corr_results.append({"Stock": name, "Pearson r": round(r_p, 4)})
+for name in stock_names:
+    r_p, p_p = pearsonr(merged["sentiment"], merged[name])
+    r_s, p_s = spearmanr(merged["sentiment"], merged[name])
+    corr_results.append({
+        "Stock": name,
+        "Sector": "Tech" if name in TECH_STOCKS else "Financial",
+        "Pearson r": round(r_p, 4),
+        "P-Value": round(p_p, 4),
+        "Spearman r": round(r_s, 4)
+    })
+st.table(pd.DataFrame(corr_results))
 
-if corr_results:
-    st.table(pd.DataFrame(corr_results))
+# --- 4. ROLLING CORRELATION ---
+st.subheader("4. Time Evolution (Rolling Correlation)")
+fig_rolling = go.Figure()
+for name in stock_names:
+    # Use the effective_window from the slider
+    rolling_corr = merged["sentiment"].rolling(effective_window).corr(merged[name])
+    fig_rolling.add_trace(go.Scatter(x=merged.index, y=rolling_corr, mode="lines", name=name))
 
-# 3. Rolling Correlation
-st.subheader(f"Rolling {rolling_window}-Month Correlation")
-if len(merged) >= rolling_window:
-    fig_rolling = go.Figure()
-    for name in stock_returns.keys():
-        rolling_corr = merged["sentiment"].rolling(rolling_window).corr(merged[name])
-        fig_rolling.add_trace(go.Scatter(x=merged.index, y=rolling_corr, mode="lines", name=name))
-    fig_rolling.add_hline(y=0, line_dash="dash", line_color="gray")
-    fig_rolling.update_layout(template="plotly_white", height=400)
-    st.plotly_chart(fig_rolling, use_container_width=True)
-else:
-    st.warning(f"Increase data history to see the rolling {rolling_window}-month correlation.")
+fig_rolling.add_hline(y=0, line_dash="dash", line_color="gray")
+fig_rolling.update_layout(
+    yaxis_title=f"Rolling {effective_window}-month correlation",
+    template="plotly_white", height=500
+)
+st.plotly_chart(fig_rolling, use_container_width=True)
 
-# --- INTERPRETATION ---
-st.info("The correlation shows how much the stock market follows consumer confidence. "
-        "With more data over time, these charts will become more expressive.")
+# --- 5. KEY INSIGHTS ---
+st.subheader("5. Key Insights")
+
+avg_tech = np.mean([c["Pearson r"] for c in corr_results if c["Sector"] == "Tech"])
+avg_fin = np.mean([c["Pearson r"] for c in corr_results if c["Sector"] == "Financial"])
+
+summary_text = f"""
+Based on the analysis of the selected {len(merged)} months:
+
+- **Average Tech correlation:** {avg_tech:.4f}
+- **Average Financial correlation:** {avg_fin:.4f}
+
+**Interpretation:**
+1. **Positive values** indicate that rising consumer optimism is associated with higher stock returns.
+2. **Financial stocks** often show higher sensitivity to sentiment as it relates to consumer credit and spending.
+3. **Tech stocks** react to sentiment as a leading indicator for discretionary spending on tech hardware/services.
+4. **Statistical significance** (P-value < 0.05) suggests the relationship is robust and not due to random noise.
+"""
+st.markdown(summary_text)
+st.caption("Data source: Local files (data/). Sentiment: Univ. of Michigan (FRED). Stocks: Alpha Vantage.")
