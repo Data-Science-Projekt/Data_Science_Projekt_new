@@ -5,13 +5,12 @@ import plotly.graph_objects as go
 import os
 
 # --- CONFIGURATION ---
-# No API keys required as we are reading data locally.
 STOCKS = {
-    "Apple": "AAPL", 
-    "NVIDIA": "NVDA", 
-    "Microsoft": "MSFT", 
-    "J.P. Morgan": "JPM", 
-    "Goldman Sachs": "GS", 
+    "Apple": "AAPL",
+    "NVIDIA": "NVDA",
+    "Microsoft": "MSFT",
+    "J.P. Morgan": "JPM",
+    "Goldman Sachs": "GS",
     "Bank of America": "BAC"
 }
 
@@ -19,58 +18,158 @@ STOCKS = {
 def get_stock_data(symbol):
     """Reads the CSV file created by the bot from the data folder."""
     file_path = f"data/stock_{symbol}.csv"
-    
+
     if not os.path.exists(file_path):
         return None
-        
+
     try:
-        # Read CSV (Index is the date)
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-        # Sort so the oldest date is at the top (crucial for rolling windows)
         df = df.sort_index()
-        # Rename Alpha Vantage column '4. close' to 'close'
         if '4. close' in df.columns:
             df.rename(columns={"4. close": "close"}, inplace=True)
         return df[["close"]]
     except Exception:
         return None
 
-def identify_phases(df_input):
-    """Calculates market phases based on a 20-day rolling window."""
+
+def identify_phases(df_input, bull_threshold, bear_threshold):
+    """Calculates market phases based on a 20-day rolling window and custom thresholds."""
     df = df_input.copy()
-    # Rolling Max/Min for phase logic
     df['rolling_max'] = df['close'].rolling(window=20, min_periods=1).max()
     df['rolling_min'] = df['close'].rolling(window=20, min_periods=1).min()
 
-    # Logic: -20% from high = Bear / +20% from low = Bull
+    bear_limit = -bear_threshold / 100
+    bull_limit = bull_threshold / 100
+
     df['phase'] = np.select(
         [
-            (df['close'] - df['rolling_max']) / df['rolling_max'] <= -0.2,
-            (df['close'] - df['rolling_min']) / df['rolling_min'] >= 0.2
+            (df['close'] - df['rolling_max']) / df['rolling_max'] <= bear_limit,
+            (df['close'] - df['rolling_min']) / df['rolling_min'] >= bull_limit
         ],
         ['Bear', 'Bull'],
         default='Neutral'
     )
     return df
 
+
+def add_phase_shading(fig, df):
+    """Adds colored background shading for each market phase as vrect shapes."""
+    phase_colors = {
+        "Bull": "rgba(0, 200, 100, 0.15)",
+        "Bear": "rgba(220, 50, 50, 0.15)",
+        "Neutral": "rgba(180, 180, 180, 0.07)"
+    }
+
+    # Group consecutive rows with the same phase into segments
+    df = df.reset_index()
+    df.columns = ['date'] + list(df.columns[1:])
+
+    segments = []
+    current_phase = df['phase'].iloc[0]
+    start_date = df['date'].iloc[0]
+
+    for i in range(1, len(df)):
+        if df['phase'].iloc[i] != current_phase:
+            segments.append((start_date, df['date'].iloc[i - 1], current_phase))
+            current_phase = df['phase'].iloc[i]
+            start_date = df['date'].iloc[i]
+    segments.append((start_date, df['date'].iloc[-1], current_phase))
+
+    for seg_start, seg_end, phase in segments:
+        fig.add_vrect(
+            x0=seg_start,
+            x1=seg_end,
+            fillcolor=phase_colors.get(phase, "rgba(0,0,0,0)"),
+            opacity=1.0,
+            layer="below",
+            line_width=0,
+        )
+
+    return fig
+
+
 # --- UI ---
 st.title("Market Phase Analysis")
 st.write("Identification of Bull, Bear, and Neutral phases using a rolling window approach.")
 
+# Sidebar controls
 selected_stock = st.sidebar.selectbox("Select Asset:", list(STOCKS.keys()))
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("Phase Thresholds")
+
+bull_threshold = st.sidebar.slider(
+    "🟢 Bull Market Threshold (%)",
+    min_value=1,
+    max_value=20,
+    value=20,
+    step=1,
+    help="Minimum rise from rolling 20-day low to qualify as a Bull phase."
+)
+
+bear_threshold = st.sidebar.slider(
+    "🔴 Bear Market Threshold (%)",
+    min_value=1,
+    max_value=20,
+    value=20,
+    step=1,
+    help="Minimum drop from rolling 20-day high to qualify as a Bear phase."
+)
+
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    f"**Current Settings:**\n"
+    f"- 🟢 Bull: +{bull_threshold}% from 20d low\n"
+    f"- 🔴 Bear: -{bear_threshold}% from 20d high"
+)
+
+# Load and process data
 df_raw = get_stock_data(STOCKS[selected_stock])
 
 if df_raw is not None:
-    df_view = identify_phases(df_raw)
+    df_view = identify_phases(df_raw, bull_threshold, bear_threshold)
 
     # Chart
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df_view.index, y=df_view['close'], name='Price'))
+
+    # Add phase shading first (below price line)
+    fig = add_phase_shading(fig, df_view)
+
+    # Price line
+    fig.add_trace(go.Scatter(
+        x=df_view.index,
+        y=df_view['close'],
+        name='Price',
+        line=dict(color='#E8E8E8', width=1.8),
+        hovertemplate='%{x|%d.%m.%Y}<br>$%{y:.2f}<extra></extra>'
+    ))
+
+    # Add invisible legend traces for phase colors
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], mode='markers',
+        marker=dict(size=10, color='rgba(0, 200, 100, 0.6)', symbol='square'),
+        name=f'Bull (≥+{bull_threshold}%)'
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], mode='markers',
+        marker=dict(size=10, color='rgba(220, 50, 50, 0.6)', symbol='square'),
+        name=f'Bear (≤-{bear_threshold}%)'
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], mode='markers',
+        marker=dict(size=10, color='rgba(180, 180, 180, 0.4)', symbol='square'),
+        name='Neutral'
+    ))
+
     fig.update_layout(
-        template="plotly_dark", 
-        xaxis_title="Date", 
-        yaxis_title="Price ($)"
+        template="plotly_dark",
+        xaxis_title="Date",
+        yaxis_title="Price ($)",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        hovermode="x unified",
+        margin=dict(t=60)
     )
+
     st.plotly_chart(fig, use_container_width=True)
 
     # Phase Distribution
@@ -125,9 +224,9 @@ This provides a direct understanding of the dominant market environment during t
 ---
 
 **5. Methodological Note**
-This model uses a 20-day window:
-- 20% drop from the recent high -> Bear
-- 20% rise from the recent low -> Bull
+This model uses a 20-day rolling window with your custom thresholds:
+- {bear_threshold}% drop from the recent high → Bear 🔴
+- {bull_threshold}% rise from the recent low → Bull 🟢
 
 This is a simplified but widely used definition of market cycles in financial analysis.
 """)
