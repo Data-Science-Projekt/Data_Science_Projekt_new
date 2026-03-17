@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import os
 from scipy.stats import pearsonr, spearmanr
 from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
@@ -143,6 +144,13 @@ fig_rolling.update_layout(
     template="plotly_white", height=500
 )
 st.plotly_chart(fig_rolling, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PDF herunterladen",
+    data=fig_to_pdf_bytes(fig),
+    file_name="marktphasen.pdf",
+    mime="application/pdf"
+)
 
 # --- 5. KEY INSIGHTS ---
 st.subheader("5. Key Insights")

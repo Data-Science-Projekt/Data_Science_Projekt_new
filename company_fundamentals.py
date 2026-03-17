@@ -6,6 +6,7 @@ from plotly.subplots import make_subplots
 from scipy.stats import pearsonr, spearmanr
 import os
 from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 # Path to the static data file in the data folder
@@ -112,6 +113,13 @@ if "price_change_pct" in df.columns:
     )
     st.plotly_chart(fig_reaction, use_container_width=True)
 
+    st.download_button(
+        label="📥 Graph als PDF herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="marktphasen.pdf",
+        mime="application/pdf"
+    )
+
 # --- 3. CORRELATION ---
 st.subheader("3. Correlation Analysis")
 
@@ -167,6 +175,13 @@ fig_seasonal.add_trace(
 )
 fig_seasonal.update_layout(template="plotly_white", height=400)
 st.plotly_chart(fig_seasonal, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PDF herunterladen",
+    data=fig_to_pdf_bytes(fig),
+    file_name="marktphasen.pdf",
+    mime="application/pdf"
+)
 
 # --- 5. KEY FINDINGS ---
 st.subheader("5. Key Insights")

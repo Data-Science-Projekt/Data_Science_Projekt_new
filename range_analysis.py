@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 # No API keys or local cache folder required anymore.
@@ -84,6 +85,13 @@ for name, df in stock_data.items():
 fig_box.update_layout(yaxis_title="Relative Trading Range (%)", template="plotly_white")
 st.plotly_chart(fig_box, use_container_width=True)
 
+st.download_button(
+    label="📥 Graph als PDF herunterladen",
+    data=fig_to_pdf_bytes(fig),
+    file_name="marktphasen.pdf",
+    mime="application/pdf"
+)
+
 # Time Series
 st.subheader("Trading Range Trend Over Time")
 fig_ts = go.Figure()
@@ -93,6 +101,13 @@ for i, (name, df) in enumerate(stock_data.items()):
     fig_ts.add_trace(go.Scatter(x=df.index, y=df["relative_range_pct"], mode="lines", name=name, line=dict(color=colors[i % len(colors)], width=1.5)))
 fig_ts.update_layout(xaxis_title="Date", yaxis_title="Relative Trading Range (%)", template="plotly_white")
 st.plotly_chart(fig_ts, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PDF herunterladen",
+    data=fig_to_pdf_bytes(fig),
+    file_name="marktphasen.pdf",
+    mime="application/pdf"
+)
 
 # Statistics Table
 st.subheader("Statistical Metrics per Stock")

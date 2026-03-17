@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
 # No API keys needed anymore. Sectors are based on locally loaded files.
@@ -132,6 +133,13 @@ if df_tech is not None and df_fin is not None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PDF herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="marktphasen.pdf",
+        mime="application/pdf"
+    )
 
     # --- STATISTICS ---
     st.subheader("Frequency Analysis")

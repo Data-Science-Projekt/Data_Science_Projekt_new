@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 from analysis.utils import render_page_header
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIG ---
 # Data sources are now loaded locally from the folder maintained by the bot
@@ -74,6 +75,13 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     st.plotly_chart(fig, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PDF herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="marktphasen.pdf",
+        mime="application/pdf"
+    )
 
     # Metrics below the chart
     c1, c2 = st.columns(2)
