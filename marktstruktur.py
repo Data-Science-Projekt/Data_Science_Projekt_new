@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
 
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
@@ -40,8 +41,10 @@ def get_vix_data():
         return None
 
 # --- UI ---
-st.title("Market Reaction: Stocks vs. VIX")
-st.markdown("Analysis of stock reactions during periods of increased market volatility (VIX).")
+render_page_header(
+    "Market Structure",
+    "How does the correlation between J.P. Morgan and Goldman Sachs change during stable market periods compared to crisis periods (bear markets)?",
+)
 
 with st.sidebar:
     st.header("Settings")

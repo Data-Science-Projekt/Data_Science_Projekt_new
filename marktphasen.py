@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
 
 # --- CONFIGURATION ---
 STOCKS = {
@@ -89,8 +90,10 @@ def add_phase_shading(fig, df):
 
 
 # --- UI ---
-st.title("Market Phase Analysis")
-st.write("Identification of Bull, Bear, and Neutral phases using a rolling window approach.")
+render_page_header(
+    "Market Phases",
+    "How do Apple and NVIDIA stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold of 30)?",
+)
 
 # Sidebar controls
 selected_stock = st.sidebar.selectbox("Select Asset:", list(STOCKS.keys()))

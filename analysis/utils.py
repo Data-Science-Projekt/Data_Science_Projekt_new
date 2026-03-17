@@ -2,11 +2,57 @@ import pandas as pd
 import requests
 import time
 import numpy as np
+import streamlit as st
 from functools import wraps
 
 # Simple in-memory cache with TTL
 _cache = {}
 CACHE_TTL_SECONDS = 3600  # 1 hour
+
+
+def render_page_header(title, research_question):
+    st.title(title)
+
+    st.markdown(
+        """
+        <style>
+        .research-header {
+            margin: 0.35rem 0 1.5rem;
+            padding: 0.95rem 1.15rem;
+            border-left: 4px solid #3b82f6;
+            border-radius: 12px;
+            background: #f8fbfd;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+        .research-header__eyebrow {
+            margin: 0 0 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #486581;
+        }
+        .research-header__question {
+            margin: 0;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            font-weight: 500;
+            color: #243b53;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <section class="research-header">
+            <p class="research-header__eyebrow">Research Question</p>
+            <p class="research-header__question">{research_question}</p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
 def simple_cache(func):
     @wraps(func)

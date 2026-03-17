@@ -4,6 +4,7 @@ import numpy as np
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
 
 # --- CONFIGURATION ---
 # We use the data provided by the bot in the data folder
@@ -35,8 +36,10 @@ def get_stock_data_local(symbol):
         return None
 
 # --- UI ---
-st.title("Daily Trading Ranges")
-st.write("Comparison of volatility between tech and financial stocks.")
+render_page_header(
+    "Return Analysis",
+    "To what extent do the daily log returns of Apple and NVIDIA deviate from a normal distribution?",
+)
 
 # Sidebar for selection
 selected_tech = st.sidebar.multiselect("Tech stocks", list(TECH_STOCKS.keys()), default=["Apple"])

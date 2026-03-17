@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
 
 # --- CONFIGURATION ---
 # No API keys or local cache folder required anymore.
@@ -34,10 +35,10 @@ def get_stock_data_local(symbol):
         return None
 
 # --- MAIN APP ---
-st.title("Research Question 2: Daily Trading Ranges")
-st.markdown("""
-**Research Question:** What differences exist in the daily trading range between selected Tech stocks (Apple, Microsoft, NVIDIA) and Financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?
-""")
+render_page_header(
+    "Volatility",
+    "What are the differences in the daily trading range between selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
+)
 
 # Sidebar for controls
 st.sidebar.header("Analysis Parameters")

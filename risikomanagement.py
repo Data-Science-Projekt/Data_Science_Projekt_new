@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
 
 # --- CONFIG ---
 # Data sources are now loaded locally from the folder maintained by the bot
@@ -33,8 +34,10 @@ st.sidebar.divider()
 show_apple = st.sidebar.checkbox("Show Apple (AAPL)", value=True, key="risk_a")
 show_nvidia = st.sidebar.checkbox("Show NVIDIA (NVDA)", value=True, key="risk_n")
 
-st.title("Value-at-Risk (VaR) and Expected Shortfall")
-st.write("Quantifying potential losses and tail risks for individual assets.")
+render_page_header(
+    "Risk Management",
+    "What is the maximum expected loss (at a 95% confidence level) for Apple compared to NVIDIA over a 1-day horizon?",
+)
 
 # --- DATA LOADING ---
 ret_a = None

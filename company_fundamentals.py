@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.stats import pearsonr, spearmanr
 import os
+from analysis.utils import render_page_header
 
 # --- CONFIGURATION ---
 # Path to the static data file in the data folder
@@ -37,11 +38,10 @@ def load_iphone_sales():
         return pd.DataFrame()
 
 # --- MAIN PAGE ---
-st.title("Research Question 9: Corporate Fundamentals")
-st.markdown("""
-**Research Question:** How do iPhone sales figures influence Apple's long-term stock performance? 
-Do quarterly surprises in the iPhone segment drive price movements following earnings announcements?
-""")
+render_page_header(
+    "Company Fundamentals",
+    "How does the quarterly sales volume of iPhone units statistically correlate with Apple's stock price returns in the month following the earnings release?",
+)
 
 st.markdown("""
 #### Methodology

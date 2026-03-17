@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from analysis.utils import render_page_header
 
 # --- CONFIGURATION ---
 # No API keys needed anymore. Sectors are based on locally loaded files.
@@ -59,8 +60,10 @@ def get_sector_data_local(sector_name):
     return None
 
 # --- UI ---
-st.title("Volume Patterns: Tech vs. Financial Sector")
-st.markdown("Comparison of trading intensity and abnormal volume spikes between sectors.")
+render_page_header(
+    "Technical Analysis",
+    "How do trading volume patterns (frequency of volume spikes) differ between selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
+)
 
 with st.sidebar:
     st.header("Sector Selection")
