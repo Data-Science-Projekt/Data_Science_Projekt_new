@@ -19,10 +19,10 @@ def render_page_header(title, research_question):
         .research-header {
             margin: 0.35rem 0 1.5rem;
             padding: 0.95rem 1.15rem;
-            border-left: 4px solid #3b82f6;
+            border-left: 4px solid #2563eb;
             border-radius: 12px;
-            background: #f8fbfd;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.10);
         }
         .research-header__eyebrow {
             margin: 0 0 0.3rem;
@@ -30,14 +30,14 @@ def render_page_header(title, research_question):
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #486581;
+            color: #1d4ed8;
         }
         .research-header__question {
             margin: 0;
             font-size: 0.98rem;
             line-height: 1.5;
             font-weight: 500;
-            color: #243b53;
+            color: #1e3a8a;
         }
         </style>
         """,

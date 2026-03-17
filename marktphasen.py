@@ -92,7 +92,7 @@ def add_phase_shading(fig, df):
 # --- UI ---
 render_page_header(
     "Market Phases",
-    "How do Apple and NVIDIA stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold of 30)?",
+    "How does the correlation between selected technology stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) change during stable market periods compared to crisis periods (bear markets)?",
 )
 
 # Sidebar controls
