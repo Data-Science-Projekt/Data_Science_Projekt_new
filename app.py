@@ -5,6 +5,7 @@ st.set_page_config(page_title="StockInsight Dashboard", layout="wide", page_icon
 # Navigation Definition
 pages = [
     st.Page("pages/home.py", title="Home", default=True),
+    st.Page("pages/about_project.py", title="About the Project"),
     st.Page("return_analysis.py", title="Return Analysis"),
     st.Page("range_analysis.py", title="Volatility"),
     st.Page("marktstruktur.py", title="Market Structure"),
