@@ -4,30 +4,44 @@ import io
 import copy
 
 
-def fig_to_pdf_bytes(fig, width=3508, height=2480, scale=2):
-    """Einzelnen Plotly-Graph als hochauflösendes PNG exportieren – druckoptimiert."""
+def fig_to_pdf_bytes(fig, width=2480, height=1654, scale=1):
+    """Einzelnen Plotly-Graph als hochauflösendes PNG exportieren – A4 Querformat, 300 DPI."""
 
     # Kopie erstellen damit der angezeigte Graph unverändert bleibt
     fig_export = copy.deepcopy(fig)
 
     fig_export.update_layout(
-        font=dict(size=18, color="black"),
-        title_font=dict(size=24),
+        font=dict(size=28, color="black"),
+        title_font=dict(size=36, color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
-        margin=dict(l=100, r=100, t=120, b=100),
-        legend=dict(font=dict(size=16, color="black")),
+        margin=dict(l=120, r=120, t=80, b=120),
+        legend=dict(
+            font=dict(size=26, color="black"),
+            bgcolor="white",
+            bordercolor="black",
+            borderwidth=1,
+            orientation="h",  # horizontal unten
+            yanchor="bottom",
+            y=-0.2,  # unterhalb des Graphs
+            xanchor="center",
+            x=0.5
+        ),
         xaxis=dict(
-            title_font=dict(size=20, color="black"),
-            tickfont=dict(size=14, color="black"),
+            title_font=dict(size=30, color="black"),
+            tickfont=dict(size=24, color="black"),
             linecolor="black",
-            gridcolor="lightgrey"
+            linewidth=2,
+            gridcolor="#dddddd",
+            title_standoff=20,
         ),
         yaxis=dict(
-            title_font=dict(size=20, color="black"),
-            tickfont=dict(size=14, color="black"),
+            title_font=dict(size=30, color="black"),
+            tickfont=dict(size=24, color="black"),
             linecolor="black",
-            gridcolor="lightgrey"
+            linewidth=2,
+            gridcolor="#dddddd",
+            title_standoff=20,
         ),
     )
 
@@ -35,13 +49,13 @@ def fig_to_pdf_bytes(fig, width=3508, height=2480, scale=2):
     for trace in fig_export.data:
         if trace.name == "Price":
             trace.line.color = "#1f77b4"
-            trace.line.width = 2.5
+            trace.line.width = 3
 
-    return pio.to_image(fig_export, format="png", width=width, height=height, scale=2)
+    return pio.to_image(fig_export, format="png", width=width, height=height, scale=scale)
 
 
-def figs_to_pdf_bytes(figures: list, width=3508, height=2480, scale=2):
-    """Mehrere Plotly-Graphen in ein einziges PNG zusammenführen."""
+def figs_to_pdf_bytes(figures: list, width=2480, height=1654, scale=1):
+    """Mehrere Plotly-Graphen in ein einziges PDF zusammenführen."""
     writer = pypdf.PdfWriter()
 
     for fig in figures:
