@@ -115,6 +115,13 @@ fig_heatmap = go.Figure(data=go.Heatmap(
 fig_heatmap.update_layout(template="plotly_white", height=500)
 st.plotly_chart(fig_heatmap, use_container_width=True)
 
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_heatmap),
+    file_name="sentiment_correlation.png",
+    mime="application/png"
+)
+
 # --- 3. DETAILED STATISTICS ---
 st.subheader("3. Detailed Correlation Statistics")
 corr_results = []
