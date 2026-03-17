@@ -78,7 +78,7 @@ if stock_data:
 
     st.download_button(
         label="📥 Graph als PDF herunterladen",
-        data=fig_to_pdf_bytes(fig),
+        data=fig_to_pdf_bytes(fig_box),
         file_name="marktphasen.pdf",
         mime="application/pdf"
     )

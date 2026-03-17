@@ -87,7 +87,7 @@ st.plotly_chart(fig_box, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PDF herunterladen",
-    data=fig_to_pdf_bytes(fig),
+    data=fig_to_pdf_bytes(fig_box),
     file_name="marktphasen.pdf",
     mime="application/pdf"
 )
@@ -104,7 +104,7 @@ st.plotly_chart(fig_ts, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PDF herunterladen",
-    data=fig_to_pdf_bytes(fig),
+    data=fig_to_pdf_bytes(fig_ts),
     file_name="marktphasen.pdf",
     mime="application/pdf"
 )
