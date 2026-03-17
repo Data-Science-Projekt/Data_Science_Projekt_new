@@ -9,12 +9,13 @@ import time
 AV_API_KEY = st.secrets.get("AV_API_KEY", "")
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
+
 @st.cache_data(show_spinner=False)
 def get_stock_returns(symbol):
-    # Kleiner Delay, um das 5-Requests-pro-Minute Limit nicht zu sprengen
+    # Small delay to avoid hitting the 5-requests-per-minute API limit
     if symbol == "NVDA":
-        time.sleep(2) 
-        
+        time.sleep(2)
+
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&outputsize=compact&apikey={AV_API_KEY}'
     try:
         r = requests.get(url, timeout=10).json()
@@ -22,11 +23,12 @@ def get_stock_returns(symbol):
             df = pd.DataFrame.from_dict(r['Time Series (Daily)'], orient='index').astype(float).sort_index()
             return df['4. close'].pct_change().dropna()
         elif "Note" in r:
-            st.error(f"API-Limit für {symbol} erreicht. Bitte Seite in 60 Sek. neu laden.")
+            st.error(f"API Limit for {symbol} reached. Please reload in 60 seconds.")
             return None
     except:
         return None
     return None
+
 
 # --- SIDEBAR ---
 st.sidebar.header("Risk Settings")
@@ -36,8 +38,9 @@ show_apple = st.sidebar.checkbox("Show Apple (AAPL)", value=True, key="risk_a")
 show_nvidia = st.sidebar.checkbox("Show NVIDIA (NVDA)", value=True, key="risk_n")
 
 st.title("Value-at-Risk (VaR) & Expected Shortfall")
+st.write("Quantifying potential losses and tail risks for individual assets.")
 
-# --- DATEN LADEN ---
+# --- DATA LOADING ---
 data_load_info = st.empty()
 ret_a = None
 ret_n = None
@@ -63,18 +66,51 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         fig.add_trace(go.Histogram(x=ret_n, name="NVIDIA", marker_color='#ff7f0e', opacity=0.6))
         fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", annotation_text=f"VaR NVDA")
 
-    fig.update_layout(barmode='overlay', template="plotly_dark")
-    st.plotly_chart(fig, width='stretch')
+    fig.update_layout(
+        barmode='overlay',
+        template="plotly_dark",
+        xaxis_title="Daily Return",
+        yaxis_title="Frequency",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
-    # Metriken unter dem Chart
+    # Metrics below the chart
     c1, c2 = st.columns(2)
     if show_apple and ret_a is not None:
-        c1.subheader("Apple")
-        c1.metric("VaR", f"{v_a:.2%}")
+        c1.subheader("Apple (AAPL)")
+        c1.metric("Value-at-Risk", f"{v_a:.2%}")
         c1.metric("Expected Shortfall", f"{e_a:.2%}")
     if show_nvidia and ret_n is not None:
-        c2.subheader("NVIDIA")
-        c2.metric("VaR", f"{v_n:.2%}")
+        c2.subheader("NVIDIA (NVDA)")
+        c2.metric("Value-at-Risk", f"{v_n:.2%}")
         c2.metric("Expected Shortfall", f"{e_n:.2%}")
+
+    # --- INTERPRETATION & EXPLANATION ---
+    st.markdown("---")
+    st.subheader("Analysis & Interpretation")
+
+    st.info(f"""
+    **Risk Metrics Definition:**
+    - **Value-at-Risk (VaR):** Represents the maximum expected loss over a specific time horizon at a given confidence level ({conf_level * 100:.1f}%). 
+    - **Expected Shortfall (CVaR):** Represents the average loss that occurs when the VaR threshold is breached (the 'average of the worst cases').
+    """)
+
+    st.markdown("""
+    ### Key Insights:
+
+    * **Tail Risk Assessment:** While the standard deviation (volatility) measures general uncertainty, **VaR** and **Expected Shortfall** focus specifically on the "left tail" of the distribution—where the most significant losses happen.
+
+    * **Apple vs. NVIDIA:** - Generally, NVIDIA tends to have a **deeper VaR** than Apple, reflecting its higher historical volatility and beta. 
+        - A larger gap between VaR and Expected Shortfall indicates **"Fat Tails"** (Leptokurtosis), meaning extreme crashes are more likely than a normal distribution would predict.
+
+    * **The Confidence Level Impact:** - Increasing the confidence level (e.g., from 95% to 99%) shifts the VaR line further to the left, capturing more extreme but less frequent events. 
+        - Investors with low risk tolerance should focus on the **Expected Shortfall**, as it provides a more realistic picture of potential damage during a market crisis.
+
+    * **Limitations:** These metrics are based on historical data (last 100 trading days). They assume that future market behavior will resemble the past, which may not hold true during unprecedented "Black Swan" events.
+    """)
+
+    st.caption("Calculation: Historical simulation based on the latest 100 trading days of data from Alpha Vantage.")
+
 else:
-    st.info("Bitte wählen Sie Assets aus oder warten Sie auf die API-Antwort.")
+    st.info("Please select assets or wait for the API response.")
