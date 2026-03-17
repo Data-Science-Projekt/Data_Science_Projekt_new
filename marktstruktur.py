@@ -146,7 +146,7 @@ if df_stock is not None and df_vix is not None:
     st.markdown(f"""
     **How to read this chart:**
     * **Blue Line:** The closing price of {selected_stock}.
-    * **Gray Dotted Line:** The VIX Index, often referred to as the "fear gauge."
+    * **Purple Dotted Line:** The VIX Index, often referred to as the "fear gauge."
     * **Red Areas:** Time periods where volatility exceeded your threshold.
 
     ### Key Insights:
