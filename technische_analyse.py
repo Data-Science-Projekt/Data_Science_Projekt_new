@@ -135,10 +135,10 @@ if df_tech is not None and df_fin is not None:
     st.plotly_chart(fig, use_container_width=True)
 
     st.download_button(
-        label="📥 Graph als PDF herunterladen",
+        label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig),
-        file_name="marktphasen.pdf",
-        mime="application/pdf"
+        file_name="marktphasen.png",
+        mime="application/png"
     )
 
     # --- STATISTICS ---

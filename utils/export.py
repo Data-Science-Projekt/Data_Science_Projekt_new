@@ -1,12 +1,11 @@
 import plotly.io as pio
-import plotly.graph_objects as go
 import pypdf
 import io
 import copy
 
 
 def fig_to_pdf_bytes(fig, width=3508, height=2480, scale=2):
-    """Einzelnen Plotly-Graph als PDF exportieren – A4 Querformat, druckoptimiert."""
+    """Einzelnen Plotly-Graph als hochauflösendes PNG exportieren – druckoptimiert."""
 
     # Kopie erstellen damit der angezeigte Graph unverändert bleibt
     fig_export = copy.deepcopy(fig)
@@ -32,7 +31,8 @@ def fig_to_pdf_bytes(fig, width=3508, height=2480, scale=2):
         ),
     )
 
-    return pio.to_image(fig_export, format="pdf", width=width, height=height, scale=scale)
+    # PNG statt PDF – stabiler mit kaleido 0.2.1
+    return pio.to_image(fig_export, format="png", width=width, height=height, scale=2)
 
 
 def figs_to_pdf_bytes(figures: list, width=3508, height=2480, scale=2):

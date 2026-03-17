@@ -86,10 +86,10 @@ fig_box.update_layout(yaxis_title="Relative Trading Range (%)", template="plotly
 st.plotly_chart(fig_box, use_container_width=True)
 
 st.download_button(
-    label="📥 Graph als PDF herunterladen",
+    label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_box),
-    file_name="volatility_boxplot.pdf",
-    mime="application/pdf",
+    file_name="volatility_boxplot.png",
+    mime="application/png",
     key="download_volatility_box"
 )
 
@@ -104,10 +104,10 @@ fig_ts.update_layout(xaxis_title="Date", yaxis_title="Relative Trading Range (%)
 st.plotly_chart(fig_ts, use_container_width=True)
 
 st.download_button(
-    label="📥 Graph als PDF herunterladen",
+    label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_ts),
-    file_name="volatility_timeseries.pdf",
-    mime="application/pdf",
+    file_name="volatility_timeseries.png",
+    mime="application/png",
     key="download_volatility_ts"
 )
 

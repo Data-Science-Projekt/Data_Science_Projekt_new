@@ -93,10 +93,10 @@ fig_sales.update_yaxes(title_text="Units Sold (Millions)", secondary_y=True)
 st.plotly_chart(fig_sales, use_container_width=True)
 
 st.download_button(
-    label="📥 Graph als PDF herunterladen",
+    label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_sales),
-    file_name="fundamentals_sales.pdf",
-    mime="application/pdf",
+    file_name="fundamentals_sales.png",
+    mime="application/png",
     key="download_fundamentals_sales"
 )
 
@@ -124,10 +124,10 @@ if "price_change_pct" in df.columns:
     st.plotly_chart(fig_reaction, use_container_width=True)
 
     st.download_button(
-        label="📥 Graph als PDF herunterladen",
+        label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig_reaction),
-        file_name="fundamentals_reaction.pdf",
-        mime="application/pdf",
+        file_name="fundamentals_reaction.png",
+        mime="application/png",
         key="download_fundamentals_reaction"
     )
 
@@ -188,10 +188,10 @@ fig_seasonal.update_layout(template="plotly_white", height=400)
 st.plotly_chart(fig_seasonal, use_container_width=True)
 
 st.download_button(
-    label="📥 Graph als PDF herunterladen",
+    label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_seasonal),
-    file_name="fundamentals_seasonal.pdf",
-    mime="application/pdf",
+    file_name="fundamentals_seasonal.png",
+    mime="application/png",
     key="download_fundamentals_seasonal"
 )
 
