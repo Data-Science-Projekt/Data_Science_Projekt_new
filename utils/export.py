@@ -31,12 +31,17 @@ def fig_to_pdf_bytes(fig, width=3508, height=2480, scale=2):
         ),
     )
 
-    # PNG statt PDF – stabiler mit kaleido 0.2.1
+    # Preislinie auf Blau setzen damit sie auf weißem Hintergrund sichtbar ist
+    for trace in fig_export.data:
+        if trace.name == "Price":
+            trace.line.color = "#1f77b4"
+            trace.line.width = 2.5
+
     return pio.to_image(fig_export, format="png", width=width, height=height, scale=2)
 
 
 def figs_to_pdf_bytes(figures: list, width=3508, height=2480, scale=2):
-    """Mehrere Plotly-Graphen in ein einziges PDF zusammenführen."""
+    """Mehrere Plotly-Graphen in ein einziges PNG zusammenführen."""
     writer = pypdf.PdfWriter()
 
     for fig in figures:
