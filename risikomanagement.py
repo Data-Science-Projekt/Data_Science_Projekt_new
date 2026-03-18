@@ -42,7 +42,7 @@ st.markdown("""
 <style>
 /* Container für Risk Settings – nur die ersten 3 Spalten einengen */
 div[data-testid="stHorizontalBlock"]:has(div[data-testid="stSlider"]) {
-    max-width: 55%;
+    max-width: 15%;
 }
 /* Slider selbst etwas kompakter */
 div[data-testid="stSlider"] {
