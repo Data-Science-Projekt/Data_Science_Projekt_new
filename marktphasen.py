@@ -94,7 +94,6 @@ def add_phase_shading(fig, df):
 
 
 def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
-    """Erstellt einen einzelnen Chart für ein Asset."""
     fig = go.Figure()
     fig = add_phase_shading(fig, df_view)
 
@@ -124,13 +123,14 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
     ))
 
     fig.update_layout(
-        title=f"Market Phases – {stock}",
+        title=f"{stock}",
         template="plotly_dark",
         xaxis_title="Date",
         yaxis_title="Price ($)",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hovermode="x unified",
-        margin=dict(t=80)
+        margin=dict(t=60),
+        height=400
     )
 
     return fig
@@ -186,39 +186,39 @@ if not all_data:
     st.error("No data could be loaded.")
     st.stop()
 
-# --- CHART PRO ASSET ---
-for stock, df_view in all_data.items():
-    st.subheader(f"📈 {stock}")
+# --- CHARTS JEWEILS ZWEI NEBENEINANDER ---
+stocks_list = list(all_data.items())
 
-    fig = build_stock_chart(stock, df_view, bull_threshold, bear_threshold)
-    st.plotly_chart(fig, use_container_width=True)
+for i in range(0, len(stocks_list), 2):
+    # Zwei Spalten
+    cols = st.columns(2)
 
-    st.download_button(
-        label=f"📥 {stock} als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig),
-        file_name=f"marktphasen_{stock.replace(' ', '_')}.png",
-        mime="image/png",
-        key=f"download_marktphasen_{stock}"
-    )
+    for j, col in enumerate(cols):
+        if i + j >= len(stocks_list):
+            break
 
-    # Phase Distribution
-    counts = df_view['phase'].value_counts()
-    percentages = (counts / len(df_view) * 100).round(2)
-    dist_df = pd.DataFrame({"Days": counts, "Share (%)": percentages})
+        stock, df_view = stocks_list[i + j]
 
-    with st.expander(f"Phase Distribution – {stock}"):
-        st.table(dist_df)
+        with col:
+            st.subheader(f"📈 {stock}")
 
-        bull_pct = percentages.get("Bull", 0)
-        bear_pct = percentages.get("Bear", 0)
-        neutral_pct = percentages.get("Neutral", 0)
+            fig = build_stock_chart(stock, df_view, bull_threshold, bear_threshold)
+            st.plotly_chart(fig, use_container_width=True)
 
-        st.markdown(f"""
-**Market Regime Overview**
-- Bull phase: **{bull_pct}%** of the time
-- Bear phase: **{bear_pct}%** of the time
-- Neutral phase: **{neutral_pct}%** of the time
-        """)
+            st.download_button(
+                label=f"📥 {stock} als PNG",
+                data=fig_to_pdf_bytes(fig),
+                file_name=f"marktphasen_{stock.replace(' ', '_')}.png",
+                mime="image/png",
+                key=f"download_marktphasen_{stock}"
+            )
+
+            # Phase Distribution direkt darunter
+            counts = df_view['phase'].value_counts()
+            percentages = (counts / len(df_view) * 100).round(2)
+            dist_df = pd.DataFrame({"Days": counts, "Share (%)": percentages})
+            st.markdown(f"**Phase Distribution – {stock}**")
+            st.table(dist_df)
 
     st.markdown("---")
 
