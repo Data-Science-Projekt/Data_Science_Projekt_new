@@ -128,7 +128,10 @@ html, body, [class*="css"] {
     padding: 22px 22px 20px;
     margin-bottom: 16px;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-    height: 100%;
+    height: 210px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 .insight-card:hover {
     border-color: #2563eb;
@@ -219,7 +222,7 @@ st.markdown("""
 st.markdown("""
 <div class="summary-box">
     This project applies modern data science methods to investigate key research questions about stock market behavior.
-    Using live data from <span class="highlight">Alpha Vantage</span> and <span class="highlight">FRED</span>,
+    Using live data from <span class="highlight">Alpha Vantage</span>, <span class="highlight">NewsAPI</span>, and <span class="highlight">FRED</span>,
     we analyze <span class="highlight">six tech and financial stocks</span>
     (Apple, Microsoft, NVIDIA, J.P. Morgan, Goldman Sachs, Bank of America)
     across multiple dimensions: return distributions, trading ranges, market structure,
