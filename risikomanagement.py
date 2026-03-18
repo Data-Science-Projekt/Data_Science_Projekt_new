@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 
-# --- HILFSFUNKTIONEN (Sicherheits-Check) ---
+# --- HILFSFUNKTIONEN ---
 try:
     from analysis.utils import render_page_header
 except ImportError:
@@ -59,7 +59,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     if show_apple and ret_a is not None:
         # Historische Simulation des VaR
         v_a = np.percentile(ret_a, (1 - conf_level) * 100)
-        # Expected Shortfall (Durchschnittlicher Verlust jenseits des VaR)
+        # Expected Shortfall
         e_a = ret_a[ret_a <= v_a].mean()
         
         fig.add_trace(go.Histogram(
@@ -68,18 +68,25 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
             marker_color='#1f77b4', 
             opacity=0.6, 
             nbinsx=50,
-            # Hover-Text gerundet (Mittelwert der Rendite im Balken)
             hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
         
-        # FIXED STRATEGY 2: Erzwinge Text-Anker nach RECHTS (Apple)
-        fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4", 
-                      annotation_text=f"VaR AAPL: {v_a:.2%}",
-                      annotation_position="top", # Grundposition oben auf der Linie
-                      annotation_textangle=0,
-                      annotation_align="left",   # Text ist linksbuendig...
-                      annotation_xanchor="left", # ...aber der ANKER ist links (Text fließt nach RECHTS)
-                      annotation_yshift=10)      # Abstand nach oben
+        # Vertikale Linie fuer Apple
+        fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4")
+        
+        # TEXT-ANNOTATION APPLE (Fixierte Hoehe 95%)
+        fig.add_annotation(
+            x=v_a,               # Anker an der X-Position des VaR
+            y=0.95,              # 95% der vertikalen Charthoehe
+            yref="paper",        # Referenz auf das Chart-Fenster (0 bis 1)
+            xref="x",            # Referenz auf die Daten-Achse
+            text=f"VaR AAPL: {v_a:.2%}",
+            showarrow=False,
+            font=dict(color="#1f77b4", size=12),
+            align="left",
+            xanchor="left",      # Text fließt nach RECHTS weg
+            xshift=5             # Kleiner horizontaler Abstand zur Linie
+        )
 
     if show_nvidia and ret_n is not None:
         v_n = np.percentile(ret_n, (1 - conf_level) * 100)
@@ -91,20 +98,27 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
             marker_color='#ff7f0e', 
             opacity=0.6, 
             nbinsx=50,
-            # Hover-Text gerundet
             hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
         
-        # FIXED STRATEGY 2: Erzwinge Text-Anker nach LINKS (NVIDIA)
-        fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", 
-                      annotation_text=f"VaR NVDA: {v_n:.2%}",
-                      annotation_position="top", # Grundposition oben auf der Linie
-                      annotation_textangle=0,
-                      annotation_align="right",   # Text ist rechtsbuendig...
-                      annotation_xanchor="right", # ...und der ANKER ist rechts (Text fließt nach LINKS)
-                      annotation_yshift=25)      # Etwas hoeher als Apple, falls sie extrem nah sind
+        # Vertikale Linie fuer NVIDIA
+        fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e")
+        
+        # TEXT-ANNOTATION NVIDIA (Fixierte Hoehe 95%)
+        fig.add_annotation(
+            x=v_n,               # Anker an der X-Position des VaR
+            y=0.95,              # EBENFALLS 95% der vertikalen Charthoehe
+            yref="paper",        # Referenz auf das Chart-Fenster (0 bis 1)
+            xref="x",            # Referenz auf die Daten-Achse
+            text=f"VaR NVDA: {v_n:.2%}",
+            showarrow=False,
+            font=dict(color="#ff7f0e", size=12),
+            align="right",
+            xanchor="right",     # Text fließt nach LINKS weg
+            xshift=-5            # Kleiner horizontaler Abstand zur Linie
+        )
 
-    # Standard Layout fuer automatische Farben
+    # Layout-Anpassungen
     fig.update_layout(
         barmode='overlay',
         xaxis_title="Daily Return",
@@ -112,15 +126,14 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(t=80), # Mehr Platz nach oben fuer die Annotations
-        # Hovermode auf 'closest', damit der Hovertemplate-Code greift
+        margin=dict(t=80, b=50), 
         hovermode="closest"
     )
 
-    # Hier nutzen wir das Standard-Streamlit-Theme für automatische Lesbarkeit
+    # Chart ausgeben mit Streamlit-Theme fuer autom. Farbanpassung (Light/Dark)
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
-    # Metrics
+    # Metrics unter dem Chart
     c1, c2 = st.columns(2)
     if show_apple and ret_a is not None:
         c1.subheader("Apple (AAPL)")
@@ -134,13 +147,13 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     # --- INTERPRETATION ---
     st.markdown("---")
     st.subheader("Analysis and Interpretation")
-    st.info(f"Analysis at a {conf_level * 100:.1f}% confidence level.")
+    st.info(f"Historical simulation at a {conf_level * 100:.1f}% confidence level.")
     
     st.markdown("""
     ### Key Insights:
-    * **Tail Risk Assessment:** VaR focuses specifically on extreme downside events.
-    * **Visualization:** The dotted lines now show the exact VaR percentages. The text labels are forced apart (Apple right, NVIDIA left) to prevent overlapping.
+    * **Tail Risk Assessment:** The Value-at-Risk (VaR) indicates the threshold of the worst-case returns.
+    * **Alignment:** Both labels are now perfectly aligned at the top of the chart for better readability.
     """)
 
 else:
-    st.info("Please select assets in the sidebar.")
+    st.info("Please select at least one asset in the sidebar.")
