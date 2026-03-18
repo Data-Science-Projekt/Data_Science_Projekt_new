@@ -107,30 +107,57 @@ st.download_button(
     key="download_volatility_box"
 )
 
-# Time Series
-st.subheader("Trading Range Trend Over Time")
-fig_ts = go.Figure()
-colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
-for i, (name, df) in enumerate(stock_data.items()):
-    fig_ts.add_trace(go.Scatter(
-        x=df.index, y=df["relative_range_pct"],
-        mode="lines", name=name,
-        line=dict(color=colors[i % len(colors)], width=1.5)
+# --- Area Chart: Tech vs. Financial sector average ---
+st.subheader("Sector Volatility Trend Over Time")
+
+# Build a shared date index
+all_dates = stock_data[list(stock_data.keys())[0]].index
+
+tech_dfs    = [stock_data[n]["relative_range_pct"] for n in selected_tech      if n in stock_data]
+fin_dfs     = [stock_data[n]["relative_range_pct"] for n in selected_financial if n in stock_data]
+
+tech_avg = pd.concat(tech_dfs,  axis=1).mean(axis=1).rolling(5).mean() if tech_dfs else None
+fin_avg  = pd.concat(fin_dfs,   axis=1).mean(axis=1).rolling(5).mean() if fin_dfs  else None
+
+fig_area = go.Figure()
+
+if tech_avg is not None:
+    fig_area.add_trace(go.Scatter(
+        x=tech_avg.index,
+        y=tech_avg.values,
+        name="Tech (avg)",
+        mode="lines",
+        line=dict(color="#2563eb", width=2),
+        fill="tozeroy",
+        fillcolor="rgba(37,99,235,0.12)",
     ))
-fig_ts.update_layout(
+
+if fin_avg is not None:
+    fig_area.add_trace(go.Scatter(
+        x=fin_avg.index,
+        y=fin_avg.values,
+        name="Financial (avg)",
+        mode="lines",
+        line=dict(color="#16a34a", width=2),
+        fill="tozeroy",
+        fillcolor="rgba(22,163,74,0.12)",
+    ))
+
+fig_area.update_layout(
     xaxis_title="Date",
-    yaxis_title="Relative Trading Range (%)",
+    yaxis_title="Avg. Relative Trading Range (%, 5-day smoothed)",
     template="plotly_white",
+    hovermode="x unified",
     **CHART_STYLE
 )
-st.plotly_chart(fig_ts, use_container_width=True)
+st.plotly_chart(fig_area, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_ts),
-    file_name="volatility_timeseries.png",
+    data=fig_to_pdf_bytes(fig_area),
+    file_name="volatility_area.png",
     mime="image/png",
-    key="download_volatility_ts"
+    key="download_volatility_area"
 )
 
 # Statistics Table
@@ -159,15 +186,15 @@ for name, df in stock_data.items():
     elif name in FINANCIAL_STOCKS:
         financial_ranges.extend(df["relative_range_pct"].tolist())
 
-tech_avg = np.mean(tech_ranges) if tech_ranges else 0
-financial_avg = np.mean(financial_ranges) if financial_ranges else 0
-diff = tech_avg - financial_avg
+tech_avg_val     = np.mean(tech_ranges)     if tech_ranges     else 0
+financial_avg_val = np.mean(financial_ranges) if financial_ranges else 0
+diff = tech_avg_val - financial_avg_val
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.metric("Tech Avg. Range (%)", f"{tech_avg:.2f}")
+    st.metric("Tech Avg. Range (%)", f"{tech_avg_val:.2f}")
 with col2:
-    st.metric("Financial Avg. Range (%)", f"{financial_avg:.2f}")
+    st.metric("Financial Avg. Range (%)", f"{financial_avg_val:.2f}")
 with col3:
     st.metric("Difference (Tech - Fin)", f"{diff:.2f}")
 
@@ -176,7 +203,7 @@ st.subheader("Key Findings")
 summary_logic = "Tech stocks show higher volatility in daily ranges." if diff > 0 else "Financial stocks show higher volatility." if diff < 0 else "Both sectors show similar trading ranges."
 summary = f"""
 The analysis of the last {len(stock_data[list(stock_data.keys())[0]])} trading days shows:
-Tech stocks have an average range of {tech_avg:.2f}%, while Financial stocks average {financial_avg:.2f}%.
+Tech stocks have an average range of {tech_avg_val:.2f}%, while Financial stocks average {financial_avg_val:.2f}%.
 The difference is {diff:.2f} percentage points.
 {summary_logic}
 """
