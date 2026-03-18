@@ -96,7 +96,7 @@ st.markdown("""
 """)
 
 st.table(pd.DataFrame({
-    "Source": ["Alpha Vantage", "FRED", "NewsAPI"],
-    "Data": ["Daily & monthly stock prices", "S&P 500 index, Consumer Sentiment Index", "News articles & headlines"],
-    "Usage": ["Core price data for all analyses", "Market benchmark & macro context", "Sentiment scoring & correlation with returns"],
+    "Source": ["Alpha Vantage", "FRED"],
+    "Data": ["Daily & monthly stock prices", "S&P 500 index, Consumer Sentiment Index"],
+    "Usage": ["Core price data for all analyses", "Market benchmark & macro context"],
 }))
