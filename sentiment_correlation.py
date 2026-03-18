@@ -68,12 +68,7 @@ render_page_header(
     "How does the broader Consumer Sentiment Index correlate with selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
 )
 
-# Sidebar
-st.sidebar.header("Analysis Parameters")
-lookback_months = st.sidebar.slider("Lookback period (months)", 3, 48, 24)
-rolling_window = st.sidebar.slider("Rolling correlation window (months)", 2, 12, 6)
-
-# Load data
+# Load data first to know actual range
 sentiment_df = get_sentiment_local()
 stock_returns = {}
 
@@ -87,13 +82,33 @@ if sentiment_df is None or not stock_returns:
     st.error("Data files not found in /data folder. Please ensure the bot has run successfully.")
     st.stop()
 
-# Merge datasets
+# Merge to find actual available months
 merged_all = sentiment_df.copy()
 for name, ret_df in stock_returns.items():
     merged_all = merged_all.join(ret_df, how="inner")
+merged_all = merged_all.dropna()
 
-# Apply slider filters
-merged = merged_all.tail(lookback_months).dropna()
+max_months = len(merged_all)  # typically 4–5 with 100 trading days
+
+# Sidebar — sliders bounded by actual data
+st.sidebar.header("Analysis Parameters")
+st.sidebar.caption(f"Available data: {max_months} months")
+
+lookback_months = st.sidebar.slider(
+    "Lookback period (months)",
+    min_value=2,
+    max_value=max_months,
+    value=max_months,
+)
+rolling_window = st.sidebar.slider(
+    "Rolling correlation window (months)",
+    min_value=2,
+    max_value=max(2, max_months - 1),
+    value=min(3, max(2, max_months - 1)),
+)
+
+# Apply lookback filter
+merged = merged_all.tail(lookback_months)
 
 if len(merged) < rolling_window:
     st.warning(f"Not enough data for a {rolling_window}-month window. Currently showing all {len(merged)} available months.")
