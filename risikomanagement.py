@@ -34,13 +34,24 @@ render_page_header(
     "What is the maximum expected loss (at a specified confidence level) for Apple compared to NVIDIA over a 1-day horizon?"
 )
 
-# --- SETTINGS: kompakt in einer schmalen Zeile ---
+# --- SETTINGS: kompakt per CSS ---
 st.markdown("### ⚙️ Risk Settings")
 
-# Alle Controls in einer einzigen Zeile mit stark unterschiedlichen Breiten:
-# Schieberegler bekommt ~40% der Breite, die Checkboxen je ~15%,
-# der Rest (~30%) bleibt als Puffer leer.
-col_slider, col_aapl, col_nvda, col_spacer = st.columns([4, 1.5, 1.5, 3])
+# CSS: Einstellungsbereich auf ~50% der Seitenbreite begrenzen
+st.markdown("""
+<style>
+/* Container für Risk Settings – nur die ersten 3 Spalten einengen */
+div[data-testid="stHorizontalBlock"]:has(div[data-testid="stSlider"]) {
+    max-width: 55%;
+}
+/* Slider selbst etwas kompakter */
+div[data-testid="stSlider"] {
+    padding-right: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+col_slider, col_aapl, col_nvda = st.columns([5, 2, 2])
 
 with col_slider:
     conf_level = st.slider(
@@ -50,7 +61,7 @@ with col_slider:
     ) / 100
 
 with col_aapl:
-    st.write("")          # kleiner vertikaler Ausgleich
+    st.write("")
     show_apple = st.checkbox("Apple (AAPL)", value=True, key="risk_a")
 
 with col_nvda:
