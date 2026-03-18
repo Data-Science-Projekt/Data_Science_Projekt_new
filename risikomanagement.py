@@ -26,6 +26,7 @@ def get_local_stock_returns(symbol):
     try:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
         df = df.astype(float).sort_index()
+        # Berechnung der prozentualen Veraenderung (Renditen)
         return df['4. close'].pct_change().dropna()
     except Exception:
         return None
@@ -56,26 +57,46 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     fig = go.Figure()
 
     if show_apple and ret_a is not None:
+        # Historische Simulation des VaR
         v_a = np.percentile(ret_a, (1 - conf_level) * 100)
+        # Expected Shortfall (Durchschnittlicher Verlust jenseits des VaR)
         e_a = ret_a[ret_a <= v_a].mean()
+        
         fig.add_trace(go.Histogram(
-            x=ret_a, name="Apple", marker_color='#1f77b4', opacity=0.6, nbinsx=50
+            x=ret_a, 
+            name="Apple", 
+            marker_color='#1f77b4', 
+            opacity=0.6, 
+            nbinsx=50,
+            # FIXED: Hover-Text gerundet (Mittelwert der Rendite im Balken)
+            hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
+        # FIXED: Text angepasst und Position auf 'top left' gesetzt
         fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4", 
                       annotation_text=f"VaR AAPL: {v_a:.2%}",
-                      annotation_position="top left")
+                      annotation_position="top left",
+                      annotation_yshift=10) # Kleiner Abstand nach oben
 
     if show_nvidia and ret_n is not None:
         v_n = np.percentile(ret_n, (1 - conf_level) * 100)
         e_n = ret_n[ret_n <= v_n].mean()
+        
         fig.add_trace(go.Histogram(
-            x=ret_n, name="NVIDIA", marker_color='#ff7f0e', opacity=0.6, nbinsx=50
+            x=ret_n, 
+            name="NVIDIA", 
+            marker_color='#ff7f0e', 
+            opacity=0.6, 
+            nbinsx=50,
+            # FIXED: Hover-Text gerundet
+            hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
+        # FIXED: Text angepasst und Position auf 'top right' gesetzt
         fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", 
                       annotation_text=f"VaR NVDA: {v_n:.2%}",
-                      annotation_position="top right")
+                      annotation_position="top right",
+                      annotation_yshift=10)
 
-    # Standard Layout ohne harte Farbvorgaben
+    # Standard Layout fuer automatische Farben
     fig.update_layout(
         barmode='overlay',
         xaxis_title="Daily Return",
@@ -83,7 +104,9 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(t=50)
+        margin=dict(t=50),
+        # FIXED: Hovermode auf 'closest', damit der Hovertemplate-Code greift
+        hovermode="closest"
     )
 
     # Hier nutzen wir das Standard-Streamlit-Theme für automatische Lesbarkeit
@@ -107,8 +130,8 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     
     st.markdown("""
     ### Key Insights:
-    * **Tail Risk:** VaR and Expected Shortfall focus on the most significant losses.
-    * **Comparison:** NVIDIA typically exhibits higher volatility and a more negative VaR than Apple.
+    * **Tail Risk Assessment:** VaR focuses specifically on extreme downside events.
+    * **Visualization:** The dotted lines now show the exact VaR percentages clearly, without overlapping.
     """)
 
 else:
