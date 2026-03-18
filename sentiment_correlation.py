@@ -12,6 +12,27 @@ TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 ALL_STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
 
+CHART_STYLE = dict(
+    font=dict(color="#718096", size=14),
+    xaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    yaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    legend=dict(
+        font=dict(color="#718096", size=13)
+    ),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+)
+
 # --- DATA LOADING (LOCAL) ---
 @st.cache_data(show_spinner="Loading local market data...")
 def get_monthly_data_local(symbol):
@@ -20,7 +41,6 @@ def get_monthly_data_local(symbol):
         return None
     try:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True).sort_index()
-        # Resample to monthly to match sentiment data frequency
         monthly = df[["4. close"]].resample("MS").last()
         monthly[f"{symbol}_return"] = monthly["4. close"].pct_change()
         return monthly[[f"{symbol}_return"]].dropna()
@@ -50,9 +70,7 @@ render_page_header(
 
 # Sidebar
 st.sidebar.header("Analysis Parameters")
-# Lookback slider: Controls how many of the AVAILABLE months are shown
 lookback_months = st.sidebar.slider("Lookback period (months)", 3, 48, 24)
-# Rolling window: Must be smaller than the available data
 rolling_window = st.sidebar.slider("Rolling correlation window (months)", 2, 12, 6)
 
 # Load data
@@ -74,13 +92,11 @@ merged_all = sentiment_df.copy()
 for name, ret_df in stock_returns.items():
     merged_all = merged_all.join(ret_df, how="inner")
 
-# --- APPLY SLIDER FILTERS ---
-# 1. Filter the data based on the lookback slider
+# Apply slider filters
 merged = merged_all.tail(lookback_months).dropna()
 
 if len(merged) < rolling_window:
     st.warning(f"Not enough data for a {rolling_window}-month window. Currently showing all {len(merged)} available months.")
-    # Adjust window if necessary to prevent empty charts
     effective_window = max(2, len(merged))
 else:
     effective_window = rolling_window
@@ -95,8 +111,21 @@ fig_sent.add_trace(go.Scatter(
     mode="lines+markers", name="Consumer Sentiment",
     line=dict(color="#1f77b4", width=2)
 ))
-fig_sent.update_layout(yaxis_title="Sentiment Index", template="plotly_white", height=400)
+fig_sent.update_layout(
+    yaxis_title="Sentiment Index",
+    template="plotly_white",
+    height=400,
+    **CHART_STYLE
+)
 st.plotly_chart(fig_sent, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig_sent),
+    file_name="sentiment_index.png",
+    mime="image/png",
+    key="download_sentiment_index"
+)
 
 # --- 2. CORRELATION MATRIX ---
 st.subheader("2. Correlation Matrix")
@@ -112,7 +141,15 @@ fig_heatmap = go.Figure(data=go.Heatmap(
     text=np.round(corr_matrix.values, 3),
     texttemplate="%{text}"
 ))
-fig_heatmap.update_layout(template="plotly_white", height=500)
+fig_heatmap.update_layout(
+    template="plotly_white",
+    height=500,
+    font=dict(color="#718096", size=14),
+    xaxis=dict(tickfont=dict(color="#718096", size=13)),
+    yaxis=dict(tickfont=dict(color="#718096", size=13)),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+)
 st.plotly_chart(fig_heatmap, use_container_width=True)
 
 st.download_button(
@@ -138,8 +175,8 @@ for name in stock_names:
     })
 st.table(pd.DataFrame(corr_results))
 
-# --- 5. KEY INSIGHTS ---
-st.subheader("5. Key Insights")
+# --- 4. KEY INSIGHTS ---
+st.subheader("4. Key Insights")
 
 avg_tech = np.mean([c["Pearson r"] for c in corr_results if c["Sector"] == "Tech"])
 avg_fin = np.mean([c["Pearson r"] for c in corr_results if c["Sector"] == "Financial"])
