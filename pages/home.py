@@ -8,43 +8,24 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ── adaptive color tokens ── */
+/* ── color tokens ── */
 :root {
-    --bg-card:        #f4f6f9;
-    --bg-card-2:      #eef1f6;
-    --border:         #d0d7e3;
-    --border-hover:   #2563eb;
-    --text-primary:   #111827;
-    --text-secondary: #4b5563;
-    --text-muted:     #6b7280;
-    --accent-blue:    #2563eb;
-    --accent-green:   #16a34a;
-    --highlight:      #1d4ed8;
-    --ticker-bg:      #e0e7ff;
-    --ticker-border:  #c7d2fe;
-    --ticker-text:    #3730a3;
-    --hero-bg-1:      #f0f4ff;
-    --hero-bg-2:      #e8f5e9;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-card:        #1e2433;
-        --bg-card-2:      #181e2e;
-        --border:         #2d3548;
-        --border-hover:   #3b82f6;
-        --text-primary:   #e8edf5;
-        --text-secondary: #9aa5b8;
-        --text-muted:     #6b7a96;
-        --accent-blue:    #3b82f6;
-        --accent-green:   #22c55e;
-        --highlight:      #60a5fa;
-        --ticker-bg:      #1e2d4a;
-        --ticker-border:  #2e4470;
-        --ticker-text:    #93c5fd;
-        --hero-bg-1:      #1a2035;
-        --hero-bg-2:      #1a2a1e;
-    }
+    --bg-card:           #ffffff;
+    --border:            #e2e8f0;
+    --border-hover:      #2563eb;
+    --text-primary:      #1e293b;
+    --text-secondary:    #475569;
+    --text-muted:        #64748b;
+    --accent-blue:       #2563eb;
+    --accent-green:      #16a34a;
+    --highlight:         #1d4ed8;
+    --ticker-bg:         #eff6ff;
+    --ticker-border:     #bfdbfe;
+    --ticker-text:       #1e40af;
+    --hero-bg-start:     #eff6ff;
+    --hero-bg-end:       #f0fdf4;
+    --section-blue-bg:   rgba(37,99,235,0.07);
+    --section-green-bg:  rgba(22,163,74,0.07);
 }
 
 /* ── global ── */
@@ -54,7 +35,7 @@ html, body, [class*="css"] {
 
 /* ── hero banner ── */
 .hero-banner {
-    background: linear-gradient(135deg, var(--hero-bg-1) 0%, var(--bg-card) 50%, var(--hero-bg-2) 100%);
+    background: linear-gradient(135deg, var(--hero-bg-start) 0%, var(--bg-card) 50%, var(--hero-bg-end) 100%);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 48px 56px;
@@ -123,11 +104,11 @@ html, body, [class*="css"] {
     margin-top: 10px;
 }
 .section-banner-blue  {
-    background: linear-gradient(90deg, rgba(37,99,235,0.12), rgba(37,99,235,0.02));
+    background: linear-gradient(90deg, var(--section-blue-bg), rgba(37,99,235,0.01));
     border-left: 3px solid var(--accent-blue);
 }
 .section-banner-green {
-    background: linear-gradient(90deg, rgba(22,163,74,0.12), rgba(22,163,74,0.02));
+    background: linear-gradient(90deg, var(--section-green-bg), rgba(22,163,74,0.01));
     border-left: 3px solid var(--accent-green);
 }
 .section-icon { font-size: 1.5rem; line-height: 1; }
