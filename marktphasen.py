@@ -16,14 +16,20 @@ STOCKS = {
     "Bank of America": "BAC"
 }
 
+STOCK_COLORS = {
+    "Apple": "#1f77b4",        # Blau
+    "NVIDIA": "#2ca02c",       # Grün
+    "Microsoft": "#ff7f0e",    # Orange
+    "J.P. Morgan": "#9467bd",  # Lila
+    "Goldman Sachs": "#d62728",# Rot
+    "Bank of America": "#8c564b" # Braun
+}
+
 @st.cache_data(show_spinner="Loading local data...")
 def get_stock_data(symbol):
-    """Reads the CSV file created by the bot from the data folder."""
     file_path = f"data/stock_{symbol}.csv"
-
     if not os.path.exists(file_path):
         return None
-
     try:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
         df = df.sort_index()
@@ -35,7 +41,6 @@ def get_stock_data(symbol):
 
 
 def identify_phases(df_input, bull_threshold, bear_threshold):
-    """Calculates market phases based on a 20-day rolling window and custom thresholds."""
     df = df_input.copy()
     df['rolling_max'] = df['close'].rolling(window=20, min_periods=1).max()
     df['rolling_min'] = df['close'].rolling(window=20, min_periods=1).min()
@@ -55,7 +60,7 @@ def identify_phases(df_input, bull_threshold, bear_threshold):
 
 
 def add_phase_shading(fig, df):
-    """Adds colored background shading for each market phase as vrect shapes."""
+    """Adds phase shading based on the first selected stock."""
     phase_colors = {
         "Bull": "rgba(0, 200, 100, 0.15)",
         "Bear": "rgba(220, 50, 50, 0.15)",
@@ -111,19 +116,13 @@ st.sidebar.subheader("Phase Thresholds")
 
 bull_threshold = st.sidebar.slider(
     "🟢 Bull Market Threshold (%)",
-    min_value=1,
-    max_value=20,
-    value=20,
-    step=1,
+    min_value=1, max_value=20, value=20, step=1,
     help="Minimum rise from rolling 20-day low to qualify as a Bull phase."
 )
 
 bear_threshold = st.sidebar.slider(
     "🔴 Bear Market Threshold (%)",
-    min_value=1,
-    max_value=20,
-    value=20,
-    step=1,
+    min_value=1, max_value=20, value=20, step=1,
     help="Minimum drop from rolling 20-day high to qualify as a Bear phase."
 )
 
@@ -134,114 +133,112 @@ st.sidebar.markdown(
     f"- 🔴 Bear: -{bear_threshold}% from 20d high"
 )
 
-# --- LOAD AND DISPLAY EACH SELECTED STOCK ---
-for selected_stock in selected_stocks:
-    df_raw = get_stock_data(STOCKS[selected_stock])
-
+# --- LOAD DATA FOR ALL SELECTED STOCKS ---
+all_data = {}
+for stock in selected_stocks:
+    df_raw = get_stock_data(STOCKS[stock])
     if df_raw is not None:
-        df_view = identify_phases(df_raw, bull_threshold, bear_threshold)
+        all_data[stock] = identify_phases(df_raw, bull_threshold, bear_threshold)
 
-        # Chart
-        fig = go.Figure()
-        fig = add_phase_shading(fig, df_view)
+if not all_data:
+    st.error("No data could be loaded.")
+    st.stop()
 
-        fig.add_trace(go.Scatter(
-            x=df_view.index,
-            y=df_view['close'],
-            name='Price',
-            line=dict(color='blue', width=3),
-            hovertemplate='%{x|%d.%m.%Y}<br>$%{y:.2f}<extra></extra>'
-        ))
-        fig.add_trace(go.Scatter(
-            x=[None], y=[None], mode='markers',
-            marker=dict(size=10, color='rgba(0, 200, 100, 0.6)', symbol='square'),
-            name=f'Bull (≥+{bull_threshold}%)'
-        ))
-        fig.add_trace(go.Scatter(
-            x=[None], y=[None], mode='markers',
-            marker=dict(size=10, color='rgba(220, 50, 50, 0.6)', symbol='square'),
-            name=f'Bear (≤-{bear_threshold}%)'
-        ))
-        fig.add_trace(go.Scatter(
-            x=[None], y=[None], mode='markers',
-            marker=dict(size=10, color='rgba(180, 180, 180, 0.4)', symbol='square'),
-            name='Neutral'
-        ))
+# --- COMBINED CHART ---
+fig = go.Figure()
 
-        fig.update_layout(
-            title=f"Market Phases – {selected_stock}",
-            template="plotly_dark",
-            xaxis_title="Date",
-            yaxis_title="Price ($)",
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            hovermode="x unified",
-            margin=dict(t=60)
-        )
+# Phase shading based on first selected stock
+first_stock = list(all_data.keys())[0]
+fig = add_phase_shading(fig, all_data[first_stock])
 
-        st.subheader(f"📈 {selected_stock}")
-        st.plotly_chart(fig, use_container_width=True)
+# Add a price line for each stock – normalized to 100 if multiple selected
+normalize = len(all_data) > 1
 
-        st.download_button(
-            label=f"📥 {selected_stock} als PNG herunterladen",
-            data=fig_to_pdf_bytes(fig),
-            file_name=f"marktphasen_{selected_stock.replace(' ', '_')}.png",
-            mime="image/png",
-            key=f"download_marktphasen_{selected_stock}"
-        )
+for stock, df_view in all_data.items():
+    y_values = df_view['close']
+    if normalize:
+        y_values = (y_values / y_values.iloc[0]) * 100  # Normalisiert auf 100
 
-        # Phase Distribution
-        st.subheader(f"Market Phase Distribution – {selected_stock}")
-        counts = df_view['phase'].value_counts()
-        percentages = (counts / len(df_view) * 100).round(2)
+    fig.add_trace(go.Scatter(
+        x=df_view.index,
+        y=y_values,
+        name=stock,
+        mode="lines",
+        line=dict(color=STOCK_COLORS[stock], width=2.5),
+        hovertemplate=f'{stock}: %{{y:.2f}}<extra></extra>'
+    ))
 
-        dist_df = pd.DataFrame({
-            "Days": counts,
-            "Share (%)": percentages
-        })
-        st.table(dist_df)
+# Phase legend traces
+fig.add_trace(go.Scatter(
+    x=[None], y=[None], mode='markers',
+    marker=dict(size=12, color='rgba(0, 200, 100, 0.6)', symbol='square'),
+    name=f'Bull (≥+{bull_threshold}%)'
+))
+fig.add_trace(go.Scatter(
+    x=[None], y=[None], mode='markers',
+    marker=dict(size=12, color='rgba(220, 50, 50, 0.6)', symbol='square'),
+    name=f'Bear (≤-{bear_threshold}%)'
+))
+fig.add_trace(go.Scatter(
+    x=[None], y=[None], mode='markers',
+    marker=dict(size=12, color='rgba(180, 180, 180, 0.4)', symbol='square'),
+    name='Neutral'
+))
 
-        bull_pct = percentages.get("Bull", 0)
-        bear_pct = percentages.get("Bear", 0)
-        neutral_pct = percentages.get("Neutral", 0)
+fig.update_layout(
+    title=f"Market Phases – {', '.join(selected_stocks)}",
+    template="plotly_dark",
+    xaxis_title="Date",
+    yaxis_title="Normalized Price (Base 100)" if normalize else "Price ($)",
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    hovermode="x unified",
+    margin=dict(t=80)
+)
 
-        st.markdown("---")
-        st.subheader(f"Interpretation and Insights – {selected_stock}")
-        st.markdown(f"""
+st.plotly_chart(fig, use_container_width=True)
+
+st.download_button(
+    label="📥 Graph als PNG herunterladen",
+    data=fig_to_pdf_bytes(fig),
+    file_name=f"marktphasen_{'_'.join(selected_stocks)}.png",
+    mime="image/png",
+    key="download_marktphasen_combined"
+)
+
+# --- PHASE DISTRIBUTION PER STOCK ---
+st.markdown("---")
+st.subheader("Market Phase Distribution")
+
+for stock, df_view in all_data.items():
+    st.markdown(f"**{stock}**")
+    counts = df_view['phase'].value_counts()
+    percentages = (counts / len(df_view) * 100).round(2)
+    dist_df = pd.DataFrame({"Days": counts, "Share (%)": percentages})
+    st.table(dist_df)
+
+# --- INTERPRETATION ---
+st.markdown("---")
+st.subheader("Interpretation and Insights")
+st.markdown(f"""
 **1. Market Regime Overview**
-- The asset spent **{bull_pct}%** of the time in a Bull phase.
-- **{bear_pct}%** in a Bear phase.
-- **{neutral_pct}%** in a neutral phase.
+Phase shading is based on **{first_stock}** as the reference asset.
 
----
-
-**2. Trend Strength**
-- A high Bull share indicates strong upward momentum.
-- A high Bear share points to longer corrections or downturns.
-- A high Neutral share signals sideways movements or consolidations.
-
----
+**2. Normalization**
+{"Prices are normalized to a base of 100 at the start of the period for better comparability." if normalize else "Single asset view – showing absolute price."}
 
 **3. Volatility and Behavior**
 - Stocks like NVIDIA often switch phases more frequently due to higher volatility.
 - Established blue-chip titles often show more stable and prolonged trends.
-
----
 
 **4. Strategic Implications**
 - **Bull Phases:** Trend-following strategies are often advantageous.
 - **Bear Phases:** Risk management and defensive positioning are crucial.
 - **Neutral Phases:** Range trading or waiting for breakouts is often more effective.
 
----
-
 **5. Methodological Note**
 This model uses a 20-day rolling window with your custom thresholds:
 - {bear_threshold}% drop from the recent high → Bear 🔴
 - {bull_threshold}% rise from the recent low → Bull 🟢
-
-This is a simplified but widely used definition of market cycles in financial analysis.
 """)
-        st.caption("Methodology: Rolling 20-day window analysis of price movements.")
 
-    else:
-        st.error(f"Data for {selected_stock} could not be loaded. Please ensure the CSV file is present in the 'data' folder.")
+st.caption("Methodology: Rolling 20-day window analysis of price movements.")
