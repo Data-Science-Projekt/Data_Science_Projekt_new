@@ -8,34 +8,48 @@ from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
+CHART_STYLE = dict(
+    font=dict(color="#718096", size=14),
+    xaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    yaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    legend=dict(
+        font=dict(color="#718096", size=13)
+    ),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+)
+
 # --- DATA LOADING ---
 @st.cache_data(show_spinner="Loading stock data...")
 def get_stock_data(symbol):
-    """Reads stock data from the local CSV file."""
     file_path = f"data/stock_{symbol}.csv"
     if not os.path.exists(file_path):
         return None
     try:
-        # Read and format index as date
         df = pd.read_csv(file_path, index_col=0, parse_dates=True).sort_index()
-        # Calculate log returns for accurate statistical comparison
         df['Returns'] = np.log(df['4. close'] / df['4. close'].shift(1))
-        # Keep '4. close' column for plotting
         return df[['4. close', 'Returns']].dropna()
     except Exception:
         return None
 
 @st.cache_data(show_spinner="Loading VIX data...")
 def get_vix_data():
-    """Reads VIX data from local macro_vix.csv."""
     file_path = "data/macro_vix.csv"
     if not os.path.exists(file_path):
         return None
     try:
         df = pd.read_csv(file_path)
-        # In FRED CSVs, the column is often lowercase ('date')
         df['date'] = pd.to_datetime(df['date'])
-        # Convert VIX values to numerical format (handles dots/errors as NaN)
         df['VIX'] = pd.to_numeric(df['value'], errors='coerce')
         return df.set_index('date')[['VIX']].dropna()
     except Exception:
@@ -50,7 +64,6 @@ render_page_header(
 with st.sidebar:
     st.header("Settings")
     selected_stock = st.selectbox("Select Stock:", list(STOCKS.keys()))
-    # Threshold for panic zones (VIX > threshold)
     vix_threshold = st.sidebar.slider("VIX Panic Threshold:", 10.0, 40.0, 20.0, step=0.5)
     st.info("The red shaded areas represent days when the VIX > threshold.")
 
@@ -59,24 +72,19 @@ df_vix = get_vix_data()
 df_stock = get_stock_data(STOCKS[selected_stock])
 
 if df_stock is not None and df_vix is not None:
-    # Merge data (Inner join combines only days existing in both datasets)
     combined = df_stock.join(df_vix, how='inner')
-
-    # Mark panic days
     combined['Panic'] = combined['VIX'] > vix_threshold
     panic_days = combined[combined['Panic']]
 
     # --- PLOT ---
     fig = go.Figure()
 
-    # Stock Price (Y1 - Left)
     fig.add_trace(go.Scatter(
         x=combined.index, y=combined['4. close'],
         name=f"{selected_stock} Price", yaxis="y1",
         line=dict(color='#1f77b4', width=4)
     ))
 
-    # VIX (Y2 - Right)
     fig.add_trace(go.Scatter(
         x=combined.index, y=combined['VIX'],
         name="VIX Index", yaxis="y2",
@@ -84,7 +92,6 @@ if df_stock is not None and df_vix is not None:
         opacity=0.5
     ))
 
-    # Draw red panic zones (1-day width)
     for day in panic_days.index:
         fig.add_vrect(
             x0=day,
@@ -96,13 +103,42 @@ if df_stock is not None and df_vix is not None:
         )
 
     fig.update_layout(
-        title=f"{selected_stock} Reaction to Market Volatility (Threshold: {vix_threshold})",
+        title=dict(
+            text=f"{selected_stock} Reaction to Market Volatility (Threshold: {vix_threshold})",
+            font=dict(color="#718096", size=18)
+        ),
         xaxis_title="Date",
-        yaxis=dict(title="Stock Price ($)", side="left"),
-        yaxis2=dict(title="VIX Index", overlaying="y", side="right", range=[0, 50]),
+        yaxis=dict(
+            title="Stock Price ($)",
+            side="left",
+            tickfont=dict(color="#718096", size=13),
+            title_font=dict(color="#718096", size=15),
+            gridcolor="#e2e8f0",
+            linecolor="#cbd5e0",
+        ),
+        yaxis2=dict(
+            title="VIX Index",
+            overlaying="y",
+            side="right",
+            range=[0, 50],
+            tickfont=dict(color="#718096", size=13),
+            title_font=dict(color="#718096", size=15),
+            gridcolor="#e2e8f0",
+            linecolor="#cbd5e0",
+        ),
         template="plotly_white",
         hovermode="x unified",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font=dict(color="#718096", size=13)
+        ),
+        font=dict(color="#718096", size=14),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
     )
 
     st.plotly_chart(fig, use_container_width=True)
@@ -111,7 +147,8 @@ if df_stock is not None and df_vix is not None:
         label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig),
         file_name="marktstruktur.png",
-        mime="application/png"
+        mime="image/png",
+        key="download_marktstruktur"
     )
 
     # --- STATISTICS ---
@@ -122,13 +159,11 @@ if df_stock is not None and df_vix is not None:
 
     col1, col2, col3 = st.columns(3)
 
-    # Normal movement
     normal_move = 0
     if not normal_data.empty:
         normal_move = normal_data['Returns'].mean()
         col1.metric("Avg. Return (Normal)", f"{normal_move:.2%}")
 
-    # Panic movement
     if not panic_data.empty:
         panic_move = panic_data['Returns'].mean()
         col2.metric(f"Return during VIX > {vix_threshold}", f"{panic_move:.2%}",
