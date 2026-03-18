@@ -4,17 +4,13 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 
-# Falls diese Hilfsfunktionen in deinem Projekt existieren, bleiben sie drin.
-# Wenn sie Fehler verursachen, kannst du sie durch st.title/st.write ersetzen.
+# --- HILFSFUNKTIONEN (Sicherheits-Check) ---
 try:
     from analysis.utils import render_page_header
-    from utils.export import fig_to_pdf_bytes
 except ImportError:
     def render_page_header(title, subtitle):
         st.title(title)
         st.write(subtitle)
-    def fig_to_pdf_bytes(fig):
-        return b""
 
 # --- CONFIG ---
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
@@ -90,19 +86,43 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
                       annotation_text=f"VaR NVDA: {v_n:.2%}",
                       annotation_position="top right")
 
-    # Layout-Anpassung fuer dynamische Farben (Light/Dark Mode)
+    # --- LAYOUT MIT TIEFSCHWARZEM TEXT-FOKUS ---
     fig.update_layout(
         barmode='overlay',
         xaxis_title="Daily Return",
         yaxis_title="Frequency",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        # Hintergruende transparent machen, damit das Streamlit-Theme wirkt
+        
+        # Schriftfarbe auf absolutes Schwarz setzen (#000000)
+        font=dict(color="#000000", family="Arial"),
+        
+        # Achsen-Farben und Gitterlinien
+        xaxis=dict(
+            color="#000000",
+            gridcolor="rgba(0,0,0,0.1)",  # Sehr dezente schwarze Linien
+            zerolinecolor="#000000"
+        ),
+        yaxis=dict(
+            color="#000000",
+            gridcolor="rgba(0,0,0,0.1)",
+            zerolinecolor="#000000"
+        ),
+        
+        legend=dict(
+            orientation="h", 
+            yanchor="bottom", 
+            y=1.02, 
+            xanchor="right", 
+            x=1,
+            font=dict(color="#000000")
+        ),
+        
+        # Transparenter Hintergrund fuer nahtlose Integration in Streamlit
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(t=50)
     )
 
-    # WICHTIG: theme="streamlit" sorgt fuer den automatischen Farbwechsel der Achsen
+    # WICHTIG: theme="streamlit" sorgt fuer den automatischen Wechsel bei Dark Mode
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
     # Metrics unter dem Chart
@@ -122,16 +142,15 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
 
     st.info(f"""
     **Definition of risk metrics:**
-    - **Value-at-Risk (VaR):** Represents the maximum expected loss over a 1-day horizon at a {conf_level * 100:.1f}% confidence level.
-    - **Expected Shortfall (CVaR):** The average loss that occurs once the VaR threshold is breached (tail risk).
+    - **Value-at-Risk (VaR):** The maximum expected loss at a {conf_level * 100:.1f}% confidence level.
+    - **Expected Shortfall (CVaR):** The average loss occurring in the worst {((1-conf_level)*100):.1f}% of cases.
     """)
 
     st.markdown(f"""
     ### Key Insights:
-
-    * **Tail Risk Assessment:** Unlike standard deviation, **VaR** and **Expected Shortfall** focus specifically on extreme downside events.
-    * **Comparison:** NVIDIA typically shows a more negative VaR, indicating higher risk due to its higher beta and volatility compared to Apple.
-    * **Current Selection:** At a {conf_level*100:.1f}% confidence level, you can see how the distribution of returns for both stocks behaves.
+    * **Tail Risk:** VaR and Expected Shortfall focus on the "left tail" of the distribution.
+    * **Comparison:** You can observe that NVIDIA generally shows a wider distribution and a more negative VaR, indicating higher market risk.
+    * **Fat Tails:** If Expected Shortfall is significantly lower than VaR, it indicates a high risk of extreme "Black Swan" events.
     """)
 
     st.caption("Method: Historical simulation based on local CSV data. Data source: Alpha Vantage.")
