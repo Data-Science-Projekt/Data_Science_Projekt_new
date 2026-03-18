@@ -175,25 +175,8 @@ html, body, [class*="css"] {
     border-color: #7c3aed;
     transform: translateY(-2px);
 }
-.method-icon-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-.method-icon {
-    font-size: 1.3rem;
-    width: 38px; height: 38px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 8px;
-    flex-shrink: 0;
-}
-.icon-blue   { background: rgba(37,99,235,0.12);  }
-.icon-purple { background: rgba(124,58,237,0.12); }
-.icon-orange { background: rgba(217,119,6,0.12);  }
-.icon-teal   { background: rgba(13,148,136,0.12); }
-.method-title { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; margin: 0; }
-.method-tags  { font-size: 0.82rem; opacity: 0.65; margin: 4px 0 0 0; line-height: 1.5; }
+.method-title { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; margin: 0 0 4px 0; }
+.method-tags  { font-size: 0.82rem; opacity: 0.65; margin: 0; line-height: 1.5; }
 
 /* ── tech table ── */
 .tech-row {
@@ -208,7 +191,6 @@ html, body, [class*="css"] {
     transition: border-color 0.15s;
 }
 .tech-row:hover { border-color: rgba(37,99,235,0.3); }
-.tech-emoji { font-size: 1.2rem; width: 28px; text-align: center; }
 .tech-name  { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; min-width: 160px; }
 .tech-desc  { font-size: 0.85rem; opacity: 0.65; }
 </style>
@@ -218,7 +200,7 @@ html, body, [class*="css"] {
 # ── Page Hero ─────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="page-hero">
-    <div class="page-badge">🔬 Methodology</div>
+    <div class="page-badge">Methodology</div>
     <h1 class="page-title">Data & Methodology</h1>
     <p class="page-subtitle">
         Data sources, preparation pipeline, and applied analytical methods
@@ -231,7 +213,6 @@ st.markdown("""
 # ── Data Sources ──────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="section-banner section-banner-blue">
-    <span class="section-icon">🗄️</span>
     <p class="section-title">Data Sources</p>
 </div>
 """, unsafe_allow_html=True)
@@ -244,9 +225,8 @@ st.markdown("""
 </div>
 
 <div class="source-strip">
-    <span class="source-pill">📈 Alpha Vantage — Stock Data</span>
-    <span class="source-pill">📰 NewsAPI — News Articles</span>
-    <span class="source-pill">🏦 FRED — S&P 500 &amp; Consumer Sentiment</span>
+    <span class="source-pill">Alpha Vantage — Stock Data</span>
+    <span class="source-pill">FRED — S&P 500 &amp; Consumer Sentiment</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -254,10 +234,7 @@ col_src1, col_src2 = st.columns(2)
 with col_src1:
     st.markdown("""
     <div class="method-card">
-        <div class="method-icon-row">
-            <div class="method-icon icon-blue">📊</div>
-            <p class="method-title">Price Data</p>
-        </div>
+        <p class="method-title">Price Data</p>
         <p class="method-tags">Daily OHLCV · 100 trading days compact · extended monthly history</p>
     </div>
     """, unsafe_allow_html=True)
@@ -265,10 +242,7 @@ with col_src1:
 with col_src2:
     st.markdown("""
     <div class="method-card">
-        <div class="method-icon-row">
-            <div class="method-icon icon-teal">🏢</div>
-            <p class="method-title">Stocks Analyzed</p>
-        </div>
+        <p class="method-title">Stocks Analyzed</p>
         <p class="method-tags">AAPL · MSFT · NVDA · JPM · GS · BAC</p>
     </div>
     """, unsafe_allow_html=True)
@@ -277,7 +251,6 @@ with col_src2:
 # ── Data Preparation ──────────────────────────────────────────────────────────
 st.markdown("""
 <div class="section-banner section-banner-green">
-    <span class="section-icon">⚙️</span>
     <p class="section-title">Data Preparation</p>
 </div>
 """, unsafe_allow_html=True)
@@ -317,7 +290,6 @@ st.markdown("""
 # ── Methods ───────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="section-banner section-banner-purple">
-    <span class="section-icon">🧮</span>
     <p class="section-title">Methods</p>
 </div>
 """, unsafe_allow_html=True)
@@ -327,17 +299,11 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("""
     <div class="method-card">
-        <div class="method-icon-row">
-            <div class="method-icon icon-blue">📐</div>
-            <p class="method-title">Statistical Analysis</p>
-        </div>
+        <p class="method-title">Statistical Analysis</p>
         <p class="method-tags">Descriptive statistics · Distribution analysis · Hypothesis testing · Normality tests</p>
     </div>
     <div class="method-card">
-        <div class="method-icon-row">
-            <div class="method-icon icon-purple">📉</div>
-            <p class="method-title">Time Series Analysis</p>
-        </div>
+        <p class="method-title">Time Series Analysis</p>
         <p class="method-tags">ARIMA · GARCH models · Stationarity tests · Regime detection</p>
     </div>
     """, unsafe_allow_html=True)
@@ -345,17 +311,11 @@ with col1:
 with col2:
     st.markdown("""
     <div class="method-card">
-        <div class="method-icon-row">
-            <div class="method-icon icon-orange">🤖</div>
-            <p class="method-title">Machine Learning</p>
-        </div>
+        <p class="method-title">Machine Learning</p>
         <p class="method-tags">Clustering · Classification · Dimensionality reduction · Feature importance</p>
     </div>
     <div class="method-card">
-        <div class="method-icon-row">
-            <div class="method-icon icon-teal">📊</div>
-            <p class="method-title">Visualization</p>
-        </div>
+        <p class="method-title">Visualization</p>
         <p class="method-tags">Matplotlib · Seaborn · Plotly · Interactive charts & dashboards</p>
     </div>
     """, unsafe_allow_html=True)
@@ -364,23 +324,21 @@ with col2:
 # ── Technologies ──────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="section-banner section-banner-orange">
-    <span class="section-icon">🛠️</span>
     <p class="section-title">Technologies Used</p>
 </div>
 """, unsafe_allow_html=True)
 
 techs = [
-    ("🐍", "Python",               "Core programming language"),
-    ("🔢", "Pandas / NumPy",       "Data processing & numerical computing"),
-    ("🤖", "Scikit-learn",         "Machine learning algorithms"),
-    ("📊", "Matplotlib / Plotly",  "Static & interactive visualization"),
-    ("🌐", "Streamlit",            "Web framework & deployment"),
+    ("Python",              "Core programming language"),
+    ("Pandas / NumPy",      "Data processing & numerical computing"),
+    ("Scikit-learn",        "Machine learning algorithms"),
+    ("Matplotlib / Plotly", "Static & interactive visualization"),
+    ("Streamlit",           "Web framework & deployment"),
 ]
 
-for emoji, name, desc in techs:
+for name, desc in techs:
     st.markdown(f"""
     <div class="tech-row">
-        <span class="tech-emoji">{emoji}</span>
         <span class="tech-name">{name}</span>
         <span class="tech-desc">{desc}</span>
     </div>
