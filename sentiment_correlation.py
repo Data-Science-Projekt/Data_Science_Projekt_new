@@ -92,22 +92,10 @@ max_months = len(merged_all)  # typically 4–5 with 100 trading days
 
 # Sidebar — sliders bounded by actual data
 st.sidebar.header("Analysis Parameters")
-st.sidebar.caption(f"Available data: {max_months} months")
+st.sidebar.info(f"Analysis is based on {max_months} months of available data.")
 
-if max_months < 2:
-    st.error(f"Not enough monthly data points ({max_months}) for analysis. Please ensure the data bot has run successfully.")
-    st.stop()
-
-lookback_months = st.sidebar.slider(
-    "Lookback period (months)",
-    min_value=2,
-    max_value=max_months,
-    value=max_months,
-)
-effective_window = 2  # fixed — too few months for a meaningful rolling window
-
-# Apply lookback filter
-merged = merged_all.tail(lookback_months)
+# Use all available data
+merged = merged_all
 
 st.write(f"**Analysis Period:** {merged.index.min().strftime('%Y-%m')} to {merged.index.max().strftime('%Y-%m')} ({len(merged)} months)")
 
