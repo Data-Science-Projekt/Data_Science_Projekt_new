@@ -3,41 +3,48 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
-from analysis.utils import render_page_header
-from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
+
+# Falls diese Hilfsfunktionen in deinem Projekt existieren, bleiben sie drin.
+# Wenn sie Fehler verursachen, kannst du sie durch st.title/st.write ersetzen.
+try:
+    from analysis.utils import render_page_header
+    from utils.export import fig_to_pdf_bytes
+except ImportError:
+    def render_page_header(title, subtitle):
+        st.title(title)
+        st.write(subtitle)
+    def fig_to_pdf_bytes(fig):
+        return b""
 
 # --- CONFIG ---
-# Data sources are now loaded locally from the folder maintained by the bot
 STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
 @st.cache_data(show_spinner=False)
 def get_local_stock_returns(symbol):
-    """Reads stock data locally and calculates daily returns."""
+    """Liest lokale Aktiendaten und berechnet die taeglichen Renditen."""
     file_path = f"data/stock_{symbol}.csv"
     
     if not os.path.exists(file_path):
         return None
         
     try:
-        # Read CSV created by the bot
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-        # Sort to ensure correct chronological order
         df = df.astype(float).sort_index()
-        # Calculate percentage change (returns)
+        # Berechnung der prozentualen Veraenderung (Renditen)
         return df['4. close'].pct_change().dropna()
     except Exception:
         return None
 
 # --- SIDEBAR ---
 st.sidebar.header("Risk Settings")
-conf_level = st.sidebar.slider("Confidence level (percent)", 90.0, 99.0, 95.0, 0.5) / 100
+conf_level = st.sidebar.slider("Confidence level (%)", 90.0, 99.0, 95.0, 0.5) / 100
 st.sidebar.divider()
 show_apple = st.sidebar.checkbox("Show Apple (AAPL)", value=True, key="risk_a")
 show_nvidia = st.sidebar.checkbox("Show NVIDIA (NVDA)", value=True, key="risk_n")
 
 render_page_header(
     "Risk Management",
-    "What is the maximum expected loss (at a 95% confidence level) for Apple compared to NVIDIA over a 1-day horizon?",
+    f"What is the maximum expected loss (at a {conf_level*100:.1f}% confidence level) for Apple compared to NVIDIA over a 1-day horizon?"
 )
 
 # --- DATA LOADING ---
@@ -54,36 +61,51 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     fig = go.Figure()
 
     if show_apple and ret_a is not None:
-        # Historical simulation of VaR
+        # Historische Simulation des VaR
         v_a = np.percentile(ret_a, (1 - conf_level) * 100)
-        # Expected Shortfall (average loss beyond VaR)
+        # Expected Shortfall (Durchschnittlicher Verlust jenseits des VaR)
         e_a = ret_a[ret_a <= v_a].mean()
-        fig.add_trace(go.Histogram(x=ret_a, name="Apple", marker_color='#1f77b4', opacity=0.6))
-        fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4", annotation_text="VaR AAPL")
+        fig.add_trace(go.Histogram(
+            x=ret_a, 
+            name="Apple", 
+            marker_color='#1f77b4', 
+            opacity=0.6,
+            nbinsx=50
+        ))
+        fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4", 
+                      annotation_text=f"VaR AAPL: {v_a:.2%}",
+                      annotation_position="top left")
 
     if show_nvidia and ret_n is not None:
         v_n = np.percentile(ret_n, (1 - conf_level) * 100)
         e_n = ret_n[ret_n <= v_n].mean()
-        fig.add_trace(go.Histogram(x=ret_n, name="NVIDIA", marker_color='#ff7f0e', opacity=0.6))
-        fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", annotation_text="VaR NVDA")
+        fig.add_trace(go.Histogram(
+            x=ret_n, 
+            name="NVIDIA", 
+            marker_color='#ff7f0e', 
+            opacity=0.6,
+            nbinsx=50
+        ))
+        fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", 
+                      annotation_text=f"VaR NVDA: {v_n:.2%}",
+                      annotation_position="top right")
 
+    # Layout-Anpassung fuer dynamische Farben (Light/Dark Mode)
     fig.update_layout(
         barmode='overlay',
-        template="plotly_dark",
         xaxis_title="Daily Return",
         yaxis_title="Frequency",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.download_button(
-        label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig),
-        file_name="riskmanagement.png",
-        mime="application/png"
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        # Hintergruende transparent machen, damit das Streamlit-Theme wirkt
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(t=50)
     )
 
-    # Metrics below the chart
+    # WICHTIG: theme="streamlit" sorgt fuer den automatischen Farbwechsel der Achsen
+    st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+
+    # Metrics unter dem Chart
     c1, c2 = st.columns(2)
     if show_apple and ret_a is not None:
         c1.subheader("Apple (AAPL)")
@@ -100,27 +122,19 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
 
     st.info(f"""
     **Definition of risk metrics:**
-    - **Value-at-Risk (VaR):** Represents the maximum expected loss over a given time horizon at a specified confidence level ({conf_level * 100:.1f} percent).  
-    - **Expected Shortfall (CVaR):** Represents the average loss that occurs once the VaR threshold is exceeded (the average of the worst-case outcomes).
+    - **Value-at-Risk (VaR):** Represents the maximum expected loss over a 1-day horizon at a {conf_level * 100:.1f}% confidence level.
+    - **Expected Shortfall (CVaR):** The average loss that occurs once the VaR threshold is breached (tail risk).
     """)
 
-    st.markdown("""
+    st.markdown(f"""
     ### Key Insights:
 
-    * **Tail Risk Assessment:** While standard deviation (volatility) measures overall uncertainty, **VaR** and **Expected Shortfall** specifically focus on the left tail of the distribution—where the most significant losses occur.
-
-    * **Apple vs. NVIDIA:**  
-        - NVIDIA typically exhibits a **lower (more negative) VaR** than Apple, reflecting higher historical volatility and beta.  
-        - A larger gap between VaR and Expected Shortfall suggests **fat tails** (leptokurtosis), meaning extreme downside events are more likely than under a normal distribution.
-
-    * **Impact of Confidence Level:**  
-        - Increasing the confidence level (e.g., from 95 to 99 percent) shifts the VaR threshold further left, capturing more extreme but rarer events.  
-        - Investors with low risk tolerance should focus on **Expected Shortfall**, as it provides a more realistic estimate of losses during market stress.
-
-    * **Limitations:** These metrics are based on historical data (last 100 trading days). They assume that future market behavior resembles the past, which may not hold during unprecedented black swan events.
+    * **Tail Risk Assessment:** Unlike standard deviation, **VaR** and **Expected Shortfall** focus specifically on extreme downside events.
+    * **Comparison:** NVIDIA typically shows a more negative VaR, indicating higher risk due to its higher beta and volatility compared to Apple.
+    * **Current Selection:** At a {conf_level*100:.1f}% confidence level, you can see how the distribution of returns for both stocks behaves.
     """)
 
-    st.caption("Method: Historical simulation based on the last 100 trading days. Data source: Local (via bot).")
+    st.caption("Method: Historical simulation based on local CSV data. Data source: Alpha Vantage.")
 
 else:
-    st.info("Please select assets or ensure that local data is available.")
+    st.info("Please select assets in the sidebar to view the risk analysis.")
