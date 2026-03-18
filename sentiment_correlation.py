@@ -94,8 +94,8 @@ max_months = len(merged_all)  # typically 4–5 with 100 trading days
 st.sidebar.header("Analysis Parameters")
 st.sidebar.caption(f"Available data: {max_months} months")
 
-if max_months < 3:
-    st.error(f"Not enough monthly data points ({max_months}) for a meaningful analysis. At least 3 months are required.")
+if max_months < 4:
+    st.error(f"Not enough monthly data points ({max_months}) for a meaningful analysis. At least 4 months are required.")
     st.stop()
 
 lookback_months = st.sidebar.slider(
@@ -107,8 +107,8 @@ lookback_months = st.sidebar.slider(
 rolling_window = st.sidebar.slider(
     "Rolling correlation window (months)",
     min_value=2,
-    max_value=max(3, max_months) - 1,
-    value=min(3, max(3, max_months) - 1),
+    max_value=lookback_months - 1,
+    value=2,
 )
 
 # Apply lookback filter
