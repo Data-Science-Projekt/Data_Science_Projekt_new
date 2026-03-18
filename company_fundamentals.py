@@ -9,30 +9,41 @@ from analysis.utils import render_page_header
 from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
-# Path to the static data file in the data folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
+CHART_STYLE = dict(
+    font=dict(color="#718096", size=14),
+    xaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    yaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    legend=dict(
+        font=dict(color="#718096", size=13)
+    ),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+)
 
 @st.cache_data(show_spinner="Loading fundamental data...")
 def load_iphone_sales():
-    """Reads the manually maintained iPhone sales figures."""
-    # Path adjustment in case the script is in a 'pages' subfolder
     path = os.path.join("data", "iphone_sales.csv")
-
     if not os.path.exists(path):
         return pd.DataFrame()
-
     try:
         df = pd.read_csv(path, parse_dates=["earnings_date"])
         df = df.sort_values("earnings_date").reset_index(drop=True)
-
-        # Calculation of price reaction (30 days after earnings vs. earnings day)
         if "price_on_earnings" in df.columns and "price_30d_after" in df.columns:
             df["price_change_pct"] = (
-                    (df["price_30d_after"] - df["price_on_earnings"]) / df["price_on_earnings"] * 100
+                (df["price_30d_after"] - df["price_on_earnings"]) / df["price_on_earnings"] * 100
             )
-
-        # Calculation of growth rates
         df["revenue_growth"] = df["iphone_revenue_billion"].pct_change() * 100
         df["units_growth"] = df["iphone_units_million"].pct_change() * 100
         return df
@@ -87,16 +98,30 @@ fig_sales.add_trace(
     ),
     secondary_y=True,
 )
-fig_sales.update_layout(template="plotly_white", height=450)
-fig_sales.update_yaxes(title_text="Revenue ($ Billion)", secondary_y=False)
-fig_sales.update_yaxes(title_text="Units Sold (Millions)", secondary_y=True)
+fig_sales.update_layout(
+    template="plotly_white",
+    height=450,
+    **CHART_STYLE
+)
+fig_sales.update_yaxes(
+    title_text="Revenue ($ Billion)",
+    title_font=dict(color="#718096", size=15),
+    tickfont=dict(color="#718096", size=13),
+    secondary_y=False
+)
+fig_sales.update_yaxes(
+    title_text="Units Sold (Millions)",
+    title_font=dict(color="#718096", size=15),
+    tickfont=dict(color="#718096", size=13),
+    secondary_y=True
+)
 st.plotly_chart(fig_sales, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_sales),
     file_name="fundamentals_sales.png",
-    mime="application/png",
+    mime="image/png",
     key="download_fundamentals_sales"
 )
 
@@ -120,6 +145,7 @@ if "price_change_pct" in df.columns:
         yaxis_title="Price Change (%)",
         template="plotly_white",
         height=400,
+        **CHART_STYLE
     )
     st.plotly_chart(fig_reaction, use_container_width=True)
 
@@ -127,7 +153,7 @@ if "price_change_pct" in df.columns:
         label="📥 Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig_reaction),
         file_name="fundamentals_reaction.png",
-        mime="application/png",
+        mime="image/png",
         key="download_fundamentals_reaction"
     )
 
@@ -184,14 +210,30 @@ fig_seasonal.add_trace(
     ),
     secondary_y=True,
 )
-fig_seasonal.update_layout(template="plotly_white", height=400)
+fig_seasonal.update_layout(
+    template="plotly_white",
+    height=400,
+    **CHART_STYLE
+)
+fig_seasonal.update_yaxes(
+    title_text="Avg. Revenue ($ Billion)",
+    title_font=dict(color="#718096", size=15),
+    tickfont=dict(color="#718096", size=13),
+    secondary_y=False
+)
+fig_seasonal.update_yaxes(
+    title_text="Avg. Price Reaction (%)",
+    title_font=dict(color="#718096", size=15),
+    tickfont=dict(color="#718096", size=13),
+    secondary_y=True
+)
 st.plotly_chart(fig_seasonal, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_seasonal),
     file_name="fundamentals_seasonal.png",
-    mime="application/png",
+    mime="image/png",
     key="download_fundamentals_seasonal"
 )
 
