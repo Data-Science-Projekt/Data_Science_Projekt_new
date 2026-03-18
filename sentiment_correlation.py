@@ -94,8 +94,8 @@ max_months = len(merged_all)  # typically 4–5 with 100 trading days
 st.sidebar.header("Analysis Parameters")
 st.sidebar.caption(f"Available data: {max_months} months")
 
-if max_months < 4:
-    st.error(f"Not enough monthly data points ({max_months}) for a meaningful analysis. At least 4 months are required.")
+if max_months < 2:
+    st.error(f"Not enough monthly data points ({max_months}) for analysis. Please ensure the data bot has run successfully.")
     st.stop()
 
 lookback_months = st.sidebar.slider(
@@ -104,21 +104,10 @@ lookback_months = st.sidebar.slider(
     max_value=max_months,
     value=max_months,
 )
-rolling_window = st.sidebar.slider(
-    "Rolling correlation window (months)",
-    min_value=2,
-    max_value=lookback_months - 1,
-    value=2,
-)
+effective_window = 2  # fixed — too few months for a meaningful rolling window
 
 # Apply lookback filter
 merged = merged_all.tail(lookback_months)
-
-if len(merged) < rolling_window:
-    st.warning(f"Not enough data for a {rolling_window}-month window. Currently showing all {len(merged)} available months.")
-    effective_window = max(2, len(merged))
-else:
-    effective_window = rolling_window
 
 st.write(f"**Analysis Period:** {merged.index.min().strftime('%Y-%m')} to {merged.index.max().strftime('%Y-%m')} ({len(merged)} months)")
 
