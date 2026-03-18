@@ -34,23 +34,28 @@ render_page_header(
     "What is the maximum expected loss (at a specified confidence level) for Apple compared to NVIDIA over a 1-day horizon?"
 )
 
-# --- SETTINGS IM HAUPTBEREICH (unter der Research Question) ---
+# --- SETTINGS: kompakt in einer schmalen Zeile ---
 st.markdown("### ⚙️ Risk Settings")
-# Wir erstellen drei Spalten für ein kompaktes Design
-col_settings_1, col_settings_2, col_settings_3 = st.columns([2, 1, 1])
 
-with col_settings_1:
+# Alle Controls in einer einzigen Zeile mit stark unterschiedlichen Breiten:
+# Schieberegler bekommt ~40% der Breite, die Checkboxen je ~15%,
+# der Rest (~30%) bleibt als Puffer leer.
+col_slider, col_aapl, col_nvda, col_spacer = st.columns([4, 1.5, 1.5, 3])
+
+with col_slider:
     conf_level = st.slider(
-        "Confidence level (%)", 
-        90.0, 99.0, 97.5, 0.5, 
+        "Confidence level (%)",
+        90.0, 99.0, 97.5, 0.5,
         help="The probability that the actual loss will not exceed the VaR."
     ) / 100
 
-with col_settings_2:
-    show_apple = st.checkbox("Show Apple (AAPL)", value=True, key="risk_a")
+with col_aapl:
+    st.write("")          # kleiner vertikaler Ausgleich
+    show_apple = st.checkbox("Apple (AAPL)", value=True, key="risk_a")
 
-with col_settings_3:
-    show_nvidia = st.checkbox("Show NVIDIA (NVDA)", value=True, key="risk_n")
+with col_nvda:
+    st.write("")
+    show_nvidia = st.checkbox("NVIDIA (NVDA)", value=True, key="risk_n")
 
 st.divider()
 
