@@ -163,12 +163,15 @@ render_page_header(
     "How does the correlation between selected technology stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) change during stable market periods compared to crisis periods (bear markets)?",
 )
 
-# Sidebar controls
+# Direkt nach render_page_header einfügen:
+if "selected_stocks_multiselect" not in st.session_state:
+    st.session_state["selected_stocks_multiselect"] = ["Apple", "NVIDIA"]
+
 selected_stocks = st.sidebar.multiselect(
     "Select Assets:",
     list(STOCKS.keys()),
-    default=["Apple", "NVIDIA"],
     key="selected_stocks_multiselect"
+    # Kein default mehr nötig – wird über session_state gesetzt
 )
 
 if not selected_stocks:
