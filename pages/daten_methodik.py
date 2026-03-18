@@ -41,7 +41,7 @@ html, body, [class*="css"] {
     background: rgba(37,99,235,0.1);
     border: 1px solid rgba(37,99,235,0.3);
     color: #2563eb;
-    font-size: 0.72rem;
+    font-size: 0.82rem;
     font-weight: 500;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -62,7 +62,7 @@ html, body, [class*="css"] {
     line-height: 1.15;
 }
 .page-subtitle {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 300;
     margin: 0;
     max-width: 580px;
@@ -85,7 +85,7 @@ html, body, [class*="css"] {
 .section-banner-purple { background: linear-gradient(90deg, rgba(124,58,237,0.08), rgba(124,58,237,0.01)); border-left: 3px solid #7c3aed; }
 .section-banner-orange { background: linear-gradient(90deg, rgba(217,119,6,0.08),  rgba(217,119,6,0.01));  border-left: 3px solid #d97706; }
 .section-icon  { font-size: 1.5rem; line-height: 1; }
-.section-title { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; margin: 0; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
 
 /* ── info box ── */
 .info-box {
@@ -95,7 +95,7 @@ html, body, [class*="css"] {
     padding: 24px 28px;
     margin-bottom: 16px;
     line-height: 1.75;
-    font-size: 0.96rem;
+    font-size: 1.08rem;
 }
 .info-box .hl-blue   { color: #2563eb; font-weight: 600; }
 .info-box .hl-green  { color: #16a34a; font-weight: 600; }
@@ -116,8 +116,8 @@ html, body, [class*="css"] {
     background: rgba(37,99,235,0.08);
     border: 1px solid rgba(37,99,235,0.2);
     border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 0.82rem;
+    padding: 7px 16px;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #2563eb;
     letter-spacing: 0.3px;
@@ -141,7 +141,7 @@ html, body, [class*="css"] {
 }
 .step-number {
     font-family: 'Syne', sans-serif;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: #2563eb;
     opacity: 0.35;
@@ -151,12 +151,12 @@ html, body, [class*="css"] {
 .step-content {}
 .step-title {
     font-family: 'Syne', sans-serif;
-    font-size: 0.92rem;
+    font-size: 1.05rem;
     font-weight: 700;
     margin: 0 0 3px 0;
 }
 .step-desc {
-    font-size: 0.85rem;
+    font-size: 0.98rem;
     line-height: 1.55;
     margin: 0;
     opacity: 0.7;
@@ -175,15 +175,15 @@ html, body, [class*="css"] {
     border-color: #7c3aed;
     transform: translateY(-2px);
 }
-.method-title { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; margin: 0 0 4px 0; }
-.method-tags  { font-size: 0.82rem; opacity: 0.65; margin: 0; line-height: 1.5; }
+.method-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 4px 0; }
+.method-tags  { font-size: 0.95rem; opacity: 0.65; margin: 0; line-height: 1.5; }
 
 /* ── tech table ── */
 .tech-row {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 13px 18px;
+    padding: 14px 20px;
     border-radius: 8px;
     margin-bottom: 8px;
     background: rgba(0,0,0,0.02);
@@ -191,8 +191,8 @@ html, body, [class*="css"] {
     transition: border-color 0.15s;
 }
 .tech-row:hover { border-color: rgba(37,99,235,0.3); }
-.tech-name  { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; min-width: 160px; }
-.tech-desc  { font-size: 0.85rem; opacity: 0.65; }
+.tech-name  { font-family: 'Syne', sans-serif; font-size: 1.02rem; font-weight: 700; min-width: 160px; }
+.tech-desc  { font-size: 0.98rem; opacity: 0.65; }
 </style>
 """, unsafe_allow_html=True)
 

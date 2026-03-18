@@ -58,7 +58,7 @@ html, body, [class*="css"] {
     line-height: 1.1;
 }
 .hero-subtitle {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     font-weight: 300;
     margin: 0;
     max-width: 640px;
@@ -70,7 +70,7 @@ html, body, [class*="css"] {
     background: rgba(37,99,235,0.1);
     border: 1px solid rgba(37,99,235,0.3);
     color: var(--accent-blue);
-    font-size: 0.72rem;
+    font-size: 0.82rem;
     font-weight: 500;
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -100,7 +100,7 @@ html, body, [class*="css"] {
 .section-icon { font-size: 1.5rem; line-height: 1; }
 .section-title {
     font-family: 'Syne', sans-serif;
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     font-weight: 700;
     margin: 0;
 }
@@ -113,7 +113,7 @@ html, body, [class*="css"] {
     padding: 24px 28px;
     margin-bottom: 24px;
     line-height: 1.7;
-    font-size: 0.97rem;
+    font-size: 1.08rem;
 }
 .summary-box .highlight {
     color: #2563eb;
@@ -156,12 +156,12 @@ html, body, [class*="css"] {
 .icon-red    { background: rgba(220,38,38,0.12);   }
 .card-title {
     font-family: 'Syne', sans-serif;
-    font-size: 0.95rem;
+    font-size: 1.08rem;
     font-weight: 700;
     margin: 0;
 }
 .card-body {
-    font-size: 0.88rem;
+    font-size: 1rem;
     line-height: 1.65;
     margin: 0;
     opacity: 0.75;
@@ -177,8 +177,8 @@ html, body, [class*="css"] {
     background: rgba(37,99,235,0.1);
     border: 1px solid rgba(37,99,235,0.25);
     border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 0.8rem;
+    padding: 5px 14px;
+    font-size: 0.92rem;
     font-weight: 600;
     color: #2563eb;
     letter-spacing: 0.5px;
