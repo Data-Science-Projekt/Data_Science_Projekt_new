@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 
-# --- HILFSFUNKTIONEN ---
+# --- HILFSFUNKTIONEN (Sicherheits-Check) ---
 try:
     from analysis.utils import render_page_header
 except ImportError:
@@ -68,14 +68,18 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
             marker_color='#1f77b4', 
             opacity=0.6, 
             nbinsx=50,
-            # FIXED: Hover-Text gerundet (Mittelwert der Rendite im Balken)
+            # Hover-Text gerundet (Mittelwert der Rendite im Balken)
             hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
-        # FIXED: Text angepasst und Position auf 'top left' gesetzt
+        
+        # FIXED STRATEGY 2: Erzwinge Text-Anker nach RECHTS (Apple)
         fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4", 
                       annotation_text=f"VaR AAPL: {v_a:.2%}",
-                      annotation_position="top left",
-                      annotation_yshift=10) # Kleiner Abstand nach oben
+                      annotation_position="top", # Grundposition oben auf der Linie
+                      annotation_textangle=0,
+                      annotation_align="left",   # Text ist linksbuendig...
+                      annotation_xanchor="left", # ...aber der ANKER ist links (Text fließt nach RECHTS)
+                      annotation_yshift=10)      # Abstand nach oben
 
     if show_nvidia and ret_n is not None:
         v_n = np.percentile(ret_n, (1 - conf_level) * 100)
@@ -87,14 +91,18 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
             marker_color='#ff7f0e', 
             opacity=0.6, 
             nbinsx=50,
-            # FIXED: Hover-Text gerundet
+            # Hover-Text gerundet
             hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
-        # FIXED: Text angepasst und Position auf 'top right' gesetzt
+        
+        # FIXED STRATEGY 2: Erzwinge Text-Anker nach LINKS (NVIDIA)
         fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e", 
                       annotation_text=f"VaR NVDA: {v_n:.2%}",
-                      annotation_position="top right",
-                      annotation_yshift=10)
+                      annotation_position="top", # Grundposition oben auf der Linie
+                      annotation_textangle=0,
+                      annotation_align="right",   # Text ist rechtsbuendig...
+                      annotation_xanchor="right", # ...und der ANKER ist rechts (Text fließt nach LINKS)
+                      annotation_yshift=25)      # Etwas hoeher als Apple, falls sie extrem nah sind
 
     # Standard Layout fuer automatische Farben
     fig.update_layout(
@@ -104,8 +112,8 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(t=50),
-        # FIXED: Hovermode auf 'closest', damit der Hovertemplate-Code greift
+        margin=dict(t=80), # Mehr Platz nach oben fuer die Annotations
+        # Hovermode auf 'closest', damit der Hovertemplate-Code greift
         hovermode="closest"
     )
 
@@ -131,7 +139,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     st.markdown("""
     ### Key Insights:
     * **Tail Risk Assessment:** VaR focuses specifically on extreme downside events.
-    * **Visualization:** The dotted lines now show the exact VaR percentages clearly, without overlapping.
+    * **Visualization:** The dotted lines now show the exact VaR percentages. The text labels are forced apart (Apple right, NVIDIA left) to prevent overlapping.
     """)
 
 else:
