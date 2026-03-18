@@ -144,7 +144,7 @@ if df_raw is not None:
         x=df_view.index,
         y=df_view['close'],
         name='Price',
-        line=dict(color='#E8E8E8', width=1.8),
+        line=dict(color='blue', width=3),
         hovertemplate='%{x|%d.%m.%Y}<br>$%{y:.2f}<extra></extra>'
     ))
 
