@@ -138,21 +138,6 @@ for name in stock_names:
     })
 st.table(pd.DataFrame(corr_results))
 
-# --- 4. ROLLING CORRELATION ---
-st.subheader("4. Time Evolution (Rolling Correlation)")
-fig_rolling = go.Figure()
-for name in stock_names:
-    # Use the effective_window from the slider
-    rolling_corr = merged["sentiment"].rolling(effective_window).corr(merged[name])
-    fig_rolling.add_trace(go.Scatter(x=merged.index, y=rolling_corr, mode="lines", name=name))
-
-fig_rolling.add_hline(y=0, line_dash="dash", line_color="gray")
-fig_rolling.update_layout(
-    yaxis_title=f"Rolling {effective_window}-month correlation",
-    template="plotly_white", height=500
-)
-st.plotly_chart(fig_rolling, use_container_width=True)
-
 # --- 5. KEY INSIGHTS ---
 st.subheader("5. Key Insights")
 
