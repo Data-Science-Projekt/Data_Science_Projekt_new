@@ -123,20 +123,20 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
     ))
 
     fig.update_layout(
-        title=f"{stock}",
+        title=dict(text=f"{stock}", font=dict(size=18, color="#718096")),
         template="plotly_white",
         xaxis_title="Date",
         yaxis_title="Price ($)",
-        font=dict(color="#718096"),
+        font=dict(color="#718096", size=14),
         xaxis=dict(
-            tickfont=dict(color="#718096"),
-            title_font=dict(color="#718096"),
+            tickfont=dict(color="#718096", size=13),
+            title_font=dict(color="#718096", size=15),
             gridcolor="#e2e8f0",
             linecolor="#cbd5e0",
         ),
         yaxis=dict(
-            tickfont=dict(color="#718096"),
-            title_font=dict(color="#718096"),
+            tickfont=dict(color="#718096", size=13),
+            title_font=dict(color="#718096", size=15),
             gridcolor="#e2e8f0",
             linecolor="#cbd5e0",
         ),
@@ -146,7 +146,7 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
             y=1.02,
             xanchor="right",
             x=1,
-            font=dict(color="#718096")
+            font=dict(color="#718096", size=13)
         ),
         hovermode="x unified",
         margin=dict(t=60),
@@ -154,7 +154,6 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
     )
-
     return fig
 
 
