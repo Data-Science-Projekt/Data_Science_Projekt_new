@@ -62,7 +62,6 @@ def add_phase_shading(fig, df):
         "Neutral": "rgba(180, 180, 180, 0.07)"
     }
 
-    # Group consecutive rows with the same phase into segments
     df = df.reset_index()
     df.columns = ['date'] + list(df.columns[1:])
 
@@ -97,7 +96,15 @@ render_page_header(
 )
 
 # Sidebar controls
-selected_stock = st.sidebar.selectbox("Select Asset:", list(STOCKS.keys()))
+selected_stocks = st.sidebar.multiselect(
+    "Select Assets:",
+    list(STOCKS.keys()),
+    default=["Apple"]
+)
+
+if not selected_stocks:
+    st.warning("Please select at least one asset.")
+    st.stop()
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("Phase Thresholds")
@@ -127,90 +134,83 @@ st.sidebar.markdown(
     f"- 🔴 Bear: -{bear_threshold}% from 20d high"
 )
 
-# Load and process data
-df_raw = get_stock_data(STOCKS[selected_stock])
+# --- LOAD AND DISPLAY EACH SELECTED STOCK ---
+for selected_stock in selected_stocks:
+    df_raw = get_stock_data(STOCKS[selected_stock])
 
-if df_raw is not None:
-    df_view = identify_phases(df_raw, bull_threshold, bear_threshold)
+    if df_raw is not None:
+        df_view = identify_phases(df_raw, bull_threshold, bear_threshold)
 
-    # Chart
-    fig = go.Figure()
+        # Chart
+        fig = go.Figure()
+        fig = add_phase_shading(fig, df_view)
 
-    # Add phase shading first (below price line)
-    fig = add_phase_shading(fig, df_view)
+        fig.add_trace(go.Scatter(
+            x=df_view.index,
+            y=df_view['close'],
+            name='Price',
+            line=dict(color='blue', width=3),
+            hovertemplate='%{x|%d.%m.%Y}<br>$%{y:.2f}<extra></extra>'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None], mode='markers',
+            marker=dict(size=10, color='rgba(0, 200, 100, 0.6)', symbol='square'),
+            name=f'Bull (≥+{bull_threshold}%)'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None], mode='markers',
+            marker=dict(size=10, color='rgba(220, 50, 50, 0.6)', symbol='square'),
+            name=f'Bear (≤-{bear_threshold}%)'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None], mode='markers',
+            marker=dict(size=10, color='rgba(180, 180, 180, 0.4)', symbol='square'),
+            name='Neutral'
+        ))
 
-    # Price line
-    fig.add_trace(go.Scatter(
-        x=df_view.index,
-        y=df_view['close'],
-        name='Price',
-        line=dict(color='blue', width=3),
-        hovertemplate='%{x|%d.%m.%Y}<br>$%{y:.2f}<extra></extra>'
-    ))
+        fig.update_layout(
+            title=f"Market Phases – {selected_stock}",
+            template="plotly_dark",
+            xaxis_title="Date",
+            yaxis_title="Price ($)",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            hovermode="x unified",
+            margin=dict(t=60)
+        )
 
-    # Add invisible legend traces for phase colors
-    fig.add_trace(go.Scatter(
-        x=[None], y=[None], mode='markers',
-        marker=dict(size=10, color='rgba(0, 200, 100, 0.6)', symbol='square'),
-        name=f'Bull (≥+{bull_threshold}%)'
-    ))
-    fig.add_trace(go.Scatter(
-        x=[None], y=[None], mode='markers',
-        marker=dict(size=10, color='rgba(220, 50, 50, 0.6)', symbol='square'),
-        name=f'Bear (≤-{bear_threshold}%)'
-    ))
-    fig.add_trace(go.Scatter(
-        x=[None], y=[None], mode='markers',
-        marker=dict(size=10, color='rgba(180, 180, 180, 0.4)', symbol='square'),
-        name='Neutral'
-    ))
+        st.subheader(f"📈 {selected_stock}")
+        st.plotly_chart(fig, use_container_width=True)
 
-    fig.update_layout(
-        template="plotly_dark",
-        xaxis_title="Date",
-        yaxis_title="Price ($)",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="x unified",
-        margin=dict(t=60)
-    )
+        st.download_button(
+            label=f"📥 {selected_stock} als PNG herunterladen",
+            data=fig_to_pdf_bytes(fig),
+            file_name=f"marktphasen_{selected_stock.replace(' ', '_')}.png",
+            mime="image/png",
+            key=f"download_marktphasen_{selected_stock}"
+        )
 
-    st.plotly_chart(fig, use_container_width=True)
+        # Phase Distribution
+        st.subheader(f"Market Phase Distribution – {selected_stock}")
+        counts = df_view['phase'].value_counts()
+        percentages = (counts / len(df_view) * 100).round(2)
 
-    st.download_button(
-        label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig),
-        file_name="marktphasen.png",
-        mime="application/png"
-    )
+        dist_df = pd.DataFrame({
+            "Days": counts,
+            "Share (%)": percentages
+        })
+        st.table(dist_df)
 
-    # Phase Distribution
-    st.subheader("Market Phase Distribution")
-    counts = df_view['phase'].value_counts()
-    percentages = (counts / len(df_view) * 100).round(2)
+        bull_pct = percentages.get("Bull", 0)
+        bear_pct = percentages.get("Bear", 0)
+        neutral_pct = percentages.get("Neutral", 0)
 
-    dist_df = pd.DataFrame({
-        "Days": counts,
-        "Share (%)": percentages
-    })
-    st.table(dist_df)
-
-    # --- Interpretation ---
-    st.markdown("---")
-    st.subheader("Interpretation and Insights")
-
-    bull_pct = percentages.get("Bull", 0)
-    bear_pct = percentages.get("Bear", 0)
-    neutral_pct = percentages.get("Neutral", 0)
-
-    st.markdown(f"""
-### Analysis Results
-
+        st.markdown("---")
+        st.subheader(f"Interpretation and Insights – {selected_stock}")
+        st.markdown(f"""
 **1. Market Regime Overview**
 - The asset spent **{bull_pct}%** of the time in a Bull phase.
 - **{bear_pct}%** in a Bear phase.
 - **{neutral_pct}%** in a neutral phase.
-
-This provides a direct understanding of the dominant market environment during the observed period.
 
 ---
 
@@ -241,8 +241,7 @@ This model uses a 20-day rolling window with your custom thresholds:
 
 This is a simplified but widely used definition of market cycles in financial analysis.
 """)
+        st.caption("Methodology: Rolling 20-day window analysis of price movements.")
 
-    st.caption("Methodology: Rolling 20-day window analysis of price movements.")
-
-else:
-    st.error("Data could not be loaded. Please ensure that the CSV files are present in the 'data' folder.")
+    else:
+        st.error(f"Data for {selected_stock} could not be loaded. Please ensure the CSV file is present in the 'data' folder.")
