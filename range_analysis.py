@@ -7,30 +7,42 @@ from analysis.utils import render_page_header
 from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
-# No API keys or local cache folder required anymore.
 TECH_STOCKS = {"Apple": "AAPL", "Microsoft": "MSFT", "NVIDIA": "NVDA"}
 FINANCIAL_STOCKS = {"J.P. Morgan": "JPM", "Goldman Sachs": "GS", "Bank of America": "BAC"}
 ALL_STOCKS = {**TECH_STOCKS, **FINANCIAL_STOCKS}
 
+CHART_STYLE = dict(
+    font=dict(color="#718096", size=14),
+    xaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    yaxis=dict(
+        tickfont=dict(color="#718096", size=13),
+        title_font=dict(color="#718096", size=15),
+        gridcolor="#e2e8f0",
+        linecolor="#cbd5e0",
+    ),
+    legend=dict(
+        font=dict(color="#718096", size=13)
+    ),
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+)
+
 # --- FUNCTION: LOAD DATA (LOCAL) ---
 @st.cache_data(show_spinner="Loading historical trading data...")
 def get_stock_data_local(symbol):
-    """Reads the CSV file created by the bot from the data folder."""
     file_path = f"data/stock_{symbol}.csv"
-    
     if not os.path.exists(file_path):
         return None
-        
     try:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
-        # Sort for correct time-series analysis
         df = df.astype(float).sort_index()
-        
-        # Calculation of the trading range
-        # Column names from Alpha Vantage: 2. high, 3. low, 4. close
         df["absolute_range"] = df["2. high"] - df["3. low"]
         df["relative_range_pct"] = (df["absolute_range"] / df["4. close"]) * 100
-        
         return df
     except Exception:
         return None
@@ -43,7 +55,6 @@ render_page_header(
 
 # Sidebar for controls
 st.sidebar.header("Analysis Parameters")
-# Since the bot fetches 100 days by default, this is the maximum
 days = st.sidebar.slider("Number of Trading Days", min_value=10, max_value=100, value=100, step=10)
 selected_tech = st.sidebar.multiselect("Select Tech Stocks", list(TECH_STOCKS.keys()), default=list(TECH_STOCKS.keys()))
 selected_financial = st.sidebar.multiselect("Select Financial Stocks", list(FINANCIAL_STOCKS.keys()), default=list(FINANCIAL_STOCKS.keys()))
@@ -52,7 +63,6 @@ if not selected_tech and not selected_financial:
     st.warning("Please select at least one stock.")
     st.stop()
 
-# Combine selection
 selected_stocks = {**{k: TECH_STOCKS[k] for k in selected_tech}, **{k: FINANCIAL_STOCKS[k] for k in selected_financial}}
 
 # Load data
@@ -82,32 +92,44 @@ st.subheader("Distribution of Daily Trading Ranges (Percent)")
 fig_box = go.Figure()
 for name, df in stock_data.items():
     fig_box.add_trace(go.Box(y=df["relative_range_pct"], name=name, boxmean=True))
-fig_box.update_layout(yaxis_title="Relative Trading Range (%)", template="plotly_white")
+fig_box.update_layout(
+    yaxis_title="Relative Trading Range (%)",
+    template="plotly_white",
+    **CHART_STYLE
+)
 st.plotly_chart(fig_box, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_box),
     file_name="volatility_boxplot.png",
-    mime="application/png",
+    mime="image/png",
     key="download_volatility_box"
 )
 
 # Time Series
 st.subheader("Trading Range Trend Over Time")
 fig_ts = go.Figure()
-# Defined colors for better differentiation
 colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
 for i, (name, df) in enumerate(stock_data.items()):
-    fig_ts.add_trace(go.Scatter(x=df.index, y=df["relative_range_pct"], mode="lines", name=name, line=dict(color=colors[i % len(colors)], width=1.5)))
-fig_ts.update_layout(xaxis_title="Date", yaxis_title="Relative Trading Range (%)", template="plotly_white")
+    fig_ts.add_trace(go.Scatter(
+        x=df.index, y=df["relative_range_pct"],
+        mode="lines", name=name,
+        line=dict(color=colors[i % len(colors)], width=1.5)
+    ))
+fig_ts.update_layout(
+    xaxis_title="Date",
+    yaxis_title="Relative Trading Range (%)",
+    template="plotly_white",
+    **CHART_STYLE
+)
 st.plotly_chart(fig_ts, use_container_width=True)
 
 st.download_button(
     label="📥 Graph als PNG herunterladen",
     data=fig_to_pdf_bytes(fig_ts),
     file_name="volatility_timeseries.png",
-    mime="application/png",
+    mime="image/png",
     key="download_volatility_ts"
 )
 
