@@ -127,18 +127,18 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
         template="plotly_white",
         xaxis_title="Date",
         yaxis_title="Price ($)",
-        font=dict(color="#4a5568"),
+        font=dict(color="#63b3ed"),
         xaxis=dict(
-            tickfont=dict(color="#4a5568"),
-            title_font=dict(color="#4a5568"),
-            gridcolor="#cbd5e0",
-            linecolor="#a0aec0",
+            tickfont=dict(color="#63b3ed"),
+            title_font=dict(color="#63b3ed"),
+            gridcolor="#bee3f8",
+            linecolor="#90cdf4",
         ),
         yaxis=dict(
-            tickfont=dict(color="#4a5568"),
-            title_font=dict(color="#4a5568"),
-            gridcolor="#cbd5e0",
-            linecolor="#a0aec0",
+            tickfont=dict(color="#63b3ed"),
+            title_font=dict(color="#63b3ed"),
+            gridcolor="#bee3f8",
+            linecolor="#90cdf4",
         ),
         legend=dict(
             orientation="h",
@@ -146,7 +146,7 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
             y=1.02,
             xanchor="right",
             x=1,
-            font=dict(color="#4a5568")
+            font=dict(color="#63b3ed")
         ),
         hovermode="x unified",
         margin=dict(t=60),
@@ -234,7 +234,6 @@ for i in range(0, len(stocks_list), 2):
                 key=f"download_marktphasen_{stock}"
             )
 
-            # Phase Distribution direkt darunter
             counts = df_view['phase'].value_counts()
             percentages = (counts / len(df_view) * 100).round(2)
             dist_df = pd.DataFrame({"Days": counts, "Share (%)": percentages})
