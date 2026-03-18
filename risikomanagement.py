@@ -17,58 +17,39 @@ STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 
 @st.cache_data(show_spinner=False)
 def get_local_stock_returns(symbol):
-    """Liest lokale Aktiendaten und berechnet die taeglichen Renditen."""
+    """Liest lokale Aktiendaten und berechnet die täglichen Renditen."""
     file_path = f"data/stock_{symbol}.csv"
+    
     if not os.path.exists(file_path):
         return None
+        
     try:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
         df = df.astype(float).sort_index()
+        # Berechnung der prozentualen Veränderung (Renditen)
         return df['4. close'].pct_change().dropna()
     except Exception:
         return None
 
+# --- SIDEBAR (Die alte, stabile Version) ---
+st.sidebar.header("Risk Settings")
+
+conf_level = st.sidebar.slider(
+    "Confidence level (%)", 
+    90.0, 99.0, 97.5, 0.5,
+    help="The probability that the actual loss will not exceed the VaR."
+) / 100
+
+st.sidebar.divider()
+
+show_apple = st.sidebar.checkbox("Show Apple (AAPL)", value=True, key="risk_a")
+show_nvidia = st.sidebar.checkbox("Show NVIDIA (NVDA)", value=True, key="risk_n")
+
 # --- UI HEADER ---
 render_page_header(
     "Risk Management",
-    "What is the maximum expected loss (at a specified confidence level) for Apple compared to NVIDIA over a 1-day horizon?"
+    f"What is the maximum expected loss (at a {conf_level*100:.1f}% confidence level) for Apple compared to NVIDIA over a 1-day horizon?"
 )
-
-# --- SETTINGS: kompakt per CSS ---
-st.markdown("### ⚙️ Risk Settings")
-
-# CSS: Einstellungsbereich auf ~50% der Seitenbreite begrenzen
-st.markdown("""
-<style>
-/* Container für Risk Settings – nur die ersten 3 Spalten einengen */
-div[data-testid="stHorizontalBlock"]:has(div[data-testid="stSlider"]) {
-    max-width: 15%;
-}
-/* Slider selbst etwas kompakter */
-div[data-testid="stSlider"] {
-    padding-right: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
-col_slider, col_aapl, col_nvda = st.columns([5, 2, 2])
-
-with col_slider:
-    conf_level = st.slider(
-        "Confidence level (%)",
-        90.0, 99.0, 97.5, 0.5,
-        help="The probability that the actual loss will not exceed the VaR."
-    ) / 100
-
-with col_aapl:
-    st.write("")
-    show_apple = st.checkbox("Apple (AAPL)", value=True, key="risk_a")
-
-with col_nvda:
-    st.write("")
-    show_nvidia = st.checkbox("NVIDIA (NVDA)", value=True, key="risk_n")
-
-st.divider()
 
 # --- DATA LOADING ---
 ret_a = None
@@ -84,21 +65,35 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     fig = go.Figure()
 
     if show_apple and ret_a is not None:
+        # Historische Simulation des VaR
         v_a = np.percentile(ret_a, (1 - conf_level) * 100)
+        # Expected Shortfall
         e_a = ret_a[ret_a <= v_a].mean()
         
         fig.add_trace(go.Histogram(
-            x=ret_a, name="Apple", marker_color='#1f77b4', opacity=0.6, nbinsx=50,
+            x=ret_a, 
+            name="Apple", 
+            marker_color='#1f77b4', 
+            opacity=0.6, 
+            nbinsx=50,
             hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
         
+        # Vertikale Linie für Apple
         fig.add_vline(x=v_a, line_dash="dash", line_color="#1f77b4")
         
+        # TEXT-ANNOTATION APPLE (Fixierte Höhe 95%)
         fig.add_annotation(
-            x=v_a, y=0.95, yref="paper", xref="x",
+            x=v_a,               # Anker an der X-Position des VaR
+            y=0.95,              # 95% der vertikalen Charthöhe
+            yref="paper",        # Referenz auf das Chart-Fenster (0 bis 1)
+            xref="x",            # Referenz auf die Daten-Achse
             text=f"VaR AAPL: {v_a:.2%}",
-            showarrow=False, font=dict(color="#1f77b4", size=12),
-            align="left", xanchor="left", xshift=5
+            showarrow=False,
+            font=dict(color="#1f77b4", size=12),
+            align="left",
+            xanchor="left",      # Text fließt nach RECHTS weg
+            xshift=5             # Kleiner horizontaler Abstand zur Linie
         )
 
     if show_nvidia and ret_n is not None:
@@ -106,19 +101,32 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         e_n = ret_n[ret_n <= v_n].mean()
         
         fig.add_trace(go.Histogram(
-            x=ret_n, name="NVIDIA", marker_color='#ff7f0e', opacity=0.6, nbinsx=50,
+            x=ret_n, 
+            name="NVIDIA", 
+            marker_color='#ff7f0e', 
+            opacity=0.6, 
+            nbinsx=50,
             hovertemplate="Avg Return: %{x:.2%}<br>Frequency: %{y:.0f}<extra></extra>"
         ))
         
+        # Vertikale Linie für NVIDIA
         fig.add_vline(x=v_n, line_dash="dash", line_color="#ff7f0e")
         
+        # TEXT-ANNOTATION NVIDIA (Fixierte Höhe 95%)
         fig.add_annotation(
-            x=v_n, y=0.95, yref="paper", xref="x",
+            x=v_n,               # Anker an der X-Position des VaR
+            y=0.95,              # EBENFALLS 95% der vertikalen Charthöhe
+            yref="paper",        # Referenz auf das Chart-Fenster (0 bis 1)
+            xref="x",            # Referenz auf die Daten-Achse
             text=f"VaR NVDA: {v_n:.2%}",
-            showarrow=False, font=dict(color="#ff7f0e", size=12),
-            align="right", xanchor="right", xshift=-5
+            showarrow=False,
+            font=dict(color="#ff7f0e", size=12),
+            align="right",
+            xanchor="right",     # Text fließt nach LINKS weg
+            xshift=-5            # Kleiner horizontaler Abstand zur Linie
         )
 
+    # Layout-Anpassungen (Automatische Farben durch Streamlit-Theme)
     fig.update_layout(
         barmode='overlay',
         xaxis_title="Daily Return",
@@ -130,29 +138,29 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         hovermode="closest"
     )
 
+    # Chart ausgeben
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
     # Metrics unter dem Chart
-    c1, c2 = st.columns(2)
+    st.divider()
+    c1, c2, c3, c4 = st.columns(4)
     if show_apple and ret_a is not None:
-        c1.subheader("Apple (AAPL)")
-        c1.metric("Value-at-Risk", f"{v_a:.2%}")
-        c1.metric("Expected Shortfall", f"{e_a:.2%}")
+        c1.metric("VaR Apple", f"{v_a:.2%}")
+        c2.metric("ES Apple", f"{e_a:.2%}")
     if show_nvidia and ret_n is not None:
-        c2.subheader("NVIDIA (NVDA)")
-        c2.metric("Value-at-Risk", f"{v_n:.2%}")
-        c2.metric("Expected Shortfall", f"{e_n:.2%}")
+        c3.metric("VaR NVIDIA", f"{v_n:.2%}")
+        c4.metric("ES NVIDIA", f"{e_n:.2%}")
 
     # --- INTERPRETATION ---
     st.markdown("---")
     st.subheader("Analysis and Interpretation")
-    st.info(f"Historical simulation at a {conf_level * 100:.1f}% confidence level based on local data.")
+    st.info(f"Historical simulation at a {conf_level * 100:.1f}% confidence level.")
     
     st.markdown("""
     ### Key Insights:
     * **Risk Comparison:** NVIDIA typically shows a wider 'tail', meaning the potential for larger single-day losses is higher than with Apple.
-    * **Confidence Impact:** Moving the slider to 99% will show you the extreme risks, while 90% shows more frequent, smaller drawdowns.
+    * **Fat Tails:** Observe how the VaR lines shift when you change the confidence level in the sidebar.
     """)
 
 else:
-    st.info("Please select at least one asset above to start the analysis.")
+    st.info("Please select at least one asset in the sidebar.")
