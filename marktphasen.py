@@ -167,7 +167,7 @@ render_page_header(
 selected_stocks = st.sidebar.multiselect(
     "Select Assets:",
     list(STOCKS.keys()),
-    default=["Apple"]
+    default=["Apple", "NVIDIA"]
 )
 
 if not selected_stocks:
