@@ -8,24 +8,10 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* ── color tokens ── */
+/* ── accent colors ── */
 :root {
-    --bg-card:           #ffffff;
-    --border:            #e2e8f0;
-    --border-hover:      #2563eb;
-    --text-primary:      #1e293b;
-    --text-secondary:    #475569;
-    --text-muted:        #64748b;
-    --accent-blue:       #2563eb;
-    --accent-green:      #16a34a;
-    --highlight:         #1d4ed8;
-    --ticker-bg:         #eff6ff;
-    --ticker-border:     #bfdbfe;
-    --ticker-text:       #1e40af;
-    --hero-bg-start:     #eff6ff;
-    --hero-bg-end:       #f0fdf4;
-    --section-blue-bg:   rgba(37,99,235,0.07);
-    --section-green-bg:  rgba(22,163,74,0.07);
+    --accent-blue:  #2563eb;
+    --accent-green: #16a34a;
 }
 
 /* ── global ── */
@@ -35,8 +21,8 @@ html, body, [class*="css"] {
 
 /* ── hero banner ── */
 .hero-banner {
-    background: linear-gradient(135deg, var(--hero-bg-start) 0%, var(--bg-card) 50%, var(--hero-bg-end) 100%);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0.02) 50%, rgba(22,163,74,0.05) 100%);
+    border: 1px solid rgba(37,99,235,0.2);
     border-radius: 16px;
     padding: 48px 56px;
     margin-bottom: 32px;
@@ -72,12 +58,12 @@ html, body, [class*="css"] {
     line-height: 1.1;
 }
 .hero-subtitle {
-    color: var(--text-muted);
     font-size: 1.05rem;
     font-weight: 300;
     margin: 0;
     max-width: 640px;
     line-height: 1.6;
+    opacity: 0.7;
 }
 .hero-badge {
     display: inline-block;
@@ -104,42 +90,40 @@ html, body, [class*="css"] {
     margin-top: 10px;
 }
 .section-banner-blue  {
-    background: linear-gradient(90deg, var(--section-blue-bg), rgba(37,99,235,0.01));
-    border-left: 3px solid var(--accent-blue);
+    background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.01));
+    border-left: 3px solid #2563eb;
 }
 .section-banner-green {
-    background: linear-gradient(90deg, var(--section-green-bg), rgba(22,163,74,0.01));
-    border-left: 3px solid var(--accent-green);
+    background: linear-gradient(90deg, rgba(22,163,74,0.08), rgba(22,163,74,0.01));
+    border-left: 3px solid #16a34a;
 }
 .section-icon { font-size: 1.5rem; line-height: 1; }
 .section-title {
     font-family: 'Syne', sans-serif;
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--text-primary);
     margin: 0;
 }
 
 /* ── summary box ── */
 .summary-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: rgba(37,99,235,0.04);
+    border: 1px solid rgba(37,99,235,0.15);
     border-radius: 12px;
     padding: 24px 28px;
     margin-bottom: 24px;
     line-height: 1.7;
-    color: var(--text-secondary);
     font-size: 0.97rem;
 }
 .summary-box .highlight {
-    color: var(--highlight);
-    font-weight: 500;
+    color: #2563eb;
+    font-weight: 600;
 }
 
 /* ── insight card ── */
 .insight-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 12px;
     padding: 22px 22px 20px;
     margin-bottom: 16px;
@@ -147,7 +131,7 @@ html, body, [class*="css"] {
     height: 100%;
 }
 .insight-card:hover {
-    border-color: var(--border-hover);
+    border-color: #2563eb;
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(37,99,235,0.1);
 }
@@ -174,16 +158,14 @@ html, body, [class*="css"] {
     font-family: 'Syne', sans-serif;
     font-size: 0.95rem;
     font-weight: 700;
-    color: var(--text-primary);
     margin: 0;
 }
 .card-body {
-    color: var(--text-muted);
     font-size: 0.88rem;
     line-height: 1.65;
     margin: 0;
+    opacity: 0.75;
 }
-
 /* ── ticker strip ── */
 .ticker-strip {
     display: flex;
@@ -192,13 +174,13 @@ html, body, [class*="css"] {
     margin-top: 18px;
 }
 .ticker-pill {
-    background: var(--ticker-bg);
-    border: 1px solid var(--ticker-border);
+    background: rgba(37,99,235,0.1);
+    border: 1px solid rgba(37,99,235,0.25);
     border-radius: 6px;
     padding: 4px 12px;
     font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--ticker-text);
+    font-weight: 600;
+    color: #2563eb;
     letter-spacing: 0.5px;
 }
 </style>
