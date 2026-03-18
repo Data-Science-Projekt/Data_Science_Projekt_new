@@ -14,7 +14,7 @@ def fig_to_pdf_bytes(fig, width=2480, height=1654, scale=1):
         title_font=dict(size=56, color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
-        margin=dict(l=180, r=80, t=120, b=220),
+        margin=dict(l=180, r=80, t=120, b=160),
         legend=dict(
             font=dict(size=40, color="black"),
             bgcolor="rgba(255,255,255,0.9)",
@@ -22,7 +22,7 @@ def fig_to_pdf_bytes(fig, width=2480, height=1654, scale=1):
             borderwidth=2,
             orientation="h",
             yanchor="bottom",
-            y=-0.22,  # näher am Graph
+            y=-0.12,  # näher am Graph
             xanchor="center",
             x=0.5
         ),
