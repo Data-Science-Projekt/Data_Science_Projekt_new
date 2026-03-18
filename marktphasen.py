@@ -93,7 +93,7 @@ def add_phase_shading(fig, df):
     return fig
 
 
-def build_stock_chart(stock, df_view, bull_threshold, bear_threshold, font_color, grid_color, line_color):
+def build_stock_chart(stock, df_view, bull_threshold, bear_threshold):
     fig = go.Figure()
     fig = add_phase_shading(fig, df_view)
 
@@ -124,21 +124,21 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold, font_color
 
     fig.update_layout(
         title=f"{stock}",
-        template="plotly_white",
+        template="plotly_dark",
         xaxis_title="Date",
         yaxis_title="Price ($)",
-        font=dict(color=font_color),
+        font=dict(color="#e0e0e0"),
         xaxis=dict(
-            tickfont=dict(color=font_color),
-            title_font=dict(color=font_color),
-            gridcolor=grid_color,
-            linecolor=line_color,
+            tickfont=dict(color="#e0e0e0"),
+            title_font=dict(color="#e0e0e0"),
+            gridcolor="#3a3a3a",
+            linecolor="#555555",
         ),
         yaxis=dict(
-            tickfont=dict(color=font_color),
-            title_font=dict(color=font_color),
-            gridcolor=grid_color,
-            linecolor=line_color,
+            tickfont=dict(color="#e0e0e0"),
+            title_font=dict(color="#e0e0e0"),
+            gridcolor="#3a3a3a",
+            linecolor="#555555",
         ),
         legend=dict(
             orientation="h",
@@ -146,13 +146,13 @@ def build_stock_chart(stock, df_view, bull_threshold, bear_threshold, font_color
             y=1.02,
             xanchor="right",
             x=1,
-            font=dict(color=font_color)
+            font=dict(color="#e0e0e0")
         ),
         hovermode="x unified",
         margin=dict(t=60),
         height=400,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#1e1e1e",
+        plot_bgcolor="#2a2a2a",
     )
 
     return fig
@@ -163,12 +163,6 @@ render_page_header(
     "Market Phases",
     "How does the correlation between selected technology stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) change during stable market periods compared to crisis periods (bear markets)?",
 )
-
-# --- THEME ERKENNEN ---
-is_dark = st.get_option("theme.base") == "dark"
-font_color = "#f0f0f0" if is_dark else "#222222"
-grid_color = "#444444" if is_dark else "#dddddd"
-line_color = "#666666" if is_dark else "#aaaaaa"
 
 # Sidebar controls
 selected_stocks = st.sidebar.multiselect(
@@ -229,7 +223,7 @@ for i in range(0, len(stocks_list), 2):
         with col:
             st.subheader(f"📈 {stock}")
 
-            fig = build_stock_chart(stock, df_view, bull_threshold, bear_threshold, font_color, grid_color, line_color)
+            fig = build_stock_chart(stock, df_view, bull_threshold, bear_threshold)
             st.plotly_chart(fig, use_container_width=True)
 
             st.download_button(
