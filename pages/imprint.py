@@ -118,25 +118,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ── Supervisory Authority ────────────────────────────────────────────────────
-st.markdown("""
-<div class="section-banner section-banner-green">
-    <span class="section-icon">⚖️</span>
-    <p class="section-title">Supervisory Authority</p>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="info-box">
-    Ministerium für Allgemeine und Berufliche Bildung, Wissenschaft, Forschung und Kultur
-    des Landes Schleswig-Holstein (MBWFK)
-    <br>Brunswiker Straße 16–22
-    <br>24105 Kiel
-    <br>Germany
-</div>
-""", unsafe_allow_html=True)
-
-
 # ── Disclaimer ───────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="section-banner section-banner-blue">
