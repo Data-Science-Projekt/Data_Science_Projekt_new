@@ -222,7 +222,7 @@ st.markdown("""
 st.markdown("""
 <div class="summary-box">
     This project applies modern data science methods to investigate key research questions about stock market behavior.
-    Using live data from <span class="highlight">Alpha Vantage</span>, and <span class="highlight">FRED</span>,
+    Using live data from <span class="highlight">Alpha Vantage</span> and <span class="highlight">FRED</span>,
     we analyze <span class="highlight">six tech and financial stocks</span>
     (Apple, Microsoft, NVIDIA, J.P. Morgan, Goldman Sachs, Bank of America)
     across multiple dimensions: return distributions, trading ranges, market structure,
