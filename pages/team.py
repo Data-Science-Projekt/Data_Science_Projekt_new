@@ -59,12 +59,17 @@ st.markdown(
         margin-bottom: 1.75rem;
         padding: 2.4rem 2.6rem;
         border-radius: 22px;
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        background:
-            radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 32%),
-            radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 28%),
-            linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.78));
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0.02) 60%, rgba(124,58,237,0.05) 100%);
+    }
+
+    .team-hero::before {
+        content: "";
+        position: absolute;
+        top: -50px; right: -50px;
+        width: 260px; height: 260px;
+        background: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%);
+        pointer-events: none;
     }
 
     .team-hero__eyebrow {
@@ -78,34 +83,39 @@ st.markdown(
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #dbeafe;
-        background: rgba(37, 99, 235, 0.18);
-        border: 1px solid rgba(96, 165, 250, 0.22);
+        color: #2563eb;
+        background: rgba(37, 99, 235, 0.1);
+        border: 1px solid rgba(37, 99, 235, 0.3);
     }
 
     .team-hero__title {
         margin: 0 0 0.5rem;
         font-family: 'Syne', sans-serif;
-        font-size: 3rem;
-        line-height: 1.05;
-        letter-spacing: -0.04em;
-        color: #f8fafc;
+        font-size: 2.4rem;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+        background: linear-gradient(90deg, #2563eb, #7c3aed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .team-hero__subtitle {
         max-width: 760px;
         margin: 0;
-        font-size: 1.05rem;
-        line-height: 1.75;
-        color: rgba(226, 232, 240, 0.88);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        font-weight: 300;
+        opacity: 0.7;
     }
 
     .team-grid-note {
         margin: 0 0 1.25rem;
         padding: 0.9rem 1rem;
         border-radius: 14px;
-        background: linear-gradient(90deg, rgba(37, 99, 235, 0.08), rgba(14, 165, 233, 0.02));
-        border: 1px solid rgba(37, 99, 235, 0.14);
+        background: rgba(37,99,235,0.04);
+        border: 1px solid rgba(37, 99, 235, 0.15);
         color: inherit;
     }
 
@@ -116,26 +126,28 @@ st.markdown(
 
     .team-card {
         overflow: hidden;
-        height: 100%;
         border-radius: 20px;
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
-        box-shadow: 0 16px 34px rgba(15, 23, 42, 0.1);
-        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.02);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
         transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        display: flex;
+        flex-direction: column;
+        min-height: 520px;
     }
 
     .team-card:hover {
         transform: translateY(-6px);
-        border-color: rgba(59, 130, 246, 0.35);
-        box-shadow: 0 22px 42px rgba(15, 23, 42, 0.16);
+        border-color: #2563eb;
+        box-shadow: 0 16px 36px rgba(37, 99, 235, 0.12);
     }
 
     .team-card__media {
         position: relative;
         overflow: hidden;
-        aspect-ratio: 4 / 4.8;
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(15, 23, 42, 0.12));
+        height: 240px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.08));
     }
 
     .team-card__image {
@@ -159,12 +171,15 @@ st.markdown(
     .team-card__overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.44));
+        background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.15));
         pointer-events: none;
     }
 
     .team-card__content {
         padding: 1.15rem 1.15rem 1.2rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     .team-card__badge {
@@ -174,43 +189,43 @@ st.markdown(
         margin-bottom: 0.8rem;
         padding: 0.42rem 0.78rem;
         border-radius: 999px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 0.02em;
-        color: #dbeafe;
-        background: linear-gradient(90deg, rgba(37, 99, 235, 0.82), rgba(14, 165, 233, 0.78));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        color: white;
+        background: linear-gradient(90deg, #2563eb, #0ea5e9);
+        width: fit-content;
     }
 
     .team-card__name {
         margin: 0 0 0.55rem;
         font-family: 'Syne', sans-serif;
-        font-size: 1.35rem;
+        font-size: 1.2rem;
         line-height: 1.2;
-        color: inherit;
+        color: #1e293b;
     }
 
     .team-card__focus {
         margin: 0 0 0.7rem;
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         line-height: 1.65;
-        color: rgba(226, 232, 240, 0.84);
+        color: #475569;
     }
 
     .team-card__focus strong {
-        color: #bfdbfe;
+        color: #2563eb;
         font-weight: 700;
     }
 
     .team-card__quote {
         margin: 0;
+        margin-top: auto;
         padding-top: 0.8rem;
-        border-top: 1px solid rgba(148, 163, 184, 0.18);
-        font-size: 0.84rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        font-size: 0.82rem;
         line-height: 1.7;
         font-style: italic;
-        color: rgba(226, 232, 240, 0.62);
-        opacity: 1;
+        color: #64748b;
     }
 
     @media (max-width: 900px) {
