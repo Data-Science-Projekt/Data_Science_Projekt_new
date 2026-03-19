@@ -264,7 +264,64 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 01. What does this analysis show?
+# --- DYNAMIC CALCULATIONS ---
+phase_stats = {}
+for stock, df in all_data.items():
+    counts = df['phase'].value_counts()
+    total = len(df)
+    phase_stats[stock] = {
+        "bull_pct":     round(counts.get("Bull", 0) / total * 100, 1),
+        "bear_pct":     round(counts.get("Bear", 0) / total * 100, 1),
+        "neutral_pct":  round(counts.get("Neutral", 0) / total * 100, 1),
+        "bull_days":    counts.get("Bull", 0),
+        "bear_days":    counts.get("Bear", 0),
+        "neutral_days": counts.get("Neutral", 0),
+        "total":        total,
+    }
+
+tech_stocks_selected = [s for s in selected_stocks if STOCKS[s] in ["AAPL", "MSFT", "NVDA"]]
+fin_stocks_selected  = [s for s in selected_stocks if STOCKS[s] in ["JPM", "GS", "BAC"]]
+
+def avg_pct(stocks, phase):
+    if not stocks:
+        return None
+    return round(sum(phase_stats[s][f"{phase}_pct"] for s in stocks) / len(stocks), 1)
+
+tech_bull    = avg_pct(tech_stocks_selected, "bull")
+tech_bear    = avg_pct(tech_stocks_selected, "bear")
+tech_neutral = avg_pct(tech_stocks_selected, "neutral")
+fin_bull     = avg_pct(fin_stocks_selected, "bull")
+fin_bear     = avg_pct(fin_stocks_selected, "bear")
+fin_neutral  = avg_pct(fin_stocks_selected, "neutral")
+
+both_sectors = bool(tech_stocks_selected and fin_stocks_selected)
+
+if both_sectors:
+    tech_active = (tech_bull or 0) + (tech_bear or 0)
+    fin_active  = (fin_bull or 0)  + (fin_bear or 0)
+    more_dynamic_sector = "Technology" if tech_active >= fin_active else "Financial"
+    more_stable_sector  = "Financial"  if tech_active >= fin_active else "Technology"
+    more_bull_sector    = "Technology" if (tech_bull or 0) >= (fin_bull or 0) else "Financial"
+    more_bear_sector    = "Technology" if (tech_bear or 0) >= (fin_bear or 0) else "Financial"
+
+most_bull_stock    = max(phase_stats, key=lambda s: phase_stats[s]["bull_pct"])    if phase_stats else None
+most_bear_stock    = max(phase_stats, key=lambda s: phase_stats[s]["bear_pct"])    if phase_stats else None
+most_neutral_stock = max(phase_stats, key=lambda s: phase_stats[s]["neutral_pct"]) if phase_stats else None
+dominant_phase_overall = max(
+    ["bull", "bear", "neutral"],
+    key=lambda p: sum(phase_stats[s][f"{p}_pct"] for s in phase_stats) / len(phase_stats)
+)
+dominant_label = {"bull": "Bull", "bear": "Bear", "neutral": "Neutral"}[dominant_phase_overall]
+
+threshold_desc = (
+    "strict — only major sustained movements qualify"
+    if bull_threshold >= 15 and bear_threshold >= 15
+    else "moderate — capturing both significant and minor trends"
+    if bull_threshold >= 8
+    else "relaxed — even small directional moves are flagged"
+)
+
+# --- 01. WHAT DOES THIS ANALYSIS SHOW? ---
 st.markdown("""
 <div class="section-banner section-banner-blue">
     <p class="section-title">01. What Does This Analysis Show?</p>
@@ -285,7 +342,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 02. Method
+# --- 02. METHOD ---
 st.markdown("""
 <div class="section-banner section-banner-purple">
     <p class="section-title">02. Method</p>
@@ -311,40 +368,68 @@ st.markdown(f"""
     <div class="step-number">03</div>
     <div>
         <p class="step-title">Threshold Adjustment</p>
-        <p class="step-desc">The thresholds can be adjusted using the sidebar sliders. Lower thresholds lead to more frequent phase changes, while higher thresholds only capture strong, sustained trends.</p>
+        <p class="step-desc">The thresholds can be adjusted using the sidebar sliders. Lower thresholds lead to more frequent phase changes, while higher thresholds only capture strong, sustained trends. The current setting is {threshold_desc}.</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 03. Analysis and Interpretation
+# --- 03. ANALYSIS AND INTERPRETATION ---
 st.markdown("""
 <div class="section-banner section-banner-green">
     <p class="section-title">03. Analysis and Interpretation</p>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
+analysis_parts = []
+
+analysis_parts.append(
+    f"Across all selected stocks, the <span class='hl'>{dominant_label} phase</span> dominates "
+    f"the observation period. "
+)
+
+if most_bull_stock and most_bear_stock:
+    analysis_parts.append(
+        f"<span class='hl'>{most_bull_stock}</span> spent the most time in a bull phase "
+        f"({phase_stats[most_bull_stock]['bull_pct']}% of trading days), "
+        f"while <span class='hl'>{most_bear_stock}</span> recorded the highest share of bear days "
+        f"({phase_stats[most_bear_stock]['bear_pct']}%). "
+    )
+
+if both_sectors:
+    analysis_parts.append(
+        f"<br><br>Comparing sectors: <span class='hl'>Tech stocks</span> averaged "
+        f"<span class='hl'>{tech_bull}% bull</span> / <span class='hl'>{tech_bear}% bear</span> / "
+        f"{tech_neutral}% neutral, while <span class='hl'>Financial stocks</span> averaged "
+        f"<span class='hl'>{fin_bull}% bull</span> / <span class='hl'>{fin_bear}% bear</span> / "
+        f"{fin_neutral}% neutral. "
+        f"This means <span class='hl'>{more_dynamic_sector} stocks</span> were more frequently "
+        f"in an active phase (bull or bear), while <span class='hl'>{more_stable_sector} stocks</span> "
+        f"spent more time in neutral territory. "
+    )
+elif tech_stocks_selected:
+    analysis_parts.append(
+        f"<br><br>The selected tech stocks averaged {tech_bull}% bull / {tech_bear}% bear / "
+        f"{tech_neutral}% neutral phases. "
+    )
+elif fin_stocks_selected:
+    analysis_parts.append(
+        f"<br><br>The selected financial stocks averaged {fin_bull}% bull / {fin_bear}% bear / "
+        f"{fin_neutral}% neutral phases. "
+    )
+
+analysis_parts.append(
+    f"<br><br>The current thresholds (Bull: +{bull_threshold}%, Bear: -{bear_threshold}%) are "
+    f"{threshold_desc}. Adjusting these values in the sidebar will directly change the phase "
+    f"distributions shown in the tables above."
+)
+
+st.markdown(f"""
 <div class="info-box">
-    The results show that most stocks spend the majority of time in <span class="hl">neutral phases</span>,
-    with fewer clearly defined bull or bear periods. However, differences between sectors become visible
-    when trends do occur.
-    <br><br>
-    <span class="hl">Technology stocks</span> (Apple, Microsoft, NVIDIA) tend to show more dynamic price
-    movements, meaning they are more likely to transition between phases when thresholds are adjusted.
-    They respond more quickly to market developments and tend to enter bull or bear phases earlier.
-    <br><br>
-    <span class="hl">Financial stocks</span> (J.P. Morgan, Goldman Sachs, Bank of America) generally
-    exhibit more stable and gradual trends, resulting in fewer abrupt phase changes under the same
-    conditions. Their valuations are more anchored to macroeconomic fundamentals, which tend to shift
-    slowly.
-    <br><br>
-    The behavior also depends strongly on the selected thresholds. With stricter thresholds, only major
-    market movements are classified as bull or bear phases. With more relaxed thresholds, smaller trends
-    are captured, increasing the number of phase transitions.
+    {"".join(analysis_parts)}
 </div>
 """, unsafe_allow_html=True)
 
-# 04. Key Insights
+# --- 04. KEY INSIGHTS ---
 st.markdown("""
 <div class="section-banner section-banner-orange">
     <p class="section-title">04. Key Insights</p>
@@ -352,66 +437,134 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 col_i1, col_i2 = st.columns(2)
+
 with col_i1:
-    st.markdown("""
+    st.markdown(f"""
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-blue">📊</div>
-            <p class="card-title">Dominance of Neutral Phases</p>
+            <p class="card-title">Dominance of {dominant_label} Phases</p>
         </div>
         <p class="card-body">
-            Most observed periods fall into the neutral category, indicating that strong directional
-            trends are relatively rare over the 100-day observation window.
-        </p>
-    </div>
-    <div class="insight-card">
-        <div class="card-icon-row">
-            <div class="card-icon icon-orange">⚡</div>
-            <p class="card-title">Higher Reactivity of Tech Stocks</p>
-        </div>
-        <p class="card-body">
-            Technology stocks tend to respond more quickly to market movements and are more likely
-            to enter bull or bear phases under flexible thresholds, reflecting their sensitivity
-            to news and sentiment.
+            Across all selected stocks, <strong>{dominant_label}</strong> is the most common phase.
+            With thresholds of +{bull_threshold}% / -{bear_threshold}% ({threshold_desc}),
+            most trading days do not meet the criteria for a strong directional trend.
+            {"Lowering the thresholds would reveal more phase transitions." if bull_threshold >= 15 else "The current thresholds already capture moderate directional moves."}
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-with col_i2:
-    st.markdown("""
-    <div class="insight-card">
-        <div class="card-icon-row">
-            <div class="card-icon icon-green">🛡️</div>
-            <p class="card-title">Stability of Financial Stocks</p>
+    if both_sectors:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-orange">⚡</div>
+                <p class="card-title">Higher Reactivity: {more_dynamic_sector} Stocks</p>
+            </div>
+            <p class="card-body">
+                {more_dynamic_sector} stocks spent more time in active (bull or bear) phases
+                ({tech_active if more_dynamic_sector == "Technology" else fin_active:.1f}% combined)
+                compared to {more_stable_sector} stocks
+                ({fin_active if more_dynamic_sector == "Technology" else tech_active:.1f}% combined).
+                This suggests they react more strongly to market events and sentiment shifts
+                under the current threshold settings.
+            </p>
         </div>
-        <p class="card-body">
-            Financial stocks generally show smoother price development and fewer abrupt shifts
-            between phases, making them more predictable under standard market conditions.
-        </p>
-    </div>
+        """, unsafe_allow_html=True)
+    elif most_bull_stock:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-orange">⚡</div>
+                <p class="card-title">Most Active Stock: {most_bull_stock}</p>
+            </div>
+            <p class="card-body">
+                {most_bull_stock} recorded the highest bull phase share
+                ({phase_stats[most_bull_stock]['bull_pct']}% of days), indicating
+                the strongest upward trend among the selected assets.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+with col_i2:
+    if both_sectors:
+        stable_neutral = fin_neutral if more_stable_sector == "Financial" else tech_neutral
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-green">🛡️</div>
+                <p class="card-title">More Stable: {more_stable_sector} Stocks</p>
+            </div>
+            <p class="card-body">
+                {more_stable_sector} stocks spent more time in neutral phases
+                ({stable_neutral}% on average), suggesting more gradual price development
+                anchored to slower-moving fundamentals.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    elif most_neutral_stock:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-green">🛡️</div>
+                <p class="card-title">Most Stable Stock: {most_neutral_stock}</p>
+            </div>
+            <p class="card-body">
+                {most_neutral_stock} spent {phase_stats[most_neutral_stock]['neutral_pct']}% of
+                trading days in a neutral phase, showing the most stable and gradual
+                price development among the selected assets.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown(f"""
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-purple">🎚️</div>
             <p class="card-title">Threshold Sensitivity</p>
         </div>
         <p class="card-body">
-            The classification of market phases depends heavily on the chosen thresholds. Small
-            changes to the bull or bear threshold can significantly alter the number of detected
-            phases and the interpretation of results.
+            At the current setting (+{bull_threshold}% / -{bear_threshold}%), phase classification
+            is {threshold_desc}. Adjusting the sliders will directly change the phase distribution
+            shown in the tables above — try lower values to see more transitions, or higher values
+            to isolate only the strongest market moves.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
+# --- DYNAMIC CONCLUSION ---
+if both_sectors:
+    conclusion = (
+        f"Based on the current settings (Bull: +{bull_threshold}%, Bear: -{bear_threshold}%), "
+        f"{more_dynamic_sector} stocks showed more frequent active phases "
+        f"({tech_active if more_dynamic_sector == 'Technology' else fin_active:.1f}% combined bull/bear) "
+        f"compared to {more_stable_sector} stocks "
+        f"({fin_active if more_dynamic_sector == 'Technology' else tech_active:.1f}%). "
+        f"{more_bull_sector} stocks led in bull phase frequency, while {more_bear_sector} stocks "
+        f"recorded more bear phase days. "
+        f"This confirms that sector membership influences how stocks move through market phases — "
+        f"{'technology stocks react more dynamically to sentiment and news, while financial stocks follow slower macroeconomic cycles.' if more_dynamic_sector == 'Technology' else 'financial stocks showed stronger directional moves under these conditions, possibly driven by interest rate sensitivity or sector-specific events.'}"
+    )
+else:
+    most_active = max(phase_stats, key=lambda s: phase_stats[s]["bull_pct"] + phase_stats[s]["bear_pct"])
+    most_active_pct = phase_stats[most_active]["bull_pct"] + phase_stats[most_active]["bear_pct"]
+    conclusion = (
+        f"Among the selected stocks, {most_active} was most frequently in an active phase "
+        f"({phase_stats[most_active]['bull_pct']}% bull, {phase_stats[most_active]['bear_pct']}% bear, "
+        f"{most_active_pct:.1f}% combined). "
+        f"With thresholds of +{bull_threshold}% / -{bear_threshold}%, most stocks spent the majority "
+        f"of the observation period in {dominant_label.lower()} territory, suggesting that "
+        f"{'strong directional trends are relatively rare under these strict conditions.' if bull_threshold >= 15 else 'moderate directional moves are captured under the current settings.'}"
+    )
+
 st.markdown(
-    """
+    f"""
     <section class="research-header">
         <p class="research-header__eyebrow">Answer to the Research Question</p>
-        <p class="research-header__question">
-            The correlation between technology and financial stocks varies across market phases, but clear differences depend strongly on how bull and bear periods are defined. Technology stocks tend to react more dynamically to changing conditions, while financial stocks behave more steadily, leading to different patterns of co-movement across stable and crisis periods.
-        </p>
+        <p class="research-header__question">{conclusion}</p>
     </section>
     """,
     unsafe_allow_html=True,
 )
 
-st.caption("Methodology: Rolling 20-day window analysis of price movements.")
+st.caption(f"Methodology: Rolling 20-day window analysis. Bull: +{bull_threshold}% from 20d low. Bear: -{bear_threshold}% from 20d high.")
