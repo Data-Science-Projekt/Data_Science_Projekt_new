@@ -124,6 +124,17 @@ st.markdown(
         font-weight: 700;
     }
 
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-top: 8px;
+    }
+
+    @media (max-width: 900px) {
+        .team-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
     .team-card {
         overflow: hidden;
         border-radius: 20px;
@@ -133,7 +144,6 @@ st.markdown(
         transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
         display: flex;
         flex-direction: column;
-        min-height: 600px;
     }
 
     .team-card:hover {
@@ -266,15 +276,35 @@ team = [
     {"name": "Balduin Makko", "role": "Data Visualization & Frontend", "focus": "Visual communication, interface design, and presentation of analytical results.", "img": "IMG_8813.jpg", "quote": "A good visualization says more than a thousand tables.", "icon": "■"},
 ]
 
-columns = st.columns(len(team), gap="medium")
-for index, column in enumerate(columns):
-    member = team[index]
-    with column:
-        render_team_member(
-            name=member["name"],
-            role=member["role"],
-            focus=member["focus"],
-            image_name=member["img"],
-            quote=member["quote"],
-            icon=member["icon"],
-        )
+cards_html = '<div class="team-grid">'
+for member in team:
+    image_path = IMG_DIR / member["img"]
+    image_src = image_to_data_uri(image_path)
+    name_esc = html.escape(member["name"])
+    role_esc = html.escape(member["role"])
+    focus_esc = html.escape(member["focus"])
+    quote_esc = html.escape(member["quote"])
+    icon_esc = html.escape(member["icon"])
+
+    if image_src:
+        image_markup = f'<img src="{image_src}" alt="{name_esc}" class="team-card__image">'
+    else:
+        image_markup = '<div class="team-card__image team-card__image--placeholder"></div>'
+
+    cards_html += f"""
+    <article class="team-card">
+        <div class="team-card__media">
+            {image_markup}
+            <div class="team-card__overlay"></div>
+        </div>
+        <div class="team-card__content">
+            <span class="team-card__badge">{icon_esc} {role_esc}</span>
+            <h3 class="team-card__name">{name_esc}</h3>
+            <p class="team-card__focus"><strong>Focus:</strong> {focus_esc}</p>
+            <p class="team-card__quote">&ldquo;{quote_esc}&rdquo;</p>
+        </div>
+    </article>
+    """
+
+cards_html += '</div>'
+st.markdown(cards_html, unsafe_allow_html=True)
