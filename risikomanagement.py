@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- HILFSFUNKTIONEN ---
 try:
@@ -132,6 +133,13 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
 
     # Chart ausgeben mit Streamlit-Theme fuer autom. Farbanpassung (Light/Dark)
     st.plotly_chart(fig, use_container_width=True, theme="streamlit")
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig),
+        file_name="technical_analysis.png",
+        mime="image/png",
+    )
 
     # Metrics unter dem Chart
     c1, c2 = st.columns(2)
