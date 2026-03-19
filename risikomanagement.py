@@ -197,19 +197,44 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     .icon-red    { background: rgba(220,38,38,0.12); }
     .card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; margin: 0; }
     .card-body  { font-size: 1rem; line-height: 1.65; margin: 0; opacity: 0.75; }
-    .step-card {
+    /* ── process flow ── */
+    .process-flow {
+        display: flex; gap: 0; margin-bottom: 24px;
+        position: relative;
+    }
+    .process-step {
+        flex: 1; text-align: center; padding: 24px 16px 20px;
+        position: relative;
         background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
-        display: flex; gap: 16px; align-items: flex-start;
-        transition: border-color 0.2s, transform 0.2s;
+        border-radius: 12px; margin: 0 6px;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    .step-card:hover { border-color: #2563eb; transform: translateX(3px); }
-    .step-number {
-        font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
-        color: #2563eb; opacity: 0.35; min-width: 32px; line-height: 1.3;
+    .process-step:hover {
+        border-color: #2563eb; transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(37,99,235,0.1);
     }
-    .step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 3px 0; }
-    .step-desc  { font-size: 0.98rem; line-height: 1.55; margin: 0; opacity: 0.7; }
+    .process-circle {
+        width: 48px; height: 48px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 12px; font-size: 1.2rem;
+        font-family: 'Syne', sans-serif; font-weight: 800;
+        color: white;
+    }
+    .circle-1 { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+    .circle-2 { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+    .circle-3 { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .circle-4 { background: linear-gradient(135deg, #16a34a, #22c55e); }
+    .process-title {
+        font-family: 'Syne', sans-serif; font-size: 0.95rem;
+        font-weight: 700; margin: 0 0 6px 0;
+    }
+    .process-desc {
+        font-size: 0.88rem; line-height: 1.5; margin: 0; opacity: 0.65;
+    }
+    .process-arrow {
+        position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+        font-size: 1.2rem; color: #cbd5e0; z-index: 2;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -247,32 +272,29 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="step-content">
-            <p class="step-title">Collect Daily Returns</p>
-            <p class="step-desc">We take all historical daily percentage changes (returns) for each stock from our dataset.</p>
+    <div class="process-flow">
+        <div class="process-step">
+            <div class="process-circle circle-1">01</div>
+            <p class="process-title">Daily Returns</p>
+            <p class="process-desc">Collect all historical daily percentage changes for each stock.</p>
+            <span class="process-arrow">→</span>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="step-content">
-            <p class="step-title">Historical Simulation</p>
-            <p class="step-desc">Instead of assuming a mathematical distribution, we use the actual past returns. The histogram above shows every daily return that occurred.</p>
+        <div class="process-step">
+            <div class="process-circle circle-2">02</div>
+            <p class="process-title">Historical Simulation</p>
+            <p class="process-desc">Use actual past returns instead of assuming a mathematical distribution.</p>
+            <span class="process-arrow">→</span>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="step-content">
-            <p class="step-title">Read Off the Worst Percentile</p>
-            <p class="step-desc">The VaR is simply the return at the chosen percentile — the dashed vertical line in the chart. Everything to the left of that line represents the worst-case days.</p>
+        <div class="process-step">
+            <div class="process-circle circle-3">03</div>
+            <p class="process-title">Worst Percentile</p>
+            <p class="process-desc">Read off the VaR at the chosen confidence level — the dashed line in the chart.</p>
+            <span class="process-arrow">→</span>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">04</div>
-        <div class="step-content">
-            <p class="step-title">Calculate Expected Shortfall</p>
-            <p class="step-desc">We average all returns that fall beyond the VaR threshold. This gives the true average loss on the very worst days.</p>
+        <div class="process-step">
+            <div class="process-circle circle-4">04</div>
+            <p class="process-title">Expected Shortfall</p>
+            <p class="process-desc">Average all returns beyond the VaR threshold — the true worst-case average.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
