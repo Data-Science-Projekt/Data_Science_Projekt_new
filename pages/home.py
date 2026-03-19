@@ -221,12 +221,21 @@ st.markdown("""
 
 st.markdown("""
 <div class="summary-box">
-    This project applies modern data science methods to investigate key research questions about stock market behavior.
-    Using live data from <span class="highlight">Alpha Vantage</span> and <span class="highlight">FRED</span>,
-    we analyze <span class="highlight">six tech and financial stocks</span>
-    (Apple, Microsoft, NVIDIA, J.P. Morgan, Goldman Sachs, Bank of America)
-    across multiple dimensions: return distributions, trading ranges, market structure,
-    regime detection, technical indicators, and risk management.
+    This project investigates <span class="highlight">eight research questions</span> about stock market
+    behavior using real financial data and modern data science methods. We analyze
+    <span class="highlight">six U.S. stocks</span> across two sectors — Technology
+    (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America) —
+    using data from <span class="highlight">Alpha Vantage</span> (daily stock prices) and
+    <span class="highlight">FRED</span> (S&P 500, VIX, Consumer Sentiment).
+    <br><br>
+    The analyses span return distributions, intraday volatility, volume anomaly detection,
+    bull/bear market phase classification, VIX-based stress testing, Value-at-Risk modeling,
+    iPhone sales event studies, and sentiment-stock correlation analysis. Each research question
+    is addressed on its own interactive page with adjustable parameters, statistical tests, and
+    a clear interpretation of results.
+    <br><br>
+    The project is built as a <span class="highlight">Streamlit web application</span>, deployed on
+    Streamlit Community Cloud, using Python, Pandas, SciPy, and Plotly.
 </div>
 """, unsafe_allow_html=True)
 
@@ -239,31 +248,55 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("""
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-blue">📉</div>
-            <p class="card-title">Return Analysis</p>
+            <p class="card-title">RQ1 — Return Analysis</p>
         </div>
         <p class="card-body">
-            Daily log-returns deviate significantly from a normal distribution,
-            exhibiting fat tails (leptokurtosis) and negative skewness —
-            extreme events occur more frequently than standard models predict.
+            Both Apple and NVIDIA deviate significantly from a normal distribution.
+            Their returns exhibit fat tails (leptokurtosis) — extreme price movements
+            occur more frequently than standard Gaussian models predict.
+        </p>
+    </div>
+
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-orange">⚡</div>
+            <p class="card-title">RQ2 — Volatility</p>
+        </div>
+        <p class="card-body">
+            Tech stocks show consistently higher daily trading ranges than financial stocks.
+            NVIDIA leads in intraday volatility, while financial stocks exhibit tighter ranges
+            under normal conditions but can spike during rate decisions or banking stress.
+        </p>
+    </div>
+
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-purple">📊</div>
+            <p class="card-title">RQ3 — Technical Analysis</p>
+        </div>
+        <p class="card-body">
+            Volume spike patterns differ measurably between sectors. Tech stocks experience
+            more frequent and intense volume anomalies, driven by earnings, AI news, and
+            analyst activity. The two sectors respond to fundamentally different market drivers.
         </p>
     </div>
 
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-green">🐂</div>
-            <p class="card-title">Market Phases</p>
+            <p class="card-title">RQ4 — Market Phases</p>
         </div>
         <p class="card-body">
-            Bull and bear markets can be systematically identified.
-            Bull markets last significantly longer on average, but bear markets
-            exhibit stronger and faster price movements.
+            Bull and bear phases can be systematically identified using rolling 20-day windows.
+            Technology stocks react more dynamically to changing conditions, while financial stocks
+            behave more steadily — leading to different co-movement patterns across market regimes.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -272,51 +305,49 @@ with col2:
     st.markdown("""
     <div class="insight-card">
         <div class="card-icon-row">
-            <div class="card-icon icon-orange">⚡</div>
-            <p class="card-title">Volatility &amp; Trading Ranges</p>
-        </div>
-        <p class="card-body">
-            Tech stocks show higher average daily trading ranges than financial stocks.
-            News sentiment magnitude is a stronger predictor of volatility spikes
-            than sentiment direction alone.
-        </p>
-    </div>
-
-    <div class="insight-card">
-        <div class="card-icon-row">
-            <div class="card-icon icon-purple">📊</div>
-            <p class="card-title">Technical Analysis</p>
-        </div>
-        <p class="card-body">
-            Technical indicators (moving averages, RSI, MACD) provide useful signals
-            in trending markets but frequently generate false signals in sideways phases.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    st.markdown("""
-    <div class="insight-card">
-        <div class="card-icon-row">
             <div class="card-icon icon-teal">🔗</div>
-            <p class="card-title">Market Structure</p>
+            <p class="card-title">RQ5 — Market Structure</p>
         </div>
         <p class="card-body">
-            Correlations between stocks are dynamic, not static. During crises,
-            correlations increase sharply, making diversification more difficult
-            precisely when it is needed most.
+            Both Apple and NVIDIA show weaker performance during periods of elevated VIX.
+            NVIDIA reacts more strongly to market stress, indicating higher sensitivity
+            to volatility spikes, while Apple remains comparatively more stable.
         </p>
     </div>
 
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-red">🛡️</div>
-            <p class="card-title">Risk Management</p>
+            <p class="card-title">RQ6 — Risk Management</p>
         </div>
         <p class="card-body">
-            With as few as 15–20 stocks, unsystematic risk can be largely eliminated
-            through diversification. However, systematic market risk remains
-            and must be managed separately.
+            NVIDIA carries significantly higher risk than Apple — its Value-at-Risk and Expected
+            Shortfall are substantially larger. The Expected Shortfall consistently exceeds the VaR
+            for both stocks, confirming that tail-risk-aware models are essential.
+        </p>
+    </div>
+
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-blue">📱</div>
+            <p class="card-title">RQ7 — Company Fundamentals</p>
+        </div>
+        <p class="card-body">
+            No statistically significant correlation was found between quarterly iPhone unit sales
+            and Apple's 30-day post-earnings return. The market prices in expected sales before
+            earnings — only surprises relative to consensus drive the reaction.
+        </p>
+    </div>
+
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-orange">🧠</div>
+            <p class="card-title">RQ8 — Sentiment Correlation</p>
+        </div>
+        <p class="card-body">
+            No statistically significant linear correlation was found between the Consumer Sentiment
+            Index and monthly stock returns over the observed period. Consumer confidence alone
+            is not a reliable predictor of short-term stock returns for either sector.
         </p>
     </div>
     """, unsafe_allow_html=True)
