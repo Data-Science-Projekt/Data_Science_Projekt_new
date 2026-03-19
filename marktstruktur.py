@@ -381,6 +381,21 @@ if df_stock is not None and df_vix is not None:
         </div>
         """, unsafe_allow_html=True)
 
+    st.markdown(
+        """
+        <section class="research-header">
+            <p class="research-header__eyebrow">Answer to the Research Question</p>
+            <p class="research-header__question">
+                Both Apple and NVIDIA show weaker performance during periods of elevated market volatility,
+                with the effect becoming more pronounced as the VIX threshold increases. NVIDIA reacts more
+                strongly to these conditions, indicating higher sensitivity to market stress, while Apple
+                remains comparatively more stable.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.caption("Data sources: Alpha Vantage (Stock Prices) and FRED (CBOE Volatility Index - VIX).")
 
 else:
