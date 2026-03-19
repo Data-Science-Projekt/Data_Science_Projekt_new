@@ -133,10 +133,66 @@ if df_stock_raw is not None:
     c3.metric("Volatility", f"{std:.4f}")
     c4.metric("Mean", f"{mu:.5f}")
 
-    # Short Analysis
-    st.subheader("Analysis Summary")
-    if k_val > 0.5:
-        st.write(
-            f"The log-returns of {selected_stock} show signs of **Leptokurtosis** (Excess Kurtosis = {k_val:.2f} > 0), indicating 'fatter tails' than a normal distribution. Extreme price movements occur more frequently than a Gaussian model would predict.")
-    else:
-        st.write(f"Over this period, the distribution of {selected_stock} remains relatively close to the normal model (Excess Kurtosis = {k_val:.2f}).")
+    st.markdown("""
+### What Does This Analysis Show?
+
+This page examines how the daily price changes (log returns) of Apple and NVIDIA are distributed and whether they follow a normal (Gaussian) distribution - a common assumption in many financial models.
+
+A normal distribution implies that most price changes are small and extreme movements are very rare. The dashed red line in the charts represents this idealized normal distribution, while the histograms show the actual observed daily returns.
+
+By comparing both, we can assess whether real-world stock returns behave as theory would suggest - or whether they exhibit different, more complex patterns.
+
+### Method
+
+We use historical daily return data for both stocks and visualize their distributions using histograms.
+
+In addition, we compute key statistical measures:
+
+- Kurtosis indicates how heavy the tails of the distribution are (i.e., how often extreme values occur).
+- Skewness measures whether returns are more tilted toward positive or negative movements.
+- Volatility (standard deviation) captures the overall spread of returns.
+- The fitted normal distribution (red dashed line) serves as a benchmark for comparison.
+
+### Analysis and Interpretation
+
+The results show that the return distributions of both Apple and NVIDIA differ from the normal distribution.
+
+In both cases, the histograms display fatter tails than the normal curve, meaning that large price movements occur more frequently than expected under a Gaussian model. This is a well-known feature of financial markets and indicates that extreme events are not as rare as traditional models assume.
+
+However, there are noticeable differences between the two stocks:
+
+- Apple tends to have a more concentrated distribution, with most daily returns clustered around the center. At the same time, it still shows occasional extreme movements, indicating the presence of tail risk.
+- NVIDIA, in contrast, exhibits a wider spread of returns, meaning that daily price changes are generally larger. This reflects higher volatility and more frequent substantial movements in both directions.
+
+### Key Insights
+
+- Non-Normality: Both Apple and NVIDIA clearly deviate from the normal distribution. Real-world stock returns are not perfectly bell-shaped and show more extreme values than expected.
+- Fat Tails: Large price movements (both gains and losses) occur more often than a normal model would predict. This is important because it implies higher real-world risk.
+- Volatility Differences: NVIDIA shows a broader distribution of returns, indicating higher day-to-day volatility compared to Apple.
+- Asymmetry: The distributions are not perfectly symmetric, suggesting that upward and downward movements may not occur with equal frequency or magnitude.
+
+### Why does this matter?
+
+Many financial models assume that returns are normally distributed, but this analysis shows that this assumption does not fully reflect reality.
+
+Understanding these deviations is crucial because:
+
+- risk may be underestimated if extreme events are assumed to be rare
+- real markets are more prone to sudden large movements
+- investors need to account for these risks when building portfolios
+
+In simple terms:
+Stock returns are less predictable and more extreme than a perfect mathematical model would suggest - especially for more volatile stocks like NVIDIA.
+""")
+
+    st.markdown(
+        """
+        <section class="research-header">
+            <p class="research-header__eyebrow">Answer to the Research Question</p>
+            <p class="research-header__question">
+                Both Apple and NVIDIA deviate significantly from a normal distribution, as their returns exhibit fat tails and non-Gaussian characteristics. While Apple shows occasional extreme movements, NVIDIA displays a broader and more volatile distribution, indicating stronger overall deviations from normality.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
