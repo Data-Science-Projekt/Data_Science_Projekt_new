@@ -204,9 +204,8 @@ diff_word = "significantly" if abs(diff) > 0.3 else "moderately"
 gap_word  = "This confirms that tech stocks exhibit meaningfully higher intraday volatility than their financial counterparts." if abs(diff) > 0.2 else "The difference is modest, suggesting relatively comparable intraday behavior across both sectors during this period."
 
 st.divider()
-
 st.subheader("01 — What does this analysis show?")
-st.info(f"""
+st.write(f"""
 This analysis measures the **daily trading range** — the difference between the intraday high and low price,
 expressed as a percentage of the closing price — across {num_days} trading days for six stocks split into
 two sectors: Tech (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America).
@@ -215,9 +214,8 @@ aggressively within a single session regardless of whether it closes up or down.
 """)
 
 st.divider()
-
 st.subheader("02 — Analysis and Interpretation")
-st.info(f"""
+st.write(f"""
 Over the observed period, tech stocks averaged an intraday range of **{tech_avg_val:.2f}%** versus
 **{financial_avg_val:.2f}%** for financial stocks — a gap of **{abs(diff):.2f} percentage points**.
 {gap_word}
@@ -237,9 +235,8 @@ The boxplot further illustrates that tech stocks not only have a higher *median*
 """)
 
 st.divider()
-
 st.subheader("03 — Key Insights")
-st.info(f"""
+st.write(f"""
 - **Tech stocks are more volatile intraday.** With an average range of {tech_avg_val:.2f}% vs. {financial_avg_val:.2f}% for financials, tech stocks move {diff_word} more within a single trading session.
 
 - **Volatility is sector-driven, not just stock-specific.** The consistent gap between sectors suggests structural differences in how tech and financial stocks are priced and how quickly markets reprice them in response to new information.
