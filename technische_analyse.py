@@ -296,43 +296,46 @@ if df_tech is not None and df_fin is not None:
     """, unsafe_allow_html=True)
 
     if tech_spikes == fin_spikes:
-        comparison_text = f"""
-        Both sectors show an identical number of volume spikes (<span class="hl">{tech_spikes} days</span>)
-        above the {spike_threshold:.1f} threshold over the {total_days}-day observation period.
-        This suggests similar levels of event-driven trading activity across both sectors during this window.
-        """
+        comparison_text = (
+            f'Both sectors show an identical number of volume spikes (<span class="hl">{tech_spikes} days</span>) '
+            f'above the {spike_threshold:.1f} threshold over the {total_days}-day observation period. '
+            f'This suggests similar levels of event-driven trading activity across both sectors during this window.'
+        )
     else:
         spike_ratio = more_spikes_count / fewer_spikes_count if fewer_spikes_count > 0 else more_spikes_count
-        comparison_text = f"""
-        <span class="hl">{more_spikes_sector}</span> recorded <span class="hl">{more_spikes_count} volume spikes</span>
-        versus <span class="hl">{fewer_spikes_count}</span> for {fewer_spikes_sector} — that is
-        <span class="hl">{spike_ratio:.1f}x more</span> anomalous volume days.
-        This means {more_spikes_sector} experienced significantly more days where trading activity
-        deviated sharply from normal levels.
-        """
+        comparison_text = (
+            f'<span class="hl">{more_spikes_sector}</span> recorded <span class="hl">{more_spikes_count} volume spikes</span> '
+            f'versus <span class="hl">{fewer_spikes_count}</span> for {fewer_spikes_sector} — that is '
+            f'<span class="hl">{spike_ratio:.1f}x more</span> anomalous volume days. '
+            f'This means {more_spikes_sector} experienced significantly more days where trading activity '
+            f'deviated sharply from normal levels.'
+        )
 
-    st.markdown(f"""
-    <div class="info-box">
-        At a spike threshold of <span class="hl">Z = {spike_threshold:.1f}</span>, the results
-        over <span class="hl">{total_days} trading days</span> show:
-        <br><br>
-        {comparison_text}
-        <br><br>
-        <strong>Average Z-scores:</strong> {tech_label} averaged <span class="hl">{tech_mean_z:.2f}</span>
-        while {fin_label} averaged <span class="hl">{fin_mean_z:.2f}</span> — indicating that
-        {"tech" if tech_mean_z > fin_mean_z else "financial"} stocks tend to have more volatile
-        volume patterns on a day-to-day basis.
-        <br><br>
-        <strong>Peak anomalies:</strong> The largest single-day volume spike was
-        <span class="hl">Z = {tech_max_z:.2f}</span> for {tech_label} and
-        <span class="hl">Z = {fin_max_z:.2f}</span> for {fin_label} — meaning
-        {"tech" if tech_max_z > fin_max_z else "financial"} stocks had the more extreme
-        outlier day where volume surged furthest above normal.
-        <br><br>
-        <strong>Spike frequency:</strong> {tech_label} spiked on <span class="hl">{tech_spike_pct:.1f}%</span>
-        of all trading days, while {fin_label} spiked on <span class="hl">{fin_spike_pct:.1f}%</span>.
-    </div>
-    """, unsafe_allow_html=True)
+    vol_sector = "tech" if tech_mean_z > fin_mean_z else "financial"
+    peak_sector = "tech" if tech_max_z > fin_max_z else "financial"
+
+    analysis_html = (
+        f'<div class="info-box">'
+        f'At a spike threshold of <span class="hl">Z = {spike_threshold:.1f}</span>, the results '
+        f'over <span class="hl">{total_days} trading days</span> show:'
+        f'<br><br>'
+        f'{comparison_text}'
+        f'<br><br>'
+        f'<strong>Average Z-scores:</strong> {tech_label} averaged <span class="hl">{tech_mean_z:.2f}</span> '
+        f'while {fin_label} averaged <span class="hl">{fin_mean_z:.2f}</span> — indicating that '
+        f'{vol_sector} stocks tend to have more volatile volume patterns on a day-to-day basis.'
+        f'<br><br>'
+        f'<strong>Peak anomalies:</strong> The largest single-day volume spike was '
+        f'<span class="hl">Z = {tech_max_z:.2f}</span> for {tech_label} and '
+        f'<span class="hl">Z = {fin_max_z:.2f}</span> for {fin_label} — meaning '
+        f'{peak_sector} stocks had the more extreme outlier day where volume surged furthest above normal.'
+        f'<br><br>'
+        f'<strong>Spike frequency:</strong> {tech_label} spiked on <span class="hl">{tech_spike_pct:.1f}%</span> '
+        f'of all trading days, while {fin_label} spiked on <span class="hl">{fin_spike_pct:.1f}%</span>.'
+        f'</div>'
+    )
+
+    st.markdown(analysis_html, unsafe_allow_html=True)
 
     # --- KEY INSIGHTS ---
     st.markdown("""
