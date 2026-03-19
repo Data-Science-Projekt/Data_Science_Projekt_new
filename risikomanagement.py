@@ -259,7 +259,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         100 days could losses be larger.
         <br><br>
         <strong>Expected Shortfall (ES)</strong>, also called Conditional VaR, goes one step further:
-        <em>"If the worst case does happen — if the loss exceeds the VaR — how bad does it get on average?"</em>
+        <em>"If the worst case does happen, if the loss exceeds the VaR, how bad does it get on average?"</em>
         It is the average loss on those very worst days.
     </div>
     """, unsafe_allow_html=True)
@@ -288,13 +288,13 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         <div class="process-step">
             <div class="process-circle circle-3">03</div>
             <p class="process-title">Worst Percentile</p>
-            <p class="process-desc">Read off the VaR at the chosen confidence level — the dashed line in the chart.</p>
+            <p class="process-desc">Read off the VaR at the chosen confidence level, the dashed line in the chart.</p>
             <span class="process-arrow">→</span>
         </div>
         <div class="process-step">
             <div class="process-circle circle-4">04</div>
             <p class="process-title">Expected Shortfall</p>
-            <p class="process-desc">Average all returns beyond the VaR threshold — the true worst-case average.</p>
+            <p class="process-desc">Average all returns beyond the VaR threshold, the true worst-case average.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -325,7 +325,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         of its value in a single day. For {safer}, this threshold is {abs(safer_var):.2%}.
         <br><br>
         The Expected Shortfall paints an even clearer picture: when {riskier} does have a bad day
-        beyond its VaR, the average loss is <span class="hl">{riskier_es:.2%}</span> — compared to
+        beyond its VaR, the average loss is <span class="hl">{riskier_es:.2%}</span>, compared to
         <span class="hl">{safer_es:.2%}</span> for {safer}.
         <br><br>
         <strong>In practical terms:</strong> If you invested <span class="hl">$10,000</span> in each stock,
@@ -379,7 +379,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
                     <p class="card-title">Risk Comparison</p>
                 </div>
                 <p class="card-body">
-                    {riskier} is the riskier asset — its VaR is {abs(riskier_var/safer_var):.1f}x larger
+                    {riskier} is the riskier asset. Its VaR is {abs(riskier_var/safer_var):.1f}x larger
                     than {safer}'s, meaning the potential for extreme daily losses is substantially higher.
                 </p>
             </div>
@@ -406,7 +406,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
                 </div>
                 <p class="card-body">
                     The Expected Shortfall is always worse than the VaR. When a truly bad day happens,
-                    losses don't just barely cross the VaR line — they tend to go significantly beyond it.
+                    losses don't just barely cross the VaR line, they tend to go significantly beyond it.
                     Risk models that only look at VaR underestimate the true downside.
                 </p>
             </div>
@@ -469,7 +469,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         losses in exchange for higher expected returns.
         <br><br>
         Banks and funds are <span class="hl">legally required</span> to calculate VaR daily to ensure
-        they hold enough capital to survive worst-case scenarios — a regulation established after the
+        they hold enough capital to survive worst-case scenarios, a regulation established after the
         2008 financial crisis through the Basel III framework.
     </div>
     """, unsafe_allow_html=True)
@@ -479,7 +479,7 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         <section class="research-header">
             <p class="research-header__eyebrow">Answer to the Research Question</p>
             <p class="research-header__question">
-                NVIDIA carries significantly higher risk than Apple across all metrics. Its Value-at-Risk and Expected Shortfall are substantially larger, reflecting higher daily volatility driven by its position as a high-growth semiconductor stock exposed to AI demand cycles. Apple, as a diversified mega-cap, shows a more moderate risk profile. The Expected Shortfall consistently exceeds the VaR for both stocks, confirming that extreme losses tend to go well beyond the worst-case threshold — underscoring the importance of tail-risk-aware models over simple VaR-only approaches.
+                NVIDIA carries significantly higher risk than Apple across all metrics. Its Value-at-Risk and Expected Shortfall are substantially larger, reflecting higher daily volatility driven by its position as a high-growth semiconductor stock exposed to AI demand cycles. Apple, as a diversified mega-cap, shows a more moderate risk profile. The Expected Shortfall consistently exceeds the VaR for both stocks, confirming that extreme losses tend to go well beyond the worst-case threshold, underscoring the importance of tail-risk-aware models over simple VaR-only approaches.
             </p>
         </section>
         """,

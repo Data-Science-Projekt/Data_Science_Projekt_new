@@ -256,7 +256,7 @@ if df_tech is not None and df_fin is not None:
 
     st.markdown(f"""
     <div class="info-box">
-        This page detects <span class="hl">unusual trading volume</span> — days where significantly
+        This page detects <span class="hl">unusual trading volume</span>, days where significantly
         more shares were traded than normal. A sudden spike in volume often signals that something
         important is happening: an earnings announcement, breaking news, an analyst upgrade, or
         a major market event.
@@ -266,10 +266,10 @@ if df_tech is not None and df_fin is not None:
         the other?</em> If so, it tells us which sector is more reactive to external events and where
         the market sees more uncertainty or opportunity.
         <br><br>
-        We measure this using the <span class="hl">Z-score</span> — a statistical measure that tells
+        We measure this using the <span class="hl">Z-score</span>, a statistical measure that tells
         us how many standard deviations today's volume is above or below its recent average. A Z-score
         of 0 means "completely normal". A Z-score above <span class="hl">{spike_threshold:.1f}</span>
-        (the red dashed line) means the volume on that day was unusually high — a "spike".
+        (the red dashed line) means the volume on that day was unusually high, a "spike".
     </div>
     """, unsafe_allow_html=True)
 
@@ -327,7 +327,7 @@ if df_tech is not None and df_fin is not None:
         spike_ratio = more_spikes_count / fewer_spikes_count if fewer_spikes_count > 0 else more_spikes_count
         comparison_text = (
             f'<span class="hl">{more_spikes_sector}</span> recorded <span class="hl">{more_spikes_count} volume spikes</span> '
-            f'versus <span class="hl">{fewer_spikes_count}</span> for {fewer_spikes_sector} — that is '
+            f'versus <span class="hl">{fewer_spikes_count}</span> for {fewer_spikes_sector}, that is '
             f'<span class="hl">{spike_ratio:.1f}x more</span> anomalous volume days. '
             f'This means {more_spikes_sector} experienced significantly more days where trading activity '
             f'deviated sharply from normal levels.'
@@ -344,12 +344,12 @@ if df_tech is not None and df_fin is not None:
         f'{comparison_text}'
         f'<br><br>'
         f'<strong>Average Z-scores:</strong> {tech_label} averaged <span class="hl">{tech_mean_z:.2f}</span> '
-        f'while {fin_label} averaged <span class="hl">{fin_mean_z:.2f}</span> — indicating that '
+        f'while {fin_label} averaged <span class="hl">{fin_mean_z:.2f}</span>, indicating that '
         f'{vol_sector} stocks tend to have more volatile volume patterns on a day-to-day basis.'
         f'<br><br>'
         f'<strong>Peak anomalies:</strong> The largest single-day volume spike was '
         f'<span class="hl">Z = {tech_max_z:.2f}</span> for {tech_label} and '
-        f'<span class="hl">Z = {fin_max_z:.2f}</span> for {fin_label} — meaning '
+        f'<span class="hl">Z = {fin_max_z:.2f}</span> for {fin_label}, meaning '
         f'{peak_sector} stocks had the more extreme outlier day where volume surged furthest above normal.'
         f'<br><br>'
         f'<strong>Spike frequency:</strong> {tech_label} spiked on <span class="hl">{tech_spike_pct:.1f}%</span> '
@@ -378,7 +378,7 @@ if df_tech is not None and df_fin is not None:
             <p class="card-body">
                 A Z-score above {spike_threshold:.1f} means trading volume is {spike_threshold:.1f} standard
                 deviations above normal. These spikes typically coincide with earnings releases, analyst
-                rating changes, product announcements, or macroeconomic shocks — days where the market is
+                rating changes, product announcements, or macroeconomic shocks, days where the market is
                 actively repricing the stock.
             </p>
         </div>
@@ -403,7 +403,7 @@ if df_tech is not None and df_fin is not None:
             </div>
             <p class="card-body">
                 In technical analysis, volume is often considered a leading indicator. Unusual volume
-                frequently appears before significant price movements — making volume spike detection
+                frequently appears before significant price movements, making volume spike detection
                 a valuable early warning system for traders and risk managers.
             </p>
         </div>
@@ -417,7 +417,7 @@ if df_tech is not None and df_fin is not None:
             <p class="card-body">
                 Try adjusting the spike threshold in the sidebar. A lower threshold (e.g. 1.0)
                 captures more moderate volume increases, while a higher threshold (e.g. 3.0+)
-                isolates only extreme events — days with truly exceptional market participation.
+                isolates only extreme events, days with truly exceptional market participation.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -438,12 +438,12 @@ if df_tech is not None and df_fin is not None:
         A price move on low volume may be noise; the same move on a volume spike is a strong signal.
         <br><br>
         For <span class="hl">portfolio managers</span>, understanding volume patterns helps assess
-        liquidity risk — stocks with frequent volume spikes may be harder to trade in size without
+        liquidity risk. Stocks with frequent volume spikes may be harder to trade in size without
         moving the market. For <span class="hl">risk managers</span>, volume anomalies serve as an
         early warning system that warrants closer attention to position exposure.
         <br><br>
         In the context of our broader analysis, this page complements the
-        <span class="hl">Volatility (Range Analysis)</span> page — while that page measures
+        <span class="hl">Volatility (Range Analysis)</span> page. While that page measures
         <em>how much</em> prices move intraday, this page measures <em>how much participation</em>
         drives those moves. Together, they provide a more complete picture of market activity.
     </div>

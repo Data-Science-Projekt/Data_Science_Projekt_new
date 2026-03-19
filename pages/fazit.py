@@ -349,4 +349,4 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.caption("StockInsight — Data Science Project, Christian-Albrechts-Universitat zu Kiel")
+st.caption("StockInsight, Data Science Project, Christian-Albrechts-Universität zu Kiel")

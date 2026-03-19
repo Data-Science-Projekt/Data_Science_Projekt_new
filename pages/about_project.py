@@ -303,4 +303,4 @@ st.table(pd.DataFrame({
 }))
 
 
-st.caption("StockInsight — Data Science Project, Christian-Albrechts-Universität zu Kiel")
+st.caption("StockInsight, Data Science Project, Christian-Albrechts-Universität zu Kiel")

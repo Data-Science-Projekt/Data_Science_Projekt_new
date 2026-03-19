@@ -223,7 +223,7 @@ st.markdown("""
 <div class="summary-box">
     This project investigates <span class="highlight">eight research questions</span> about stock market
     behavior using real financial data and modern data science methods. We analyze
-    <span class="highlight">six U.S. stocks</span> across two sectors — Technology
+    <span class="highlight">six U.S. stocks</span> across two sectors, Technology
     (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America) —
     using data from <span class="highlight">Alpha Vantage</span> (daily stock prices) and
     <span class="highlight">FRED</span> (S&P 500, VIX, Consumer Sentiment).
@@ -255,7 +255,7 @@ with col1:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-blue">📉</div>
-            <p class="card-title">RQ1 — Return Analysis</p>
+            <p class="card-title">RQ1: Return Analysis</p>
         </div>
         <p class="card-body">
             Are the daily returns of Apple and NVIDIA normally distributed, or do they
@@ -266,7 +266,7 @@ with col1:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-orange">⚡</div>
-            <p class="card-title">RQ2 — Volatility</p>
+            <p class="card-title">RQ2: Volatility</p>
         </div>
         <p class="card-body">
             How do the intraday trading ranges of tech stocks compare to those of
@@ -277,7 +277,7 @@ with col1:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-purple">📊</div>
-            <p class="card-title">RQ3 — Technical Analysis</p>
+            <p class="card-title">RQ3: Technical Analysis</p>
         </div>
         <p class="card-body">
             Do volume spike patterns differ systematically between the technology
@@ -288,7 +288,7 @@ with col1:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-green">🐂</div>
-            <p class="card-title">RQ4 — Market Phases</p>
+            <p class="card-title">RQ4: Market Phases</p>
         </div>
         <p class="card-body">
             Can bull and bear market phases be systematically identified, and how do
@@ -302,7 +302,7 @@ with col2:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-teal">🔗</div>
-            <p class="card-title">RQ5 — Market Structure</p>
+            <p class="card-title">RQ5: Market Structure</p>
         </div>
         <p class="card-body">
             How do Apple and NVIDIA react to periods of elevated market stress
@@ -313,7 +313,7 @@ with col2:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-red">🛡️</div>
-            <p class="card-title">RQ6 — Risk Management</p>
+            <p class="card-title">RQ6: Risk Management</p>
         </div>
         <p class="card-body">
             What are the Value-at-Risk and Expected Shortfall levels for Apple and
@@ -324,7 +324,7 @@ with col2:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-blue">📱</div>
-            <p class="card-title">RQ7 — Company Fundamentals</p>
+            <p class="card-title">RQ7: Company Fundamentals</p>
         </div>
         <p class="card-body">
             Does the quarterly iPhone sales volume statistically correlate with
@@ -335,7 +335,7 @@ with col2:
     <div class="insight-card">
         <div class="card-icon-row">
             <div class="card-icon icon-orange">🧠</div>
-            <p class="card-title">RQ8 — Sentiment Correlation</p>
+            <p class="card-title">RQ8: Sentiment Correlation</p>
         </div>
         <p class="card-body">
             How does the Consumer Sentiment Index correlate with the monthly

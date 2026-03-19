@@ -268,8 +268,8 @@ if len(merged) >= 3:
 
     st.markdown(f"""
     <div class="info-box">
-        This page investigates whether <span class="hl">iPhone sales figures</span> — Apple's most
-        important product line — have a measurable impact on <span class="hl">Apple's stock price</span>
+        This page investigates whether <span class="hl">iPhone sales figures</span>, Apple's most
+        important product line, have a measurable impact on <span class="hl">Apple's stock price</span>
         in the month following each quarterly earnings announcement.
         <br><br>
         Every quarter, Apple reports its financial results, including iPhone revenue and estimated unit
@@ -363,7 +363,7 @@ if len(merged) >= 3:
         f'<strong>What this means in practice:</strong> Even with {len(merged)} quarters of data, '
         f'knowing how many iPhones Apple sold does {"help" if is_significant else "not help"} predict '
         f'what the stock will do in the following month. The market\'s reaction to earnings is driven '
-        f'by many factors beyond unit sales — including guidance, margins, services growth, and '
+        f'by many factors beyond unit sales, including guidance, margins, services growth, and '
         f'macroeconomic conditions.'
         f'</div>'
     )
@@ -386,7 +386,7 @@ if len(merged) >= 3:
                 <p class="card-title">Expectations vs. Reality</p>
             </div>
             <p class="card-body">
-                Markets don't react to absolute sales numbers — they react to surprises.
+                Markets don't react to absolute sales numbers, they react to surprises.
                 If analysts expect 70 million iPhones and Apple delivers 71 million, the stock
                 may barely move. But delivering 65 million could trigger a sell-off, even though
                 65 million is still a massive number.
@@ -401,7 +401,7 @@ if len(merged) >= 3:
             </div>
             <p class="card-body">
                 Apple's stock reacts to guidance, services revenue, margins, buyback announcements,
-                and macroeconomic outlook — not just iPhone units. Isolating one variable
+                and macroeconomic outlook, not just iPhone units. Isolating one variable
                 inevitably misses the full picture of what drives post-earnings returns.
             </p>
         </div>
@@ -416,7 +416,7 @@ if len(merged) >= 3:
             <p class="card-body">
                 Launch quarters (Q4/Q1) naturally show higher sales due to the iPhone release cycle
                 and holiday shopping. The market anticipates this seasonality, which dampens the
-                return signal — high sales in Q1 are expected, not surprising.
+                return signal. High sales in Q1 are expected, not surprising.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -429,7 +429,7 @@ if len(merged) >= 3:
             <p class="card-body">
                 Apple officially stopped reporting iPhone unit sales after Q4 2018. The unit figures
                 in this analysis ({merged['quarter'].iloc[0]}–{merged['quarter'].iloc[-1]}) are
-                third-party estimates (Statista, IDC, analyst consensus) — not official Apple data.
+                third-party estimates (Statista, IDC, analyst consensus), not official Apple data.
                 This introduces measurement uncertainty into the analysis.
             </p>
         </div>
@@ -450,7 +450,7 @@ if len(merged) >= 3:
         for modern financial markets.
         <br><br>
         The <span class="hl">Efficient Market Hypothesis</span> suggests that stock prices already
-        reflect all publicly available information — including analyst forecasts for iPhone sales.
+        reflect all publicly available information, including analyst forecasts for iPhone sales.
         By the time Apple reports actual numbers, the market has largely priced in expectations.
         Only the <em>deviation</em> from expectations (the "earnings surprise") drives the reaction.
         <br><br>
@@ -462,7 +462,7 @@ if len(merged) >= 3:
         <span class="hl">Return Analysis</span> (which examines how returns are distributed) and
         <span class="hl">Risk Management</span> (which quantifies downside risk). Together, they
         show that stock behavior is driven by a complex interplay of fundamental, technical, and
-        sentiment factors — not any single metric.
+        sentiment factors, not any single metric.
     </div>
     """, unsafe_allow_html=True)
 
@@ -472,7 +472,7 @@ if len(merged) >= 3:
         <section class="research-header">
             <p class="research-header__eyebrow">Answer to the Research Question</p>
             <p class="research-header__question">
-                Over {len(merged)} quarters of data, {"a statistically significant " + direction + " correlation was found" if is_significant else "no statistically significant correlation was found"} between quarterly iPhone unit sales and Apple's 30-day post-earnings stock returns (r = {corr:.4f}, p = {p_corr:.4f}). The regression model explains only {r_squared*100:.1f}% of the variance in returns, indicating that iPhone sales volume alone is not a meaningful predictor of short-term stock performance. This is consistent with the Efficient Market Hypothesis — markets price in expected sales before earnings, so only surprises relative to consensus drive the post-announcement return.
+                Over {len(merged)} quarters of data, {"a statistically significant " + direction + " correlation was found" if is_significant else "no statistically significant correlation was found"} between quarterly iPhone unit sales and Apple's 30-day post-earnings stock returns (r = {corr:.4f}, p = {p_corr:.4f}). The regression model explains only {r_squared*100:.1f}% of the variance in returns, indicating that iPhone sales volume alone is not a meaningful predictor of short-term stock performance. This is consistent with the Efficient Market Hypothesis. Markets price in expected sales before earnings, so only surprises relative to consensus drive the post-announcement return.
             </p>
         </section>
         """,

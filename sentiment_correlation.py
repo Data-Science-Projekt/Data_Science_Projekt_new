@@ -277,8 +277,8 @@ st.markdown("""
 
 st.markdown(f"""
 <div class="info-box">
-    This page investigates whether <span class="hl">consumer confidence</span> — how optimistic or
-    pessimistic ordinary people feel about the economy — has any measurable connection to
+    This page investigates whether <span class="hl">consumer confidence</span>, how optimistic or
+    pessimistic ordinary people feel about the economy, has any measurable connection to
     <span class="hl">stock market returns</span>.
     <br><br>
     The <span class="hl">Consumer Sentiment Index</span> is published monthly by the University of
@@ -287,7 +287,7 @@ st.markdown(f"""
     number means growing pessimism.
     <br><br>
     We compare this index against the monthly returns of <span class="hl">6 stocks across two sectors</span>
-    (Tech: Apple, Microsoft, NVIDIA — Financial: J.P. Morgan, Goldman Sachs, Bank of America)
+    (Tech: Apple, Microsoft, NVIDIA; Financial: J.P. Morgan, Goldman Sachs, Bank of America)
     over <span class="hl">{len(merged)} months</span> of overlapping data.
     <br><br>
     The key question: <em>When consumers feel more confident, do stock returns tend to be higher?
@@ -398,7 +398,7 @@ with col_i1:
         </div>
         <p class="card-body">
             Consumer sentiment captures the collective mood of households. When confidence rises,
-            consumers spend more — boosting corporate revenues. When it falls, spending contracts.
+            consumers spend more, boosting corporate revenues. When it falls, spending contracts.
             This makes it a potential leading indicator for stock performance.
         </p>
     </div>
@@ -410,7 +410,7 @@ with col_i1:
             <p class="card-title">Sector Sensitivity</p>
         </div>
         <p class="card-body">
-            {"Financial stocks react more strongly to sentiment shifts. Banks and financial institutions are directly affected by consumer borrowing, spending, and credit conditions — all of which are captured in the sentiment survey." if abs(fin_avg) > abs(tech_avg) else "Tech stocks react more strongly to sentiment shifts. Consumer demand for devices, subscriptions, and digital services is closely tied to household confidence and discretionary spending power."}
+            {"Financial stocks react more strongly to sentiment shifts. Banks and financial institutions are directly affected by consumer borrowing, spending, and credit conditions, all of which are captured in the sentiment survey." if abs(fin_avg) > abs(tech_avg) else "Tech stocks react more strongly to sentiment shifts. Consumer demand for devices, subscriptions, and digital services is closely tied to household confidence and discretionary spending power."}
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -423,8 +423,8 @@ with col_i2:
         </div>
         <p class="card-body">
             A correlation between sentiment and returns does not mean one causes the other.
-            Both may be driven by a common factor — such as economic growth, employment data,
-            or monetary policy — that simultaneously lifts consumer confidence and stock prices.
+            Both may be driven by a common factor such as economic growth, employment data,
+            or monetary policy that simultaneously lifts consumer confidence and stock prices.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -456,7 +456,7 @@ st.markdown("""
     <span class="hl">stock returns</span> is central to both academic finance and practical investing.
     <br><br>
     For <span class="hl">investors</span>, sentiment data can serve as an additional input for
-    timing decisions — not as a standalone signal, but as context for understanding market conditions.
+    timing decisions, not as a standalone signal, but as context for understanding market conditions.
     Rising sentiment may support bullish positioning; falling sentiment may warrant caution.
     <br><br>
     For <span class="hl">portfolio construction</span>, knowing which sectors are more sentiment-sensitive
