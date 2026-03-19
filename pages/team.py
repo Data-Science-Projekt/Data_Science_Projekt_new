@@ -36,7 +36,7 @@ def render_team_member(name: str, role: str, focus: str, image_name: str, quote:
                 <span class="team-card__badge">{html.escape(icon)} {html.escape(role)}</span>
                 <h3 class="team-card__name">{html.escape(name)}</h3>
                 <p class="team-card__focus"><strong>Focus:</strong> {html.escape(focus)}</p>
-                <p class="team-card__quote">&ldquo;{html.escape(quote)}&rdquo;</p>
+                {'<p class="team-card__quote">&ldquo;' + html.escape(quote) + '&rdquo;</p>' if quote else ''}
             </div>
         </article>
         """,
