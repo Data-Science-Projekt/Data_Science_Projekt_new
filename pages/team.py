@@ -260,19 +260,15 @@ team = [
     {"name": "Balduin Makko", "role": "Data Visualization & Frontend", "focus": "Visual communication, interface design, and presentation of analytical results.", "img": "IMG_8813.jpg", "quote": "A good visualization says more than a thousand tables.", "icon": "■"},
 ]
 
-for start in range(0, len(team), 2):
-    columns = st.columns(2, gap="large")
-    for index, column in enumerate(columns):
-        if start + index >= len(team):
-            continue
-
-        member = team[start + index]
-        with column:
-            render_team_member(
-                name=member["name"],
-                role=member["role"],
-                focus=member["focus"],
-                image_name=member["img"],
-                quote=member["quote"],
-                icon=member["icon"],
-            )
+columns = st.columns(len(team), gap="medium")
+for index, column in enumerate(columns):
+    member = team[index]
+    with column:
+        render_team_member(
+            name=member["name"],
+            role=member["role"],
+            focus=member["focus"],
+            image_name=member["img"],
+            quote=member["quote"],
+            icon=member["icon"],
+        )
