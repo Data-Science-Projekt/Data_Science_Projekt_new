@@ -242,17 +242,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 01 — What does this analysis show?
+# 01
 st.markdown("""
 <div class="section-banner section-banner-blue">
-    <p class="section-title">01 &mdash; What Does This Analysis Show?</p>
+    <p class="section-title">01. What Does This Analysis Show?</p>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="info-box">
-    This analysis measures the <span class="hl">daily trading range</span> &mdash; the difference between
-    the intraday high and low price, expressed as a percentage of the closing price &mdash; across
+    This analysis measures the <span class="hl">daily trading range</span>, calculated as the difference
+    between the intraday high and low price expressed as a percentage of the closing price, across
     <span class="hl">{num_days} trading days</span> for six stocks split into two sectors:
     Tech (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America).
     A higher relative trading range indicates greater intraday price volatility, meaning the stock moves
@@ -260,39 +260,39 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 02 — Analysis and Interpretation
+# 02
 st.markdown("""
 <div class="section-banner section-banner-green">
-    <p class="section-title">02 &mdash; Analysis and Interpretation</p>
+    <p class="section-title">02. Analysis and Interpretation</p>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="info-box">
     Over the observed period, tech stocks averaged an intraday range of <span class="hl">{tech_avg_val:.2f}%</span>
-    versus <span class="hl">{financial_avg_val:.2f}%</span> for financial stocks &mdash; a gap of
+    versus <span class="hl">{financial_avg_val:.2f}%</span> for financial stocks, a gap of
     <span class="hl">{abs(diff):.2f} percentage points</span>. {gap_word}
     <br><br>
     Tech stocks are inherently more reactive to news cycles, earnings surprises, analyst upgrades, and macro
-    sentiment shifts &mdash; particularly NVIDIA, whose price action is heavily influenced by AI-related
-    developments and supply chain headlines. Apple and Microsoft, while more stable, still respond sharply
-    to product announcements and broader market moves.
+    sentiment shifts. This is especially true for NVIDIA, whose price action is heavily influenced by
+    AI-related developments and supply chain headlines. Apple and Microsoft, while more stable, still
+    respond sharply to product announcements and broader market moves.
     <br><br>
     Financial stocks tend to exhibit tighter intraday ranges under normal market conditions, as their
-    valuations are more anchored to interest rate expectations and macroeconomic data releases. However,
-    during stress events such as Federal Reserve rate decisions or banking sector concerns, financial stocks
-    can spike in volatility dramatically and temporarily exceed tech-sector ranges.
+    valuations are more anchored to interest rate expectations and macroeconomic data releases. During
+    stress events such as Federal Reserve rate decisions or banking sector concerns, however, financial
+    stocks can spike in volatility dramatically and temporarily exceed tech-sector ranges.
     <br><br>
     The boxplot further illustrates that tech stocks not only have a higher <em>median</em> range but also
-    a wider <em>distribution</em> &mdash; meaning extreme volatile days are more frequent and more
+    a wider <em>distribution</em>, meaning extreme volatile days are more frequent and more
     pronounced in tech than in finance.
 </div>
 """, unsafe_allow_html=True)
 
-# 03 — Key Insights
+# 03
 st.markdown("""
 <div class="section-banner section-banner-orange">
-    <p class="section-title">03 &mdash; Key Insights</p>
+    <p class="section-title">03. Key Insights</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -329,7 +329,7 @@ with col_i2:
             <p class="card-title">Higher Range Does Not Equal Higher Return</p>
         </div>
         <p class="card-body">
-            A wide trading range reflects uncertainty among market participants &mdash; it is a measure
+            A wide trading range reflects uncertainty among market participants. It is a measure
             of risk, not direction. Investors seeking lower intraday risk may prefer financial stocks
             under normal conditions.
         </p>
@@ -341,7 +341,7 @@ with col_i2:
         </div>
         <p class="card-body">
             The analysis covers only {num_days} trading days. Extending the window to cover different
-            market regimes would likely reveal periods where this relationship inverts &mdash;
+            market regimes would likely reveal periods where this relationship inverts,
             particularly during banking stress events.
         </p>
     </div>
