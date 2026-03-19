@@ -70,6 +70,8 @@ render_page_header(
     "How do trading volume patterns (frequency of volume spikes) differ between selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
 )
 
+st.info("⬅️ Use the **sidebar** to select sector assets and adjust the spike threshold.")
+
 with st.sidebar:
     st.header("Sector Selection")
     tech_options = ["All (sector average)"] + SECTORS["Tech"]

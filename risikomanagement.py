@@ -44,6 +44,8 @@ render_page_header(
     f"What is the maximum expected loss (at a {conf_level*100:.1f}% confidence level) for Apple compared to NVIDIA over a 1-day horizon?"
 )
 
+st.info("⬅️ Use the **sidebar** to adjust the confidence level and select stocks.")
+
 # --- DATA LOADING ---
 ret_a = None
 ret_n = None

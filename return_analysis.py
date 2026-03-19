@@ -56,6 +56,8 @@ render_page_header(
     "To what extent do the daily log returns of Apple and NVIDIA deviate from a normal distribution?",
 )
 
+st.info("⬅️ Use the **sidebar** to select a stock, adjust the lookback period, and toggle the S&P 500 benchmark.")
+
 with st.sidebar:
     st.header("Settings")
     selected_stock = st.selectbox("Select stock:", list(STOCKS.keys()))

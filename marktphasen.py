@@ -164,6 +164,8 @@ render_page_header(
 )
 
 
+st.info("⬅️ Use the **sidebar** to select assets and adjust Bull/Bear thresholds.")
+
 if "selected_stocks_multiselect" not in st.session_state:
     st.session_state["selected_stocks_multiselect"] = ["Apple", "NVIDIA"]
 
