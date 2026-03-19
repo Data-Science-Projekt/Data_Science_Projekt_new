@@ -141,20 +141,287 @@ if df_tech is not None and df_fin is not None:
     )
 
     # --- STATISTICS ---
-    st.subheader("Frequency Analysis")
-
     tech_spikes = len(plot_df[plot_df[tech_label] > spike_threshold])
     fin_spikes = len(plot_df[plot_df[fin_label] > spike_threshold])
+    total_days = len(plot_df)
+    tech_spike_pct = (tech_spikes / total_days * 100) if total_days > 0 else 0
+    fin_spike_pct = (fin_spikes / total_days * 100) if total_days > 0 else 0
+    tech_mean_z = plot_df[tech_label].mean()
+    fin_mean_z = plot_df[fin_label].mean()
+    tech_max_z = plot_df[tech_label].max()
+    fin_max_z = plot_df[fin_label].max()
+    more_spikes_sector = tech_label if tech_spikes > fin_spikes else fin_label
+    fewer_spikes_sector = fin_label if tech_spikes > fin_spikes else tech_label
+    more_spikes_count = max(tech_spikes, fin_spikes)
+    fewer_spikes_count = min(tech_spikes, fin_spikes)
+
+    st.subheader("Frequency Analysis")
 
     c1, c2, c3 = st.columns(3)
     c1.metric(f"{tech_label} spikes", tech_spikes)
     c2.metric(f"{fin_label} spikes", fin_spikes)
-    c3.metric("Observation days", len(plot_df))
+    c3.metric("Observation days", total_days)
 
-    st.info(f"""
-    **Interpretation:** A Z-score of **{spike_threshold:.1f}** means that trading volume significantly deviates 
-    from the normal level (it is **{spike_threshold:.1f} standard deviations** above the 20-day moving average). 
-    This indicates unusual market activity, often triggered by news or earnings.
-    """)
+    # --- Shared CSS ---
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    .section-banner {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 22px; border-radius: 10px;
+        margin-bottom: 20px; margin-top: 10px;
+    }
+    .section-banner-blue  { background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.01)); border-left: 3px solid #2563eb; }
+    .section-banner-green { background: linear-gradient(90deg, rgba(22,163,74,0.08), rgba(22,163,74,0.01)); border-left: 3px solid #16a34a; }
+    .section-banner-purple { background: linear-gradient(90deg, rgba(124,58,237,0.08), rgba(124,58,237,0.01)); border-left: 3px solid #7c3aed; }
+    .section-banner-orange { background: linear-gradient(90deg, rgba(217,119,6,0.08), rgba(217,119,6,0.01)); border-left: 3px solid #d97706; }
+    .section-icon  { font-size: 1.5rem; line-height: 1; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
+    .info-box {
+        background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.15);
+        border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+        line-height: 1.75; font-size: 1.08rem;
+    }
+    .info-box .hl { color: #2563eb; font-weight: 600; }
+    .insight-card {
+        background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 12px; padding: 22px 22px 20px; margin-bottom: 16px;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .insight-card:hover {
+        border-color: #2563eb; transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(37,99,235,0.1);
+    }
+    .card-icon-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .card-icon {
+        font-size: 1.4rem; width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; flex-shrink: 0;
+    }
+    .icon-blue   { background: rgba(37,99,235,0.12); }
+    .icon-green  { background: rgba(22,163,74,0.12); }
+    .icon-orange { background: rgba(217,119,6,0.12); }
+    .icon-purple { background: rgba(124,58,237,0.12); }
+    .icon-red    { background: rgba(220,38,38,0.12); }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; margin: 0; }
+    .card-body  { font-size: 1rem; line-height: 1.65; margin: 0; opacity: 0.75; }
+    .step-card {
+        background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+        display: flex; gap: 16px; align-items: flex-start;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .step-card:hover { border-color: #2563eb; transform: translateX(3px); }
+    .step-number {
+        font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
+        color: #2563eb; opacity: 0.35; min-width: 32px; line-height: 1.3;
+    }
+    .step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 3px 0; }
+    .step-desc  { font-size: 0.98rem; line-height: 1.55; margin: 0; opacity: 0.7; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- WHAT IS THIS? ---
+    st.markdown("""
+    <div class="section-banner section-banner-blue">
+        <span class="section-icon">📖</span>
+        <p class="section-title">What Does This Analysis Show?</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="info-box">
+        This page detects <span class="hl">unusual trading volume</span> — days where significantly
+        more shares were traded than normal. A sudden spike in volume often signals that something
+        important is happening: an earnings announcement, breaking news, an analyst upgrade, or
+        a major market event.
+        <br><br>
+        We compare <span class="hl">{tech_label}</span> against <span class="hl">{fin_label}</span>
+        to answer a key question: <em>Does one sector experience more frequent volume anomalies than
+        the other?</em> If so, it tells us which sector is more reactive to external events and where
+        the market sees more uncertainty or opportunity.
+        <br><br>
+        We measure this using the <span class="hl">Z-score</span> — a statistical measure that tells
+        us how many standard deviations today's volume is above or below its recent average. A Z-score
+        of 0 means "completely normal". A Z-score above <span class="hl">{spike_threshold:.1f}</span>
+        (the red dashed line) means the volume on that day was unusually high — a "spike".
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- HOW IT WORKS ---
+    st.markdown("""
+    <div class="section-banner section-banner-purple">
+        <span class="section-icon">⚙️</span>
+        <p class="section-title">How It Works</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-content">
+            <p class="step-title">Calculate Rolling Average</p>
+            <p class="step-desc">For each stock, we compute a 20-day rolling average of daily trading volume. This represents "normal" volume for that period.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-content">
+            <p class="step-title">Compute Z-Score</p>
+            <p class="step-desc">Each day's volume is compared to its rolling average: Z = (Today's Volume − 20-day Average) / 20-day Std. Deviation. This standardizes the comparison across stocks with very different absolute volumes.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-content">
+            <p class="step-title">Aggregate by Sector</p>
+            <p class="step-desc">When "All (sector average)" is selected, we average the Z-scores of all stocks within a sector to get a single representative signal per day.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">04</div>
+        <div class="step-content">
+            <p class="step-title">Detect Spikes</p>
+            <p class="step-desc">Any day where the Z-score exceeds the threshold (the red dashed line) is counted as a volume spike — an anomaly that warrants attention.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- ANALYSIS ---
+    st.markdown("""
+    <div class="section-banner section-banner-green">
+        <span class="section-icon">📊</span>
+        <p class="section-title">Analysis and Interpretation</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if tech_spikes == fin_spikes:
+        comparison_text = f"""
+        Both sectors show an identical number of volume spikes (<span class="hl">{tech_spikes} days</span>)
+        above the {spike_threshold:.1f} threshold over the {total_days}-day observation period.
+        This suggests similar levels of event-driven trading activity across both sectors during this window.
+        """
+    else:
+        spike_ratio = more_spikes_count / fewer_spikes_count if fewer_spikes_count > 0 else more_spikes_count
+        comparison_text = f"""
+        <span class="hl">{more_spikes_sector}</span> recorded <span class="hl">{more_spikes_count} volume spikes</span>
+        versus <span class="hl">{fewer_spikes_count}</span> for {fewer_spikes_sector} — that is
+        <span class="hl">{spike_ratio:.1f}x more</span> anomalous volume days.
+        This means {more_spikes_sector} experienced significantly more days where trading activity
+        deviated sharply from normal levels.
+        """
+
+    st.markdown(f"""
+    <div class="info-box">
+        At a spike threshold of <span class="hl">Z = {spike_threshold:.1f}</span>, the results
+        over <span class="hl">{total_days} trading days</span> show:
+        <br><br>
+        {comparison_text}
+        <br><br>
+        <strong>Average Z-scores:</strong> {tech_label} averaged <span class="hl">{tech_mean_z:.2f}</span>
+        while {fin_label} averaged <span class="hl">{fin_mean_z:.2f}</span> — indicating that
+        {"tech" if tech_mean_z > fin_mean_z else "financial"} stocks tend to have more volatile
+        volume patterns on a day-to-day basis.
+        <br><br>
+        <strong>Peak anomalies:</strong> The largest single-day volume spike was
+        <span class="hl">Z = {tech_max_z:.2f}</span> for {tech_label} and
+        <span class="hl">Z = {fin_max_z:.2f}</span> for {fin_label} — meaning
+        {"tech" if tech_max_z > fin_max_z else "financial"} stocks had the more extreme
+        outlier day where volume surged furthest above normal.
+        <br><br>
+        <strong>Spike frequency:</strong> {tech_label} spiked on <span class="hl">{tech_spike_pct:.1f}%</span>
+        of all trading days, while {fin_label} spiked on <span class="hl">{fin_spike_pct:.1f}%</span>.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- KEY INSIGHTS ---
+    st.markdown("""
+    <div class="section-banner section-banner-orange">
+        <span class="section-icon">🔍</span>
+        <p class="section-title">Key Insights</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_i1, col_i2 = st.columns(2)
+    with col_i1:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-blue">📈</div>
+                <p class="card-title">Volume Spikes Signal Events</p>
+            </div>
+            <p class="card-body">
+                A Z-score above {spike_threshold:.1f} means trading volume is {spike_threshold:.1f} standard
+                deviations above normal. These spikes typically coincide with earnings releases, analyst
+                rating changes, product announcements, or macroeconomic shocks — days where the market is
+                actively repricing the stock.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-orange">⚡</div>
+                <p class="card-title">Sector Reactivity</p>
+            </div>
+            <p class="card-body">
+                {"Tech stocks show more frequent volume anomalies, reflecting their higher sensitivity to news cycles, AI developments, and earnings surprises. The semiconductor and software sectors attract rapid speculative flows." if tech_spikes >= fin_spikes else "Financial stocks show more frequent volume anomalies during this period, likely driven by interest rate decisions, banking sector news, or regulatory developments that trigger sector-wide repricing."}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_i2:
+        st.markdown("""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-purple">🔗</div>
+                <p class="card-title">Volume Precedes Price</p>
+            </div>
+            <p class="card-body">
+                In technical analysis, volume is often considered a leading indicator. Unusual volume
+                frequently appears before significant price movements — making volume spike detection
+                a valuable early warning system for traders and risk managers.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown("""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-green">🎚️</div>
+                <p class="card-title">Threshold Sensitivity</p>
+            </div>
+            <p class="card-body">
+                Try adjusting the spike threshold in the sidebar. A lower threshold (e.g. 1.0)
+                captures more moderate volume increases, while a higher threshold (e.g. 3.0+)
+                isolates only extreme events — days with truly exceptional market participation.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # --- BIGGER PICTURE ---
+    st.markdown("""
+    <div class="section-banner section-banner-blue">
+        <span class="section-icon">💡</span>
+        <p class="section-title">Why Does This Matter?</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="info-box">
+        Volume analysis is a cornerstone of <span class="hl">technical analysis</span> and
+        <span class="hl">market microstructure research</span>. While price tells you
+        <em>what</em> happened, volume tells you <em>how much conviction</em> was behind it.
+        A price move on low volume may be noise; the same move on a volume spike is a strong signal.
+        <br><br>
+        For <span class="hl">portfolio managers</span>, understanding volume patterns helps assess
+        liquidity risk — stocks with frequent volume spikes may be harder to trade in size without
+        moving the market. For <span class="hl">risk managers</span>, volume anomalies serve as an
+        early warning system that warrants closer attention to position exposure.
+        <br><br>
+        In the context of our broader analysis, this page complements the
+        <span class="hl">Volatility (Range Analysis)</span> page — while that page measures
+        <em>how much</em> prices move intraday, this page measures <em>how much participation</em>
+        drives those moves. Together, they provide a more complete picture of market activity.
+    </div>
+    """, unsafe_allow_html=True)
 else:
     st.error("Local data could not be loaded. Please ensure that the data bot has created the CSV files.")
