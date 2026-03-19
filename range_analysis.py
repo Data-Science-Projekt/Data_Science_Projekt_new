@@ -199,129 +199,46 @@ with col3:
     st.metric("Difference (Tech - Fin)", f"{diff:.2f}")
 
 # Conclusion
-st.markdown("""
-<style>
-.interp-box {
-    background: rgba(37,99,235,0.04);
-    border: 1px solid rgba(37,99,235,0.18);
-    border-left: 4px solid #2563eb;
-    border-radius: 12px;
-    padding: 32px 36px;
-    margin-top: 8px;
-    line-height: 1.8;
-    font-size: 1.05rem;
-}
-.interp-section-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    color: #2563eb;
-    margin: 0 0 6px 0;
-}
-.interp-section-title {
-    font-size: 1.18rem;
-    font-weight: 700;
-    margin: 0 0 12px 0;
-}
-.interp-divider {
-    border: none;
-    border-top: 1px solid rgba(37,99,235,0.15);
-    margin: 24px 0;
-}
-.interp-body {
-    opacity: 0.85;
-    margin: 0 0 10px 0;
-}
-.interp-insight-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    margin-bottom: 12px;
-}
-.interp-insight-dot {
-    width: 8px; height: 8px;
-    min-width: 8px;
-    background: #2563eb;
-    border-radius: 50%;
-    margin-top: 8px;
-}
-</style>
-""", unsafe_allow_html=True)
+st.divider()
 
-num_days     = len(stock_data[list(stock_data.keys())[0]])
-diff_word    = "significantly" if abs(diff) > 0.3 else "moderately"
-gap_word     = "This confirms that tech stocks exhibit meaningfully higher intraday volatility than their financial counterparts." if abs(diff) > 0.2 else "The difference is modest, suggesting relatively comparable intraday behavior across both sectors during this period."
+st.subheader("01 — What does this analysis show?")
+st.write(f"""
+This analysis measures the **daily trading range** — the difference between the intraday high and low price,
+expressed as a percentage of the closing price — across {num_days} trading days for six stocks split into
+two sectors: Tech (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America).
+A higher relative trading range indicates greater intraday price volatility, meaning the stock moves more
+aggressively within a single session regardless of whether it closes up or down.
+""")
 
-st.markdown(f"""
-<div class="interp-box">
+st.divider()
 
-    <p class="interp-section-label">01</p>
-    <p class="interp-section-title">What does this analysis show?</p>
-    <p class="interp-body">
-        This analysis measures the <strong>daily trading range</strong> &mdash; the difference between the intraday high
-        and low price, expressed as a percentage of the closing price &mdash; across {num_days} trading days
-        for six stocks split into two sectors: Tech (Apple, Microsoft, NVIDIA) and Financial
-        (J.P. Morgan, Goldman Sachs, Bank of America).
-        A higher relative trading range indicates greater intraday price volatility, meaning the stock moves
-        more aggressively within a single session regardless of whether it closes up or down.
-    </p>
+st.subheader("02 — Analysis and Interpretation")
+st.write(f"""
+Over the observed period, tech stocks averaged an intraday range of **{tech_avg_val:.2f}%** versus
+**{financial_avg_val:.2f}%** for financial stocks — a gap of **{abs(diff):.2f} percentage points**.
+{gap_word}
+""")
+st.write("""
+Tech stocks are inherently more reactive to news cycles, earnings surprises, analyst upgrades, and macro
+sentiment shifts — particularly NVIDIA, whose price action is heavily influenced by AI-related developments
+and supply chain headlines. Apple and Microsoft, while more stable, still respond sharply to product
+announcements and broader market moves.
+""")
+st.write("""
+Financial stocks tend to exhibit tighter intraday ranges under normal market conditions, as their valuations
+are more anchored to interest rate expectations and macroeconomic data releases. However, during stress events
+such as Federal Reserve rate decisions or banking sector concerns, financial stocks can spike in volatility
+dramatically and temporarily exceed tech-sector ranges.
+""")
+st.write("""
+The boxplot further illustrates that tech stocks not only have a higher *median* range but also a wider
+*distribution* — meaning extreme volatile days are more frequent and more pronounced in tech than in finance.
+""")
 
-    <hr class="interp-divider"/>
+st.divider()
 
-    <p class="interp-section-label">02</p>
-    <p class="interp-section-title">Analysis and Interpretation</p>
-    <p class="interp-body">
-        Over the observed period, tech stocks averaged an intraday range of <strong>{tech_avg_val:.2f}%</strong>
-        versus <strong>{financial_avg_val:.2f}%</strong> for financial stocks &mdash; a gap of
-        <strong>{abs(diff):.2f} percentage points</strong>. {gap_word}
-    </p>
-    <p class="interp-body">
-        Tech stocks are inherently more reactive to news cycles, earnings surprises, analyst upgrades, and macro
-        sentiment shifts &mdash; particularly NVIDIA, whose price action is heavily influenced by AI-related developments
-        and supply chain headlines. Apple and Microsoft, while more stable, still respond sharply to product
-        announcements and broader market moves.
-    </p>
-    <p class="interp-body">
-        Financial stocks tend to exhibit tighter intraday ranges under normal market conditions, as their valuations
-        are more anchored to interest rate expectations and macroeconomic data releases. However, during stress events
-        such as Federal Reserve rate decisions or banking sector concerns, financial stocks can spike in volatility
-        dramatically and temporarily exceed tech-sector ranges.
-    </p>
-    <p class="interp-body">
-        The boxplot further illustrates that tech stocks not only have a higher <em>median</em> range but also a
-        wider <em>distribution</em> &mdash; meaning extreme volatile days are more frequent and pronounced in tech.
-    </p>
-
-    <hr class="interp-divider"/>
-
-    <p class="interp-section-label">03</p>
-    <p class="interp-section-title">Key Insights</p>
-
-    <div class="interp-insight-row">
-        <div class="interp-insight-dot"></div>
-        <p class="interp-body"><strong>Tech stocks are more volatile intraday.</strong>
-        With an average range of {tech_avg_val:.2f}% vs. {financial_avg_val:.2f}% for financials,
-        tech stocks move {diff_word} more within a single trading session.</p>
-    </div>
-    <div class="interp-insight-row">
-        <div class="interp-insight-dot"></div>
-        <p class="interp-body"><strong>Volatility is sector-driven, not just stock-specific.</strong>
-        The consistent gap between sectors suggests structural differences in how tech and financial stocks
-        are priced and how quickly markets reprice them in response to new information.</p>
-    </div>
-    <div class="interp-insight-row">
-        <div class="interp-insight-dot"></div>
-        <p class="interp-body"><strong>Higher range does not equal higher return.</strong>
-        A wide trading range reflects uncertainty among market participants &mdash; it is a measure of risk,
-        not direction. Investors seeking lower intraday risk may prefer financial stocks under normal conditions.</p>
-    </div>
-    <div class="interp-insight-row">
-        <div class="interp-insight-dot"></div>
-        <p class="interp-body"><strong>Context matters.</strong>
-        The analysis covers only {num_days} trading days. Extending the window to cover different market regimes
-        would likely reveal periods where this relationship inverts &mdash; particularly during banking stress events.</p>
-    </div>
-
-</div>
-""", unsafe_allow_html=True)
+st.subheader("03 — Key Insights")
+st.write(f"**Tech stocks are more volatile intraday.** With an average range of {tech_avg_val:.2f}% vs. {financial_avg_val:.2f}% for financials, tech stocks move {diff_word} more within a single trading session.")
+st.write("**Volatility is sector-driven, not just stock-specific.** The consistent gap between sectors suggests structural differences in how tech and financial stocks are priced and how quickly markets reprice them in response to new information.")
+st.write("**Higher range does not equal higher return.** A wide trading range reflects uncertainty among market participants — it is a measure of risk, not direction. Investors seeking lower intraday risk may prefer financial stocks under normal conditions.")
+st.write(f"**Context matters.** The analysis covers only {num_days} trading days. Extending the window to cover different market regimes would likely reveal periods where this relationship inverts — particularly during banking stress events.")
