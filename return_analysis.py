@@ -62,7 +62,7 @@ with st.sidebar:
 
     days_to_show = st.slider("Lookback Period (last X trading days):",
                              min_value=5,
-                             max_value=500,
+                             max_value=100,
                              value=100)
 
     show_benchmark = st.checkbox("Show S&P 500 (FRED)", value=True)
