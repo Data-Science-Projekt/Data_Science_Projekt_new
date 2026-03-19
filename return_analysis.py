@@ -116,7 +116,7 @@ if df_stock_raw is not None:
 
     st.download_button(
         label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig_area),
+        data=fig_to_pdf_bytes(fig),
         file_name="volatility_area.png",
         mime="image/png",
     )
