@@ -53,8 +53,6 @@ render_page_header(
     "What are the differences in the daily trading range between selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
 )
 
-st.info("⬅️ Use the **sidebar** to adjust trading days and select stocks.")
-
 # Sidebar for controls
 st.sidebar.header("Analysis Parameters")
 days = st.sidebar.slider("Number of Trading Days", min_value=10, max_value=100, value=100, step=10)
@@ -200,13 +198,46 @@ with col2:
 with col3:
     st.metric("Difference (Tech - Fin)", f"{diff:.2f}")
 
-# Conclusion Text
+# Conclusion
 st.subheader("Key Findings")
 summary_logic = "Tech stocks show higher volatility in daily ranges." if diff > 0 else "Financial stocks show higher volatility." if diff < 0 else "Both sectors show similar trading ranges."
-summary = f"""
-The analysis of the last {len(stock_data[list(stock_data.keys())[0]])} trading days shows:
-Tech stocks have an average range of {tech_avg_val:.2f}%, while Financial stocks average {financial_avg_val:.2f}%.
-The difference is {diff:.2f} percentage points.
-{summary_logic}
-"""
-st.write(summary)
+
+st.markdown(f"""
+<style>
+.interpretation-box {{
+    background: rgba(37,99,235,0.04);
+    border: 1px solid rgba(37,99,235,0.18);
+    border-left: 4px solid #2563eb;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-top: 8px;
+    line-height: 1.75;
+    font-size: 1.05rem;
+}}
+.interpretation-box .answer {{
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 12px;
+}}
+.interpretation-box .detail {{
+    opacity: 0.85;
+}}
+</style>
+
+<div class="interpretation-box">
+    <p class="answer">
+        {'📈 Tech stocks exhibit notably higher daily trading ranges than financial stocks.' if diff > 0 else '📉 Financial stocks exhibit higher daily trading ranges than tech stocks.' if diff < 0 else '➡️ Both sectors show comparable daily trading ranges.'}
+    </p>
+    <p class="detail">
+        Over the analyzed period of {len(stock_data[list(stock_data.keys())[0]])} trading days,
+        tech stocks (Apple, Microsoft, NVIDIA) averaged a relative intraday range of <strong>{tech_avg_val:.2f}%</strong>,
+        while financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) averaged <strong>{financial_avg_val:.2f}%</strong> —
+        a difference of <strong>{abs(diff):.2f} percentage points</strong>.
+        This indicates that tech stocks are subject to
+        {'greater intraday price swings, reflecting higher sensitivity to news, earnings expectations, and market sentiment shifts.' if diff > 0 else 'smaller intraday price swings compared to their financial counterparts during this period.'}
+        Financial stocks, by contrast, tend to move more steadily within a trading day,
+        {'though they are not immune to volatility spikes during macro events such as rate decisions or banking stress.' if diff > 0 else 'yet showed elevated volatility during this particular window.'}
+    </p>
+</div>
+""", unsafe_allow_html=True)
