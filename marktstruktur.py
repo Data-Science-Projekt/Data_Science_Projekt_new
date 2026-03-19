@@ -178,24 +178,80 @@ if df_stock is not None and df_vix is not None:
 
     # --- INTERPRETATION ---
     st.divider()
-    st.subheader("Analysis and Interpretation")
 
-    st.markdown(f"""
-    **How to read this chart:**
-    * **Blue Line:** The closing price of {selected_stock}.
-    * **Purple Dotted Line:** The VIX Index, often referred to as the "fear gauge."
-    * **Red Areas:** Time periods where volatility exceeded your threshold.
+    st.markdown("""
+### What Does This Analysis Show?
 
-    ### Key Insights:
+This page examines how Apple and NVIDIA stock prices behave during periods of elevated market volatility, measured by the VIX index.
 
-    * **Market Sensitivity:** High-beta stocks like NVIDIA often show a stronger negative correlation to the VIX. If the price drops sharply during VIX spikes (red zones), it indicates high vulnerability to systemic risks.
+The VIX is often referred to as the fear index - when it rises above a certain threshold, it indicates increased uncertainty and stress in financial markets. In the charts above, these high-volatility periods are highlighted in red.
 
-    * **Statistical Deviation:** The comparison between normal returns and panic returns shows the direct influence of market fear. Significantly negative returns during panic phases suggest that the asset is not perceived as a safe haven.
+A key feature of this analysis is the interactive VIX threshold slider, which allows you to define what level of volatility should be considered a panic state. By adjusting this threshold, you can explore how stock behavior changes under different levels of market stress.
 
-    * **Recovery Speed:** Observe the behavior immediately after a red zone ends. Fast recoveries suggest strong fundamentals, while prolonged declines may indicate a trend reversal.
+### Method
 
-    * **Threshold Significance:** A low value (e.g., VIX 15) captures general market noise, while a high value (e.g., VIX 30) isolates genuine crises or Black Swan events.
-    """)
+We use historical daily data for both stocks and the VIX index.
+
+The VIX panic threshold (controlled by the slider) determines when the market is classified as being in a high-volatility state.
+
+All days where the VIX exceeds this threshold are marked as panic periods and highlighted in red.
+
+We then compare:
+
+- Average returns during normal conditions
+- Average returns during high-volatility periods
+
+By adjusting the threshold, you can analyze how stock performance responds to mild vs. extreme market stress.
+
+### Analysis and Interpretation
+
+The results show a clear difference in stock behavior between normal and high-volatility environments.
+
+During normal market conditions, both Apple and NVIDIA tend to generate stable or slightly positive returns. However, during periods of elevated volatility, returns typically decline.
+
+Apple shows a moderate decrease in performance during high-volatility periods, indicating some sensitivity to market stress but relatively stable behavior overall.
+
+NVIDIA, in contrast, exhibits a stronger negative reaction. Its returns tend to decrease more significantly when volatility increases, suggesting a higher sensitivity to changes in market sentiment.
+
+The extent of these effects depends on the selected threshold:
+
+- A lower threshold captures more frequent, moderate volatility periods
+- A higher threshold isolates fewer but more extreme market stress events
+
+This allows for a more nuanced analysis of how each stock behaves under different market conditions.
+
+### Key Insights
+
+- Market Stress Impact: Both stocks tend to perform worse during periods of elevated volatility.
+- Threshold Sensitivity: The definition of a panic state matters - changing the VIX threshold can significantly affect the results and interpretation.
+- Stronger Reaction of NVIDIA: NVIDIA generally reacts more strongly to volatility spikes, showing larger performance declines.
+- Stability of Apple: Apple tends to be more resilient, with smaller changes in performance during stressful market periods.
+
+### Why does this matter?
+
+Financial markets do not react the same way to all levels of volatility.
+
+By adjusting the VIX threshold, investors can:
+
+- distinguish between normal fluctuations and true crisis periods
+- better understand how assets behave under different stress levels
+- make more informed decisions about diversification and risk exposure
+
+In simple terms:
+The definition of market stress is flexible - and different stocks react differently depending on how severe that stress is.
+""")
+
+    st.markdown(
+        """
+        <section class="research-header">
+            <p class="research-header__eyebrow">Answer to the Research Question</p>
+            <p class="research-header__question">
+                Both Apple and NVIDIA show weaker performance during periods of elevated market volatility, with the effect becoming more pronounced as the VIX threshold increases. NVIDIA reacts more strongly to these conditions, indicating higher sensitivity to market stress, while Apple remains comparatively more stable.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.caption("Data sources: Alpha Vantage (Stock Prices) and FRED (CBOE Volatility Index - VIX).")
 else:

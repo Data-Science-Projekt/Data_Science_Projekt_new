@@ -196,3 +196,5 @@ Stock returns are less predictable and more extreme than a perfect mathematical 
         """,
         unsafe_allow_html=True,
     )
+
+    st.caption("Data sources: Alpha Vantage (Stock Prices) and FRED (S&P 500 Index).")
