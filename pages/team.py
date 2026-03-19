@@ -124,20 +124,6 @@ st.markdown(
         font-weight: 700;
     }
 
-    /* Force equal height on Streamlit columns */
-    [data-testid="stHorizontalBlock"] {
-        align-items: stretch !important;
-    }
-    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div {
-        height: 100%;
-    }
-    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div > div {
-        height: 100%;
-    }
-    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div > div > div {
-        height: 100%;
-    }
-
     .team-card {
         overflow: hidden;
         border-radius: 20px;
@@ -147,6 +133,7 @@ st.markdown(
         transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
         display: flex;
         flex-direction: column;
+        height: 580px;
     }
 
     .team-card:hover {
