@@ -16,14 +16,6 @@ render_page_header(
     "How does the quarterly sales volume of iPhone units statistically correlate with Apple's stock price returns in the month following the earnings release?",
 )
 
-st.markdown("""
-#### Methodology
-This analysis examines the relationship between quarterly iPhone sales and Apple's stock
-performance in the 30 calendar days following each earnings announcement. We use:
-- **iPhone unit sales data** from quarterly earnings reports (Q1 2019 – Q1 2025)
-- **Apple stock prices** at earnings date and 30 days after (historical data)
-- **Pearson correlation** and **OLS linear regression** to quantify the relationship
-""")
 
 
 # --- Load iPhone Sales Data (includes pre-collected price data) ---
