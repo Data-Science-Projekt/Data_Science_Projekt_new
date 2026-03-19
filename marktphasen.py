@@ -247,20 +247,75 @@ for i in range(0, len(stocks_list), 2):
     st.markdown("---")
 
 # --- GEMEINSAME INTERPRETATION ---
-st.subheader("Interpretation and Insights")
-st.markdown(f"""
-**1. Thresholds applied to all assets:**
-- 🟢 Bull: +{bull_threshold}% rise from 20-day low
-- 🔴 Bear: -{bear_threshold}% drop from 20-day high
+st.markdown("""
+### What Does This Analysis Show?
 
-**2. Volatility and Behavior**
-- Stocks like NVIDIA often switch phases more frequently due to higher volatility.
-- Established blue-chip titles often show more stable and prolonged trends.
+This page analyzes how stock price movements can be classified into different market phases - bull, bear, and neutral - and how these phases differ across technology and financial stocks.
 
-**3. Strategic Implications**
-- **Bull Phases:** Trend-following strategies are often advantageous.
-- **Bear Phases:** Risk management and defensive positioning are crucial.
-- **Neutral Phases:** Range trading or waiting for breakouts is often more effective.
+Instead of looking only at returns or volatility, this approach focuses on trend behavior over time. By identifying sustained upward or downward movements, we can better understand how different types of stocks behave during changing market conditions.
+
+The charts show the price development of each selected stock, while the tables summarize how often each stock was in a bull, bear, or neutral phase.
+
+### Method
+
+We classify market phases using a rolling 20-day window and user-defined thresholds:
+
+- A bull phase is identified when the price rises by a certain percentage from its recent low
+- A bear phase is identified when the price falls by a certain percentage from its recent high
+- All other periods are classified as neutral
+
+The thresholds for bull and bear markets can be adjusted using the sliders in the sidebar.
+
+This means:
+
+- Lower thresholds -> more frequent phase changes
+- Higher thresholds -> only strong trends are classified as bull or bear phases
+
+This flexible setup allows you to explore how sensitive different stocks are to trend definitions.
+
+### Analysis and Interpretation
+
+The results show that most stocks spend the majority of time in neutral phases, with fewer clearly defined bull or bear periods.
+
+However, differences between sectors become visible when trends do occur:
+
+- Technology stocks (Apple, Microsoft, NVIDIA) tend to show more dynamic price movements, meaning they are more likely to transition between phases when thresholds are adjusted.
+- Financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) generally exhibit more stable and gradual trends, resulting in fewer abrupt phase changes under the same conditions.
+
+The behavior also depends strongly on the selected thresholds:
+
+- With stricter thresholds, only major market movements are classified as bull or bear phases
+- With more relaxed thresholds, smaller trends are captured, increasing the number of phase transitions
+
+### Key Insights
+
+- Dominance of Neutral Phases: Most observed periods fall into the neutral category, indicating that strong directional trends are relatively rare.
+- Threshold Sensitivity: The classification of market phases depends heavily on the chosen thresholds - small changes can significantly alter the results.
+- Higher Reactivity of Tech Stocks: Technology stocks tend to respond more quickly to market movements and are more likely to enter bull or bear phases under flexible thresholds.
+- Stability of Financial Stocks: Financial stocks generally show smoother price development and fewer abrupt shifts between phases.
+
+### Why does this matter?
+
+Understanding market phases helps investors move beyond simple return analysis and focus on trend behavior and timing.
+
+- It supports trend-following strategies during bull phases
+- It highlights the importance of risk management during bear phases
+- It shows when markets are uncertain or sideways, where different strategies may be needed
+
+In simple terms:
+Markets are not always clearly rising or falling - and how you define these phases can change your entire interpretation of market behavior.
 """)
+
+st.markdown(
+    """
+    <section class="research-header">
+        <p class="research-header__eyebrow">Answer to the Research Question</p>
+        <p class="research-header__question">
+            The correlation between technology and financial stocks varies across market phases, but clear differences depend strongly on how bull and bear periods are defined. Technology stocks tend to react more dynamically to changing conditions, while financial stocks behave more steadily, leading to different patterns of co-movement across stable and crisis periods.
+        </p>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.caption("Methodology: Rolling 20-day window analysis of price movements.")
