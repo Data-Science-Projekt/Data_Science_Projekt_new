@@ -346,3 +346,21 @@ with col_i2:
         </p>
     </div>
     """, unsafe_allow_html=True)
+
+st.markdown(
+    f"""
+    <section class="research-header">
+        <p class="research-header__eyebrow">Answer to the Research Question</p>
+        <p class="research-header__question">
+            Tech stocks (Apple, Microsoft, NVIDIA) exhibit higher daily trading ranges than financial stocks
+            (J.P. Morgan, Goldman Sachs, Bank of America), with an average intraday range of {tech_avg_val:.2f}%
+            versus {financial_avg_val:.2f}% over the observed {num_days} trading days. This confirms that tech stocks
+            experience greater intraday price volatility, driven by their higher sensitivity to news cycles,
+            earnings surprises, and sentiment shifts. Financial stocks show more stable intraday behavior
+            under normal conditions, though they remain susceptible to sharp volatility spikes during
+            macroeconomic stress events.
+        </p>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
