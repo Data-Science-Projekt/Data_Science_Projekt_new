@@ -199,6 +199,10 @@ with col3:
     st.metric("Difference (Tech - Fin)", f"{diff:.2f}")
 
 # Conclusion
+num_days  = len(stock_data[list(stock_data.keys())[0]])
+diff_word = "significantly" if abs(diff) > 0.3 else "moderately"
+gap_word  = "This confirms that tech stocks exhibit meaningfully higher intraday volatility than their financial counterparts." if abs(diff) > 0.2 else "The difference is modest, suggesting relatively comparable intraday behavior across both sectors during this period."
+
 st.divider()
 
 st.subheader("01 — What does this analysis show?")
