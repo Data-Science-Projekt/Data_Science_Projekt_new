@@ -474,5 +474,17 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown(
+        """
+        <section class="research-header">
+            <p class="research-header__eyebrow">Answer to the Research Question</p>
+            <p class="research-header__question">
+                NVIDIA carries significantly higher risk than Apple across all metrics. Its Value-at-Risk and Expected Shortfall are substantially larger, reflecting higher daily volatility driven by its position as a high-growth semiconductor stock exposed to AI demand cycles. Apple, as a diversified mega-cap, shows a more moderate risk profile. The Expected Shortfall consistently exceeds the VaR for both stocks, confirming that extreme losses tend to go well beyond the worst-case threshold — underscoring the importance of tail-risk-aware models over simple VaR-only approaches.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
 else:
     st.info("Please select at least one asset in the sidebar.")

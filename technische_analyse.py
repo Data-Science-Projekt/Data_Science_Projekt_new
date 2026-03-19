@@ -448,5 +448,17 @@ if df_tech is not None and df_fin is not None:
         drives those moves. Together, they provide a more complete picture of market activity.
     </div>
     """, unsafe_allow_html=True)
+    st.markdown(
+        """
+        <section class="research-header">
+            <p class="research-header__eyebrow">Answer to the Research Question</p>
+            <p class="research-header__question">
+                Trading volume patterns differ measurably between tech and financial stocks. Tech stocks tend to experience more frequent and more intense volume spikes, reflecting their higher sensitivity to news cycles, earnings surprises, and AI-related developments. Financial stocks show fewer but more clustered volume anomalies, typically triggered by interest rate decisions or sector-wide regulatory events. These differences in volume behavior confirm that the two sectors respond to fundamentally different market drivers.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
 else:
     st.error("Local data could not be loaded. Please ensure that the data bot has created the CSV files.")

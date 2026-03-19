@@ -463,4 +463,16 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown(
+    """
+    <section class="research-header">
+        <p class="research-header__eyebrow">Answer to the Research Question</p>
+        <p class="research-header__question">
+            Over the observed period, no statistically significant linear correlation was found between the Consumer Sentiment Index and the monthly returns of any of the six analyzed stocks. While individual stocks show varying degrees of positive or negative correlation, the short observation window and high p-values mean these relationships cannot be distinguished from random noise. Both tech and financial sectors show weak average correlations with sentiment, suggesting that consumer confidence alone is not a reliable predictor of short-term stock returns.
+        </p>
+    </section>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.caption("Data source: Local files (data/). Sentiment: Univ. of Michigan (FRED). Stocks: Alpha Vantage.")
