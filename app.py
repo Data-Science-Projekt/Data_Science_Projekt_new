@@ -29,6 +29,7 @@ pages = {
         st.Page("pages/about_project.py", title="About the Project"),
         st.Page("pages/fazit.py", title="Conclusion"),
         st.Page("pages/team.py", title="Team"),
+        st.Page("pages/imprint.py", title="Imprint"),
     ],
 }
 
