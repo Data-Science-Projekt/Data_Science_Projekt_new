@@ -47,14 +47,6 @@ render_page_header(
     "How does the broader Consumer Sentiment Index (University of Michigan) correlate with selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
 )
 
-st.markdown("""
-#### Methodology
-- **Consumer Sentiment Index** from the University of Michigan (via FRED API) — a monthly survey
-  measuring consumer confidence about the economy
-- **Monthly stock returns** from Alpha Vantage for 6 stocks across two sectors
-- **Pearson & Spearman correlations** to quantify linear and rank-based relationships
-- **Rolling correlation** to examine how the relationship evolves over time
-""")
 
 # Load data
 sentiment_df = get_sentiment_local()
