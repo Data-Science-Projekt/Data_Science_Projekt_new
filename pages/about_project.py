@@ -129,73 +129,16 @@ st.markdown("""
 
 st.markdown("""
 <div class="info-box">
-    The goal of this project is to systematically investigate <span class="hl">eight research questions</span>
-    about stock market behavior using modern data science methods. We analyze
-    <span class="hl">six major U.S. stocks</span> across two sectors: Technology (Apple, Microsoft, NVIDIA)
-    and Financial (J.P. Morgan, Goldman Sachs, Bank of America), to understand how these assets
+    The goal of this project is to systematically analyze <span class="hl">stock market behavior</span>
+    using modern data science methods. We investigate
+    <span class="hl">six major U.S. stocks</span> across two sectors — Technology (Apple, Microsoft, NVIDIA)
+    and Financial (J.P. Morgan, Goldman Sachs, Bank of America) — to understand how these assets
     behave under different market conditions.
     <br><br>
-    Each research question is addressed on its own dedicated page with interactive charts,
-    statistical analysis, and a clear interpretation of the results.
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div class="rq-card">
-    <div class="rq-number">RQ1</div>
-    <div>
-        <p class="rq-title">Return Analysis</p>
-        <p class="rq-desc">To what extent do the daily log-returns of Apple and NVIDIA deviate from a normal distribution?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ2</div>
-    <div>
-        <p class="rq-title">Volatility</p>
-        <p class="rq-desc">What are the differences in the daily trading range between selected tech stocks and selected financial stocks?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ3</div>
-    <div>
-        <p class="rq-title">Technical Analysis</p>
-        <p class="rq-desc">How do trading volume patterns (frequency of volume spikes) differ between tech and financial stocks?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ4</div>
-    <div>
-        <p class="rq-title">Market Phases</p>
-        <p class="rq-desc">How does the correlation between tech and financial stocks change during stable market periods compared to crisis periods?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ5</div>
-    <div>
-        <p class="rq-title">Market Structure</p>
-        <p class="rq-desc">How do stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold)?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ6</div>
-    <div>
-        <p class="rq-title">Risk Management</p>
-        <p class="rq-desc">What is the maximum expected loss (Value-at-Risk) for Apple compared to NVIDIA over a 1-day horizon?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ7</div>
-    <div>
-        <p class="rq-title">Company Fundamentals</p>
-        <p class="rq-desc">How does the quarterly sales volume of iPhone units correlate with Apple's stock price returns after earnings?</p>
-    </div>
-</div>
-<div class="rq-card">
-    <div class="rq-number">RQ8</div>
-    <div>
-        <p class="rq-title">Sentiment Correlation</p>
-        <p class="rq-desc">How does the Consumer Sentiment Index correlate with tech and financial stock returns?</p>
-    </div>
+    The analysis covers return distributions, volatility patterns, volume anomalies, market regime
+    detection, risk modeling, fundamental event studies, and sentiment analysis. Each topic is
+    addressed on its own dedicated page with interactive charts, statistical tests, and a clear
+    interpretation of the results.
 </div>
 """, unsafe_allow_html=True)
 
