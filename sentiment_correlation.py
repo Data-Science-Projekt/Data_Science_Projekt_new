@@ -489,4 +489,3 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.caption("Data source: Local files (data/). Sentiment: Univ. of Michigan (FRED). Stocks: Alpha Vantage.")
