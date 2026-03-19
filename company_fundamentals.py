@@ -4,6 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from scipy.stats import pearsonr, spearmanr
+from scipy import stats as scipy_stats
 import os
 from analysis.utils import render_page_header
 from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
@@ -180,6 +181,66 @@ if len(clean) >= 3:
     ])
     st.table(corr_table)
 
+    # --- Scatter Plot with OLS Regression ---
+    st.subheader("3b. Scatter Plot: iPhone Sales vs 30-Day Post-Earnings Return")
+
+    x = clean["iphone_units_million"].values
+    y = clean["price_change_pct"].values
+
+    slope, intercept, r_value, p_reg, std_err = scipy_stats.linregress(x, y)
+    r_squared = r_value ** 2
+
+    fig_scatter = go.Figure()
+    fig_scatter.add_trace(go.Scatter(
+        x=x, y=y,
+        mode="markers+text",
+        text=df.loc[clean.index, "quarter"],
+        textposition="top center",
+        textfont=dict(size=9),
+        marker=dict(size=10, color="#e94560", line=dict(width=1, color="white")),
+        name="Quarters",
+    ))
+
+    x_line = np.linspace(x.min(), x.max(), 100)
+    y_line = slope * x_line + intercept
+    fig_scatter.add_trace(go.Scatter(
+        x=x_line, y=y_line,
+        mode="lines",
+        name=f"Regression (R²={r_squared:.3f})",
+        line=dict(color="#1f77b4", dash="dash", width=2),
+    ))
+
+    fig_scatter.update_layout(
+        xaxis_title="iPhone Units Sold (millions)",
+        yaxis_title="30-Day Post-Earnings Return (%)",
+        template="plotly_white",
+        height=500,
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        **CHART_STYLE
+    )
+    st.plotly_chart(fig_scatter, use_container_width=True)
+
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig_scatter),
+        file_name="fundamentals_scatter.png",
+        mime="image/png",
+        key="download_fundamentals_scatter"
+    )
+
+    # --- Regression Model ---
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Pearson r", f"{unit_pearson_r:.4f}")
+    col2.metric("R²", f"{r_squared:.4f}")
+    col3.metric("p-value", f"{unit_pearson_p:.4f}")
+    col4.metric("Slope (β₁)", f"{slope:.6f}")
+
+    st.markdown("**Linear Regression Model:**")
+    st.latex(
+        rf"\text{{Return}}_{{30d}} = {intercept:.4f} + {slope:.6f} "
+        rf"\times \text{{iPhone\_Sales}} \quad (p = {p_reg:.4f})"
+    )
+
 # --- 4. SEASONALITY ---
 st.subheader("4. Seasonal Patterns by Fiscal Quarter")
 
@@ -254,4 +315,17 @@ else:
     summary += "The correlation is not statistically significant. This suggests that the market already prices in expectations, and only deviations from these expectations drive the price."
 
 st.markdown(summary)
+
+st.markdown("""
+**Possible explanations:**
+- **Market expectations matter more than absolute sales:** If the market already prices in
+  expected iPhone sales, only *surprises* (beats or misses vs. consensus) drive returns.
+- **Earnings are multi-dimensional:** Apple's stock reacts to guidance, services revenue,
+  margins, and macroeconomic outlook — not just iPhone units.
+- **Product cycle effects:** Launch quarters (Q4/Q1) naturally have higher sales, but the
+  market anticipates this seasonality, dampening the return signal.
+- **Sample size:** With ~25 quarterly observations, detecting moderate effects requires
+  a fairly strong true correlation.
+""")
+
 st.caption("Data source: Apple Investor Relations / Statista. Manual updates required in data/iphone_sales.csv.")
