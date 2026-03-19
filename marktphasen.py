@@ -228,6 +228,13 @@ for i in range(0, len(stocks_list), 2):
             fig = build_stock_chart(stock, df_view, bull_threshold, bear_threshold)
             st.plotly_chart(fig, use_container_width=True)
 
+            st.download_button(
+                label=f"📥 {stock} als PNG",
+                data=fig_to_pdf_bytes(fig),
+                file_name=f"marktphasen_{stock.replace(' ', '_')}.png",
+                mime="image/png",
+                key=f"download_marktphasen_{stock}"
+            )
 
             counts = df_view['phase'].value_counts()
             percentages = (counts / len(df_view) * 100).round(2)
