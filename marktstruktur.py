@@ -61,6 +61,8 @@ render_page_header(
     "How do Apple and NVIDIA stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold of 30)?",
 )
 
+st.info("⬅️ Use the **sidebar** to select a stock and adjust the VIX panic threshold.")
+
 with st.sidebar:
     st.header("Settings")
     selected_stock = st.selectbox("Select Stock:", list(STOCKS.keys()))
