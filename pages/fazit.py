@@ -67,7 +67,10 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 .result-card:hover { border-color: #2563eb; transform: translateX(3px); }
 .result-number {
     font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
-    color: #2563eb; opacity: 0.4; min-width: 36px; line-height: 1.3;
+    color: #2563eb; opacity: 1; min-width: 44px; line-height: 1.2;
+    background: rgba(37,99,235,0.1); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px 8px; flex-shrink: 0;
 }
 .result-title { font-family: 'Syne', sans-serif; font-size: 1.02rem; font-weight: 700; margin: 0 0 3px 0; }
 .result-desc { font-size: 0.95rem; line-height: 1.55; margin: 0; opacity: 0.7; }
@@ -104,7 +107,7 @@ st.markdown("""
     <div class="page-badge">Conclusion</div>
     <h1 class="page-title">Summary & Conclusion</h1>
     <p class="page-subtitle">
-        A synthesis of all findings across eight research questions —
+        A synthesis of all findings across eight research questions
         what we learned, why it matters, and where the limits lie.
     </p>
 </div>
@@ -132,7 +135,7 @@ st.markdown("""
     <div class="result-number">RQ1</div>
     <div>
         <p class="result-title">Return Analysis</p>
-        <p class="result-desc">Both Apple and NVIDIA deviate significantly from a normal distribution. Their daily log-returns exhibit fat tails (leptokurtosis), meaning extreme price movements — both positive and negative — occur far more frequently than standard Gaussian models predict. This has direct implications for risk modeling.</p>
+        <p class="result-desc">Both Apple and NVIDIA deviate significantly from a normal distribution. Their daily log-returns exhibit fat tails (leptokurtosis), meaning extreme price movements occur far more frequently than standard Gaussian models predict. This has direct implications for risk modeling.</p>
     </div>
 </div>
 <div class="result-card">
@@ -167,14 +170,14 @@ st.markdown("""
     <div class="result-number">RQ6</div>
     <div>
         <p class="result-title">Risk Management</p>
-        <p class="result-desc">NVIDIA carries significantly higher risk than Apple across all metrics. Its Value-at-Risk and Expected Shortfall are substantially larger, reflecting higher daily volatility. Critically, the Expected Shortfall consistently exceeds the VaR for both stocks, confirming that tail risks are underestimated by VaR-only approaches.</p>
+        <p class="result-desc">NVIDIA carries significantly higher risk than Apple across all metrics. Its Value-at-Risk and Expected Shortfall are substantially larger, reflecting higher daily volatility. The Expected Shortfall consistently exceeds the VaR for both stocks, confirming that tail risks are underestimated by VaR-only approaches.</p>
     </div>
 </div>
 <div class="result-card">
     <div class="result-number">RQ7</div>
     <div>
         <p class="result-title">Company Fundamentals</p>
-        <p class="result-desc">No statistically significant correlation was found between quarterly iPhone unit sales and Apple's 30-day post-earnings stock return. This is consistent with the Efficient Market Hypothesis — markets price in expected sales before earnings, so only surprises relative to consensus drive the post-announcement reaction.</p>
+        <p class="result-desc">No statistically significant correlation was found between quarterly iPhone unit sales and Apple's 30-day post-earnings stock return. This is consistent with the Efficient Market Hypothesis: markets price in expected sales before earnings, so only surprises relative to consensus drive the post-announcement reaction.</p>
     </div>
 </div>
 <div class="result-card">
@@ -214,7 +217,7 @@ with col1:
         </div>
         <p class="card-body">
             RQ1 and RQ6 both demonstrate that assuming normally distributed returns leads
-            to a systematic underestimation of risk. Fat tails are not an exception — they
+            to a systematic underestimation of risk. Fat tails are not an exception: they
             are a persistent feature of equity markets. Risk models must account for this
             to avoid dangerous blind spots.
         </p>
@@ -229,7 +232,7 @@ with col1:
         <p class="card-body">
             Across RQ2, RQ3, RQ4, and RQ5, a consistent pattern emerges: tech stocks are
             more volatile, more reactive to news, and more sensitive to market stress than
-            financial stocks. These are not random fluctuations — they reflect fundamental
+            financial stocks. These are not random fluctuations: they reflect fundamental
             differences in business models, investor base, and information flow.
         </p>
     </div>
@@ -241,9 +244,8 @@ with col1:
             <p class="card-title">Negative Results Are Valid Results</p>
         </div>
         <p class="card-body">
-            RQ7 and RQ8 found no statistically significant correlations. This is not a failure —
-            it is an important scientific finding. It demonstrates that intuitive assumptions
-            ("more iPhones sold = higher stock price") do not hold up under statistical testing,
+            RQ7 and RQ8 found no statistically significant correlations. This is not a failure:
+            it demonstrates that intuitive assumptions do not hold up under statistical testing,
             and that markets are more efficient at pricing in information than commonly believed.
         </p>
     </div>
@@ -257,10 +259,9 @@ with col2:
             <p class="card-title">Markets Price In Expectations</p>
         </div>
         <p class="card-body">
-            The findings from RQ7 (iPhone sales) and RQ8 (consumer sentiment) both point to
-            the same conclusion: stock prices react to surprises, not to absolute numbers.
-            The market has already incorporated publicly available information — what matters
-            is the deviation from consensus expectations.
+            The findings from RQ7 and RQ8 both point to the same conclusion: stock prices
+            react to surprises, not to absolute numbers. The market has already incorporated
+            publicly available information: what matters is the deviation from consensus expectations.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -271,10 +272,9 @@ with col2:
             <p class="card-title">Multi-Dimensional Analysis Is Essential</p>
         </div>
         <p class="card-body">
-            No single metric — returns, volume, sentiment, or fundamentals — fully explains
-            stock behavior. The value of this project lies in combining multiple perspectives:
-            statistical analysis, risk modeling, market regime detection, and fundamental data.
-            Each dimension reveals something the others miss.
+            No single metric fully explains stock behavior. The value of this project lies in
+            combining multiple perspectives: statistical analysis, risk modeling, market regime
+            detection, and fundamental data. Each dimension reveals something the others miss.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -285,10 +285,9 @@ with col2:
             <p class="card-title">Interactive Analysis Over Static Reports</p>
         </div>
         <p class="card-body">
-            By deploying the analysis as an interactive web application rather than a static
-            PDF, users can adjust parameters (confidence levels, thresholds, stock selection)
-            and see how results change in real time. This makes the analysis more transparent,
-            reproducible, and accessible to non-technical audiences.
+            By deploying the analysis as an interactive web application, users can adjust
+            parameters and see how results change in real time. This makes the analysis more
+            transparent, reproducible, and accessible to non-technical audiences.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -305,8 +304,8 @@ st.markdown("""
 st.markdown("""
 <div class="info-box">
     <strong>Data window:</strong> The analysis is based on approximately 100 trading days of daily
-    stock data (Alpha Vantage compact) and a limited number of monthly observations for sentiment
-    analysis. Longer time series would increase statistical power and allow for more robust conclusions.
+    stock data and a limited number of monthly observations for sentiment analysis. Longer time
+    series would increase statistical power and allow for more robust conclusions.
     <br><br>
     <strong>Sample size:</strong> Six stocks across two sectors provide a meaningful comparison,
     but do not represent the full breadth of the market. Results may not generalize to small-cap
@@ -317,11 +316,11 @@ st.markdown("""
     introduces measurement uncertainty.
     <br><br>
     <strong>No causal claims:</strong> All analyses are correlational. Correlation does not imply
-    causation — observed relationships may be driven by unmodeled confounding factors such as
+    causation: observed relationships may be driven by unmodeled confounding factors such as
     monetary policy, geopolitical events, or broader economic cycles.
     <br><br>
     <strong>No transaction costs:</strong> The analysis does not account for trading costs,
-    bid-ask spreads, or market impact — factors that would affect the practical implementation
+    bid-ask spreads, or market impact: factors that would affect the practical implementation
     of any strategy derived from these findings.
 </div>
 """, unsafe_allow_html=True)
@@ -338,16 +337,16 @@ st.markdown("""
 st.markdown("""
 <div class="info-box">
     This project demonstrates that <span class="hl">data science methods can provide meaningful
-    insights into stock market behavior</span> — but also that financial markets resist simple
+    insights into stock market behavior</span>, but also that financial markets resist simple
     explanations. The most important takeaway is not any single finding, but the recognition
     that robust analysis requires multiple perspectives, honest reporting of negative results,
     and a clear understanding of methodological limitations.
     <br><br>
     The interactive nature of this application allows users to explore the data themselves,
-    adjust parameters, and form their own conclusions — embodying the principle that
+    adjust parameters, and form their own conclusions, embodying the principle that
     <span class="hl">good data science is not about giving answers, but about enabling
     better questions</span>.
 </div>
 """, unsafe_allow_html=True)
 
-st.caption("StockInsight — Data Science Project, Christian-Albrechts-Universität zu Kiel")
+st.caption("StockInsight — Data Science Project, Christian-Albrechts-Universitat zu Kiel")
