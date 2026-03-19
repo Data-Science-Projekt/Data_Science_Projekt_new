@@ -260,10 +260,10 @@ st.markdown(
 IMG_DIR = Path(__file__).parent.parent / "static" / "img"
 
 team = [
-    {"name": "Tom Steinke", "role": "Project Lead (The Architect)", "focus": "Overall leadership, time management and coordination across technical modules. Ensuring a consistent thread across all research questions.", "img": "IMG_1174.JPG", "quote": "Data doesn't lie — but you have to ask the right questions.", "icon": "◆"},
-    {"name": "Jakob Puchert", "role": "Data & DevOps Engineer (The Engine)", "focus": "Backend architecture, API management and automation. Maintaining the ETL pipeline, GitHub Actions and ensuring data integrity.", "img": "IMG_2725.jpg", "quote": "Clean data is half the analysis.", "icon": "●"},
-    {"name": "Ole Schweckendiek", "role": "Quantitative Analyst (The Brain)", "focus": "Statistical models and mathematical correctness. Developing the return analysis, risk metrics (VaR/ES) and regression models.", "img": "IMG_8812.jpg", "quote": "A model is only as good as its feature engineering.", "icon": "▲"},
-    {"name": "Balduin Makko", "role": "Full-Stack Developer / UI-Designer (The Interface)", "focus": "Streamlit frontend and visualization. Designing interactive Plotly charts, CSS styling and user experience.", "img": "IMG_8813.jpg", "quote": "A good visualization says more than a thousand tables.", "icon": "■"},
+    {"name": "Tom Steinke", "role": "Project Lead (The Architect)", "focus": "Overall leadership, time management and coordination across technical modules. Ensuring a consistent thread across all research questions.", "img": "IMG_1174.JPG", "quote": "", "icon": "◆"},
+    {"name": "Jakob Puchert", "role": "Data & DevOps Engineer (The Engine)", "focus": "Backend architecture, API management and automation. Maintaining the ETL pipeline, GitHub Actions and ensuring data integrity.", "img": "IMG_2725.jpg", "quote": "", "icon": "●"},
+    {"name": "Ole Schweckendiek", "role": "Quantitative Analyst (The Brain)", "focus": "Statistical models and mathematical correctness. Developing the return analysis, risk metrics (VaR/ES) and regression models.", "img": "IMG_8812.jpg", "quote": "", "icon": "▲"},
+    {"name": "Balduin Makko", "role": "Full-Stack Developer / UI-Designer (The Interface)", "focus": "Streamlit frontend and visualization. Designing interactive Plotly charts, CSS styling and user experience.", "img": "IMG_8813.jpg", "quote": "", "icon": "■"},
 ]
 
 columns = st.columns(len(team), gap="medium")
