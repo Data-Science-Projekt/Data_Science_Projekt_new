@@ -80,12 +80,7 @@ if len(merged) < 3:
     st.warning(f"Only {len(merged)} months of overlapping data. Need at least 3.")
     st.stop()
 
-# Sidebar
 st.sidebar.header("Analysis Parameters")
-if len(merged) > 3:
-    rolling_window = st.sidebar.slider("Rolling Correlation Window (months)", 3, len(merged), min(12, len(merged)))
-else:
-    rolling_window = 3
 st.sidebar.info(f"Analysis is based on {len(merged)} months of available data.")
 
 st.write(f"**Period:** {merged.index.min().strftime('%Y-%m')} to {merged.index.max().strftime('%Y-%m')} ({len(merged)} months)")
@@ -93,32 +88,8 @@ st.write(f"**Period:** {merged.index.min().strftime('%Y-%m')} to {merged.index.m
 # --- Stock names for iteration ---
 stock_names = [n for n in ALL_STOCKS.keys() if n in merged.columns]
 
-# --- 1. Sentiment Index Over Time ---
-st.subheader("1. Consumer Sentiment Index Over Time")
-fig_sent = go.Figure()
-fig_sent.add_trace(go.Scatter(
-    x=merged.index, y=merged["sentiment"],
-    mode="lines+markers", name="Consumer Sentiment",
-    line=dict(color="#1f77b4", width=2),
-    marker=dict(size=4),
-))
-fig_sent.update_layout(
-    yaxis_title="Sentiment Index",
-    xaxis_title="Date",
-    template="plotly_white", height=400,
-)
-st.plotly_chart(fig_sent, use_container_width=True)
-
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_sent),
-    file_name="sentiment_index.png",
-    mime="image/png",
-    key="download_sentiment_index"
-)
-
-# --- 2. Correlation Heatmap ---
-st.subheader("2. Correlation Matrix: Sentiment vs Stock Returns")
+# --- 1. Correlation Heatmap ---
+st.subheader("1. Correlation Matrix: Sentiment vs Stock Returns")
 
 corr_data = []
 for name in stock_names:
@@ -159,8 +130,8 @@ st.download_button(
     key="download_sentiment_heatmap"
 )
 
-# Correlation table
-st.subheader("3. Detailed Correlation Statistics")
+# --- 2. Detailed Statistics ---
+st.subheader("2. Detailed Correlation Statistics")
 display_df = corr_df.copy()
 for col in ["Pearson r", "Spearman r"]:
     display_df[col] = display_df[col].map("{:.4f}".format)
@@ -168,97 +139,8 @@ for col in ["Pearson p-value", "Spearman p-value"]:
     display_df[col] = display_df[col].map("{:.4f}".format)
 st.table(display_df)
 
-# --- 4. Scatter Plots ---
-st.subheader("4. Scatter Plots: Sentiment vs Monthly Returns")
-
-tech_names = [n for n in TECH_STOCKS.keys() if n in merged.columns]
-fin_names = [n for n in FINANCIAL_STOCKS.keys() if n in merged.columns]
-
-colors_tech = ["#1f77b4", "#ff7f0e", "#2ca02c"]
-colors_fin = ["#d62728", "#9467bd", "#8c564b"]
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("**Tech Stocks**")
-    fig_tech = go.Figure()
-    for i, name in enumerate(tech_names):
-        fig_tech.add_trace(go.Scatter(
-            x=merged["sentiment"], y=merged[name] * 100,
-            mode="markers", name=name,
-            marker=dict(size=8, color=colors_tech[i], opacity=0.7),
-        ))
-    fig_tech.update_layout(
-        xaxis_title="Consumer Sentiment Index",
-        yaxis_title="Monthly Return (%)",
-        template="plotly_white", height=400,
-    )
-    st.plotly_chart(fig_tech, use_container_width=True)
-
-    st.download_button(
-        label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig_tech),
-        file_name="sentiment_scatter_tech.png",
-        mime="image/png",
-        key="download_scatter_tech"
-    )
-
-with col2:
-    st.markdown("**Financial Stocks**")
-    fig_fin = go.Figure()
-    for i, name in enumerate(fin_names):
-        fig_fin.add_trace(go.Scatter(
-            x=merged["sentiment"], y=merged[name] * 100,
-            mode="markers", name=name,
-            marker=dict(size=8, color=colors_fin[i], opacity=0.7),
-        ))
-    fig_fin.update_layout(
-        xaxis_title="Consumer Sentiment Index",
-        yaxis_title="Monthly Return (%)",
-        template="plotly_white", height=400,
-    )
-    st.plotly_chart(fig_fin, use_container_width=True)
-
-    st.download_button(
-        label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig_fin),
-        file_name="sentiment_scatter_financial.png",
-        mime="image/png",
-        key="download_scatter_fin"
-    )
-
-# --- 5. Rolling Correlation ---
-st.subheader("5. Rolling Correlation Over Time")
-
-fig_rolling = go.Figure()
-all_colors = colors_tech + colors_fin
-for i, name in enumerate(stock_names):
-    rolling_corr = merged["sentiment"].rolling(rolling_window).corr(merged[name])
-    fig_rolling.add_trace(go.Scatter(
-        x=merged.index, y=rolling_corr,
-        mode="lines", name=name,
-        line=dict(color=all_colors[i % len(all_colors)], width=1.5),
-    ))
-
-fig_rolling.add_hline(y=0, line_dash="dash", line_color="gray", opacity=0.5)
-fig_rolling.update_layout(
-    xaxis_title="Date",
-    yaxis_title=f"Rolling {rolling_window}-Month Pearson Correlation",
-    template="plotly_white", height=500,
-    legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
-)
-st.plotly_chart(fig_rolling, use_container_width=True)
-
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_rolling),
-    file_name="sentiment_rolling_correlation.png",
-    mime="image/png",
-    key="download_rolling_corr"
-)
-
-# --- 6. Sector Comparison ---
-st.subheader("6. Sector Comparison")
+# --- 3. Sector Comparison ---
+st.subheader("3. Sector Comparison")
 
 tech_corrs = [c["Pearson r"] for c in corr_data if c["Sector"] == "Tech"]
 fin_corrs = [c["Pearson r"] for c in corr_data if c["Sector"] == "Financial"]
@@ -296,8 +178,8 @@ st.download_button(
     key="download_sector_comparison"
 )
 
-# --- 7. Key Insights ---
-st.subheader("7. Key Insights")
+# --- 4. Key Insights ---
+st.subheader("4. Key Insights")
 
 sig_stocks = [c["Stock"] for c in corr_data if c["Pearson p-value"] < 0.05]
 nonsig_stocks = [c["Stock"] for c in corr_data if c["Pearson p-value"] >= 0.05]
