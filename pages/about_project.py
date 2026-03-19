@@ -131,8 +131,8 @@ st.markdown("""
 <div class="info-box">
     The goal of this project is to systematically analyze <span class="hl">stock market behavior</span>
     using modern data science methods. We investigate
-    <span class="hl">six major U.S. stocks</span> across two sectors — Technology (Apple, Microsoft, NVIDIA)
-    and Financial (J.P. Morgan, Goldman Sachs, Bank of America) — to understand how these assets
+    <span class="hl">six major U.S. stocks</span> across two sectors, Technology (Apple, Microsoft, NVIDIA)
+    and Financial (J.P. Morgan, Goldman Sachs, Bank of America), to understand how these assets
     behave under different market conditions.
     <br><br>
     The analysis covers return distributions, volatility patterns, volume anomalies, market regime
@@ -157,19 +157,19 @@ st.markdown("""
     such as normally distributed returns, constant correlations, or efficient pricing of
     fundamental data break down in practice. This project was motivated by the desire to:
     <br><br>
-    <strong>1. Bridge theory and practice</strong> — apply academic concepts (VaR, OLS regression,
+    <strong>1. Bridge theory and practice:</strong> Apply academic concepts (VaR, OLS regression,
     Pearson correlation, Z-score anomaly detection) to real market data and examine where models
     hold up and where they fail.
     <br><br>
-    <strong>2. Build an end-to-end data pipeline</strong> — from API data ingestion
+    <strong>2. Build an end-to-end data pipeline:</strong> From API data ingestion
     (Alpha Vantage, FRED) through automated data processing to interactive visualization
     on a deployed web application.
     <br><br>
-    <strong>3. Create an accessible tool</strong> — make quantitative financial analysis
+    <strong>3. Create an accessible tool:</strong> Make quantitative financial analysis
     available through an <span class="hl">interactive Streamlit web application</span> with
     adjustable parameters, rather than static PDF reports.
     <br><br>
-    <strong>4. Compare sectors systematically</strong> — by analyzing three tech and three
+    <strong>4. Compare sectors systematically:</strong> By analyzing three tech and three
     financial stocks in parallel, we can identify structural differences in how these
     sectors behave under different market conditions.
 </div>
