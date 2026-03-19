@@ -114,6 +114,13 @@ if df_stock_raw is not None:
 
     st.plotly_chart(fig, use_container_width=True)
 
+    st.download_button(
+        label="📥 Graph als PNG herunterladen",
+        data=fig_to_pdf_bytes(fig_area),
+        file_name="volatility_area.png",
+        mime="image/png",
+    )
+
     # Metrics Board
     k_val = kurtosis(returns)  # Excess Kurtosis
     s_val = skew(returns)
