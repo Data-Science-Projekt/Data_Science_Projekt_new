@@ -115,13 +115,6 @@ fig_sent.update_layout(
 )
 st.plotly_chart(fig_sent, use_container_width=True)
 
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_sent),
-    file_name="sentiment_index.png",
-    mime="image/png",
-    key="download_sentiment_index"
-)
 
 # --- 2. CORRELATION MATRIX ---
 st.subheader("2. Correlation Matrix")
@@ -147,14 +140,6 @@ fig_heatmap.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
 )
 st.plotly_chart(fig_heatmap, use_container_width=True)
-
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_heatmap),
-    file_name="sentiment_correlation.png",
-    mime="image/png",
-    key="download_sentiment_heatmap"
-)
 
 # --- 3. DETAILED STATISTICS ---
 st.subheader("3. Detailed Correlation Statistics")

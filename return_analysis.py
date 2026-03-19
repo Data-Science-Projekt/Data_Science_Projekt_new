@@ -111,13 +111,6 @@ if df_stock_raw is not None:
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.download_button(
-        label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig),
-        file_name="return_analysis.png",
-        mime="application/png"
-    )
-
     # Metrics Board
     k_val = kurtosis(returns)  # Excess Kurtosis
     s_val = skew(returns)

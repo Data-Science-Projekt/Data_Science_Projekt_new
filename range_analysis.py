@@ -99,14 +99,6 @@ fig_box.update_layout(
 )
 st.plotly_chart(fig_box, use_container_width=True)
 
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_box),
-    file_name="volatility_boxplot.png",
-    mime="image/png",
-    key="download_volatility_box"
-)
-
 # --- Area Chart: Tech vs. Financial sector average ---
 st.subheader("Sector Volatility Trend Over Time")
 
@@ -151,14 +143,6 @@ fig_area.update_layout(
     **CHART_STYLE
 )
 st.plotly_chart(fig_area, use_container_width=True)
-
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_area),
-    file_name="volatility_area.png",
-    mime="image/png",
-    key="download_volatility_area"
-)
 
 # Statistics Table
 st.subheader("Statistical Metrics per Stock")

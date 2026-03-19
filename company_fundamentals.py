@@ -117,14 +117,6 @@ fig_sales.update_yaxes(
 )
 st.plotly_chart(fig_sales, use_container_width=True)
 
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_sales),
-    file_name="fundamentals_sales.png",
-    mime="image/png",
-    key="download_fundamentals_sales"
-)
-
 # --- 2. PRICE REACTION ---
 st.subheader("2. Stock Price Movement Post-Earnings (30 Days)")
 
@@ -149,13 +141,6 @@ if "price_change_pct" in df.columns:
     )
     st.plotly_chart(fig_reaction, use_container_width=True)
 
-    st.download_button(
-        label="📥 Graph als PNG herunterladen",
-        data=fig_to_pdf_bytes(fig_reaction),
-        file_name="fundamentals_reaction.png",
-        mime="image/png",
-        key="download_fundamentals_reaction"
-    )
 
 # --- 3. CORRELATION ---
 st.subheader("3. Correlation Analysis")
@@ -228,14 +213,6 @@ fig_seasonal.update_yaxes(
     secondary_y=True
 )
 st.plotly_chart(fig_seasonal, use_container_width=True)
-
-st.download_button(
-    label="📥 Graph als PNG herunterladen",
-    data=fig_to_pdf_bytes(fig_seasonal),
-    file_name="fundamentals_seasonal.png",
-    mime="image/png",
-    key="download_fundamentals_seasonal"
-)
 
 # --- 5. KEY FINDINGS ---
 st.subheader("5. Key Insights")
