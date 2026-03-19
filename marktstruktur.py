@@ -256,25 +256,39 @@ if df_stock is not None and df_vix is not None:
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="step-card">
-        <div class="step-number">01</div>
-        <div>
-            <p class="step-title">Define the Panic Threshold</p>
-            <p class="step-desc">The VIX panic threshold is controlled by the sidebar slider. All days where the VIX exceeds this threshold are classified as high-volatility periods and highlighted in red.</p>
+    <style>
+    .method-cols { display: flex; gap: 16px; margin-bottom: 16px; }
+    .method-col {
+        flex: 1; background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px; padding: 22px 20px;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .method-col:hover { border-color: #2563eb; transform: translateY(-2px); }
+    .method-col-num {
+        font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+        color: #2563eb; opacity: 0.25; line-height: 1; margin-bottom: 10px;
+    }
+    .method-col-title {
+        font-family: 'Syne', sans-serif; font-size: 1.0rem; font-weight: 700;
+        margin: 0 0 8px 0;
+    }
+    .method-col-desc { font-size: 0.92rem; line-height: 1.6; margin: 0; opacity: 0.7; }
+    </style>
+    <div class="method-cols">
+        <div class="method-col">
+            <div class="method-col-num">01</div>
+            <p class="method-col-title">Define the Panic Threshold</p>
+            <p class="method-col-desc">The VIX panic threshold is set via the sidebar slider. All days where the VIX exceeds this value are classified as high-volatility periods and highlighted in red.</p>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">02</div>
-        <div>
-            <p class="step-title">Split into Normal and Panic Periods</p>
-            <p class="step-desc">Daily returns are split into two groups: days with normal market conditions (VIX below threshold) and days in a panic state (VIX above threshold).</p>
+        <div class="method-col">
+            <div class="method-col-num">02</div>
+            <p class="method-col-title">Split into Normal and Panic Periods</p>
+            <p class="method-col-desc">Daily returns are divided into two groups: normal market conditions (VIX below threshold) and panic state (VIX above threshold).</p>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">03</div>
-        <div>
-            <p class="step-title">Compare Average Returns</p>
-            <p class="step-desc">We compare average log-returns during normal conditions versus high-volatility periods to quantify how much market stress affects each stock.</p>
+        <div class="method-col">
+            <div class="method-col-num">03</div>
+            <p class="method-col-title">Compare Average Returns</p>
+            <p class="method-col-desc">Average log-returns are compared across both groups to quantify how much market stress affects the performance of each stock.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
