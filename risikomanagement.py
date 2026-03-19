@@ -154,29 +154,136 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         c2.metric("Value-at-Risk", f"{v_n:.2%}")
         c2.metric("Expected Shortfall", f"{e_n:.2%}")
 
+    # --- Shared CSS for styled boxes ---
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    .section-banner {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 22px; border-radius: 10px;
+        margin-bottom: 20px; margin-top: 10px;
+    }
+    .section-banner-blue  { background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.01)); border-left: 3px solid #2563eb; }
+    .section-banner-green { background: linear-gradient(90deg, rgba(22,163,74,0.08), rgba(22,163,74,0.01)); border-left: 3px solid #16a34a; }
+    .section-banner-purple { background: linear-gradient(90deg, rgba(124,58,237,0.08), rgba(124,58,237,0.01)); border-left: 3px solid #7c3aed; }
+    .section-banner-orange { background: linear-gradient(90deg, rgba(217,119,6,0.08), rgba(217,119,6,0.01)); border-left: 3px solid #d97706; }
+    .section-icon  { font-size: 1.5rem; line-height: 1; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
+    .info-box {
+        background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.15);
+        border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+        line-height: 1.75; font-size: 1.08rem;
+    }
+    .info-box .hl { color: #2563eb; font-weight: 600; }
+    .insight-card {
+        background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 12px; padding: 22px 22px 20px; margin-bottom: 16px;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .insight-card:hover {
+        border-color: #2563eb; transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(37,99,235,0.1);
+    }
+    .card-icon-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .card-icon {
+        font-size: 1.4rem; width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; flex-shrink: 0;
+    }
+    .icon-blue   { background: rgba(37,99,235,0.12); }
+    .icon-green  { background: rgba(22,163,74,0.12); }
+    .icon-orange { background: rgba(217,119,6,0.12); }
+    .icon-purple { background: rgba(124,58,237,0.12); }
+    .icon-red    { background: rgba(220,38,38,0.12); }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; margin: 0; }
+    .card-body  { font-size: 1rem; line-height: 1.65; margin: 0; opacity: 0.75; }
+    .step-card {
+        background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+        display: flex; gap: 16px; align-items: flex-start;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .step-card:hover { border-color: #2563eb; transform: translateX(3px); }
+    .step-number {
+        font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
+        color: #2563eb; opacity: 0.35; min-width: 32px; line-height: 1.3;
+    }
+    .step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 3px 0; }
+    .step-desc  { font-size: 0.98rem; line-height: 1.55; margin: 0; opacity: 0.7; }
+    </style>
+    """, unsafe_allow_html=True)
+
     # --- WHAT IS THIS? ---
-    st.markdown("---")
-    st.subheader("What Does This Analysis Show?")
+    st.markdown("""
+    <div class="section-banner section-banner-blue">
+        <span class="section-icon">📖</span>
+        <p class="section-title">What Does This Analysis Show?</p>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown(f"""
-    This page measures **how much money you could lose on a single bad day** when investing in Apple or NVIDIA stock.
-    We use two well-established risk metrics from financial risk management:
+    <div class="info-box">
+        This page measures <span class="hl">how much money you could lose on a single bad day</span>
+        when investing in Apple or NVIDIA stock. We use two well-established risk metrics from
+        financial risk management:
+        <br><br>
+        <strong>Value-at-Risk (VaR)</strong> answers: <em>"What is the worst daily loss I can expect
+        under normal conditions?"</em> At a <span class="hl">{conf_level*100:.1f}% confidence level</span>,
+        the VaR tells you that on {conf_level*100:.0f} out of 100 trading days, your loss will
+        <strong>not</strong> exceed this value. Only on the remaining {(1-conf_level)*100:.0f} out of
+        100 days could losses be larger.
+        <br><br>
+        <strong>Expected Shortfall (ES)</strong>, also called Conditional VaR, goes one step further:
+        <em>"If the worst case does happen — if the loss exceeds the VaR — how bad does it get on average?"</em>
+        It is the average loss on those very worst days.
+    </div>
+    """, unsafe_allow_html=True)
 
-    - **Value-at-Risk (VaR)** answers the question: *"What is the worst daily loss I can expect
-      under normal conditions?"* At a **{conf_level*100:.1f}% confidence level**, the VaR tells you
-      that on {conf_level*100:.0f} out of 100 trading days, your loss will **not** exceed this value.
-      Only on the remaining {(1-conf_level)*100:.0f} out of 100 days could losses be larger.
-    - **Expected Shortfall (ES)**, also called Conditional VaR, goes one step further: *"If the worst
-      case does happen — if the loss exceeds the VaR — how bad does it get on average?"*
-      It is the average loss on those very worst days.
+    st.markdown("""
+    <div class="section-banner section-banner-purple">
+        <span class="section-icon">⚙️</span>
+        <p class="section-title">How It Works</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    **Method:** We use **Historical Simulation** — instead of assuming a mathematical distribution,
-    we look at the actual historical daily returns and simply read off the worst percentiles.
-    The histogram above shows every daily return that occurred in our dataset. The dashed vertical
-    lines mark the VaR threshold for each stock.
-    """)
+    st.markdown("""
+    <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-content">
+            <p class="step-title">Collect Daily Returns</p>
+            <p class="step-desc">We take all historical daily percentage changes (returns) for each stock from our dataset.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-content">
+            <p class="step-title">Historical Simulation</p>
+            <p class="step-desc">Instead of assuming a mathematical distribution, we use the actual past returns. The histogram above shows every daily return that occurred.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-content">
+            <p class="step-title">Read Off the Worst Percentile</p>
+            <p class="step-desc">The VaR is simply the return at the chosen percentile — the dashed vertical line in the chart. Everything to the left of that line represents the worst-case days.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">04</div>
+        <div class="step-content">
+            <p class="step-title">Calculate Expected Shortfall</p>
+            <p class="step-desc">We average all returns that fall beyond the VaR threshold. This gives the true average loss on the very worst days.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # --- ANALYSIS WITH ACTUAL NUMBERS ---
-    st.subheader("Analysis and Interpretation")
+    st.markdown("""
+    <div class="section-banner section-banner-green">
+        <span class="section-icon">📊</span>
+        <p class="section-title">Analysis and Interpretation</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     if show_apple and ret_a is not None and show_nvidia and ret_n is not None:
         riskier = "NVIDIA" if v_n < v_a else "Apple"
@@ -187,111 +294,163 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         safer_es = e_a if riskier == "NVIDIA" else e_n
 
         st.markdown(f"""
-    At the **{conf_level*100:.1f}% confidence level**, the results show:
-
-    | Metric | Apple (AAPL) | NVIDIA (NVDA) |
-    |--------|-------------|---------------|
-    | **Value-at-Risk** | {v_a:.2%} | {v_n:.2%} |
-    | **Expected Shortfall** | {e_a:.2%} | {e_n:.2%} |
-    | **Volatility (Std. Dev.)** | {ret_a.std():.2%} | {ret_n.std():.2%} |
-    | **Trading Days Analyzed** | {len(ret_a):,} | {len(ret_n):,} |
-
-    **{riskier} carries significantly more risk than {safer}.** A VaR of **{riskier_var:.2%}** means
-    that on the worst {(1-conf_level)*100:.0f}% of trading days, {riskier} loses more than
-    {abs(riskier_var):.2%} of its value in a single day. For {safer}, this threshold is
-    {abs(safer_var):.2%}.
-
-    The Expected Shortfall paints an even clearer picture: when {riskier} does have a bad day
-    beyond its VaR, the average loss is **{riskier_es:.2%}** — compared to **{safer_es:.2%}** for {safer}.
-
-    **In practical terms:** If you invested **$10,000** in each stock, on a bad day
-    (beyond the {conf_level*100:.0f}% threshold):
-    - **{safer}** would lose on average **${abs(safer_es) * 10000:.0f}**
-    - **{riskier}** would lose on average **${abs(riskier_es) * 10000:.0f}**
-        """)
+    <div class="info-box">
+        At the <span class="hl">{conf_level*100:.1f}% confidence level</span>, the results show:
+        <br><br>
+        <strong>{riskier} carries significantly more risk than {safer}.</strong>
+        A VaR of <span class="hl">{riskier_var:.2%}</span> means that on the worst
+        {(1-conf_level)*100:.0f}% of trading days, {riskier} loses more than {abs(riskier_var):.2%}
+        of its value in a single day. For {safer}, this threshold is {abs(safer_var):.2%}.
+        <br><br>
+        The Expected Shortfall paints an even clearer picture: when {riskier} does have a bad day
+        beyond its VaR, the average loss is <span class="hl">{riskier_es:.2%}</span> — compared to
+        <span class="hl">{safer_es:.2%}</span> for {safer}.
+        <br><br>
+        <strong>In practical terms:</strong> If you invested <span class="hl">$10,000</span> in each stock,
+        on a bad day (beyond the {conf_level*100:.0f}% threshold):
+        <br>• <strong>{safer}</strong> would lose on average <strong>${abs(safer_es) * 10000:.0f}</strong>
+        <br>• <strong>{riskier}</strong> would lose on average <strong>${abs(riskier_es) * 10000:.0f}</strong>
+    </div>
+        """, unsafe_allow_html=True)
 
     elif show_apple and ret_a is not None:
         st.markdown(f"""
-    At the **{conf_level*100:.1f}% confidence level**, Apple's results:
-
-    | Metric | Apple (AAPL) |
-    |--------|-------------|
-    | **Value-at-Risk** | {v_a:.2%} |
-    | **Expected Shortfall** | {e_a:.2%} |
-    | **Volatility (Std. Dev.)** | {ret_a.std():.2%} |
-    | **Trading Days Analyzed** | {len(ret_a):,} |
-
-    On {(1-conf_level)*100:.0f} out of 100 trading days, Apple could lose more than **{abs(v_a):.2%}**
-    of its value. When those worst days occur, the average loss is **{e_a:.2%}**.
-    On a **$10,000 investment**, that translates to an average worst-case loss of **${abs(e_a) * 10000:.0f}**.
-        """)
+    <div class="info-box">
+        At the <span class="hl">{conf_level*100:.1f}% confidence level</span>, Apple's VaR is
+        <span class="hl">{v_a:.2%}</span>. On {(1-conf_level)*100:.0f} out of 100 trading days,
+        Apple could lose more than {abs(v_a):.2%} of its value. When those worst days occur,
+        the average loss is <span class="hl">{e_a:.2%}</span>.
+        <br><br>
+        On a <span class="hl">$10,000 investment</span>, that translates to an average worst-case
+        loss of <strong>${abs(e_a) * 10000:.0f}</strong>.
+    </div>
+        """, unsafe_allow_html=True)
 
     elif show_nvidia and ret_n is not None:
         st.markdown(f"""
-    At the **{conf_level*100:.1f}% confidence level**, NVIDIA's results:
-
-    | Metric | NVIDIA (NVDA) |
-    |--------|---------------|
-    | **Value-at-Risk** | {v_n:.2%} |
-    | **Expected Shortfall** | {e_n:.2%} |
-    | **Volatility (Std. Dev.)** | {ret_n.std():.2%} |
-    | **Trading Days Analyzed** | {len(ret_n):,} |
-
-    On {(1-conf_level)*100:.0f} out of 100 trading days, NVIDIA could lose more than **{abs(v_n):.2%}**
-    of its value. When those worst days occur, the average loss is **{e_n:.2%}**.
-    On a **$10,000 investment**, that translates to an average worst-case loss of **${abs(e_n) * 10000:.0f}**.
-        """)
+    <div class="info-box">
+        At the <span class="hl">{conf_level*100:.1f}% confidence level</span>, NVIDIA's VaR is
+        <span class="hl">{v_n:.2%}</span>. On {(1-conf_level)*100:.0f} out of 100 trading days,
+        NVIDIA could lose more than {abs(v_n):.2%} of its value. When those worst days occur,
+        the average loss is <span class="hl">{e_n:.2%}</span>.
+        <br><br>
+        On a <span class="hl">$10,000 investment</span>, that translates to an average worst-case
+        loss of <strong>${abs(e_n) * 10000:.0f}</strong>.
+    </div>
+        """, unsafe_allow_html=True)
 
     # --- KEY INSIGHTS ---
-    st.subheader("Key Insights")
-
-    insights = []
+    st.markdown("""
+    <div class="section-banner section-banner-orange">
+        <span class="section-icon">🔍</span>
+        <p class="section-title">Key Insights</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     if show_apple and ret_a is not None and show_nvidia and ret_n is not None:
-        insights.append(
-            f"**Risk Comparison:** {riskier} is the riskier asset — its VaR is "
-            f"{abs(riskier_var/safer_var):.1f}x larger than {safer}'s, meaning the potential "
-            f"for extreme daily losses is substantially higher."
-        )
-        insights.append(
-            f"**Volatility Gap:** NVIDIA's daily volatility ({ret_n.std():.2%}) vs. Apple's "
-            f"({ret_a.std():.2%}) reflects NVIDIA's nature as a high-growth semiconductor stock "
-            f"with larger price swings driven by AI demand cycles, earnings surprises, and sector rotation."
-        )
-        insights.append(
-            "**Tail Risk Matters:** The Expected Shortfall is always worse than the VaR. "
-            "This means that when a truly bad day happens, losses don't just barely cross the "
-            "VaR line — they tend to go significantly beyond it. Risk models that only look at "
-            "VaR underestimate the true downside."
-        )
-        insights.append(
-            f"**Confidence Level Sensitivity:** Try adjusting the confidence slider in the sidebar. "
-            f"A higher confidence level (e.g. 99%) reveals more extreme tail risks, while a lower "
-            f"level (e.g. 90%) shows more moderate, frequent losses."
-        )
-    elif show_apple and ret_a is not None:
-        insights.append(
-            f"**Apple's Risk Profile:** With a VaR of {v_a:.2%}, Apple shows the relatively "
-            f"moderate risk profile typical of a mega-cap stock with diversified revenue streams."
-        )
-    elif show_nvidia and ret_n is not None:
-        insights.append(
-            f"**NVIDIA's Risk Profile:** With a VaR of {v_n:.2%}, NVIDIA carries the higher "
-            f"volatility typical of a growth-oriented semiconductor company."
-        )
+        col_i1, col_i2 = st.columns(2)
+        with col_i1:
+            st.markdown(f"""
+            <div class="insight-card">
+                <div class="card-icon-row">
+                    <div class="card-icon icon-red">⚖️</div>
+                    <p class="card-title">Risk Comparison</p>
+                </div>
+                <p class="card-body">
+                    {riskier} is the riskier asset — its VaR is {abs(riskier_var/safer_var):.1f}x larger
+                    than {safer}'s, meaning the potential for extreme daily losses is substantially higher.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="insight-card">
+                <div class="card-icon-row">
+                    <div class="card-icon icon-orange">⚡</div>
+                    <p class="card-title">Volatility Gap</p>
+                </div>
+                <p class="card-body">
+                    NVIDIA's daily volatility ({ret_n.std():.2%}) vs. Apple's ({ret_a.std():.2%}) reflects
+                    NVIDIA's nature as a high-growth semiconductor stock with larger price swings driven
+                    by AI demand cycles, earnings surprises, and sector rotation.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        with col_i2:
+            st.markdown("""
+            <div class="insight-card">
+                <div class="card-icon-row">
+                    <div class="card-icon icon-purple">📉</div>
+                    <p class="card-title">Tail Risk Matters</p>
+                </div>
+                <p class="card-body">
+                    The Expected Shortfall is always worse than the VaR. When a truly bad day happens,
+                    losses don't just barely cross the VaR line — they tend to go significantly beyond it.
+                    Risk models that only look at VaR underestimate the true downside.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown("""
+            <div class="insight-card">
+                <div class="card-icon-row">
+                    <div class="card-icon icon-blue">🎚️</div>
+                    <p class="card-title">Confidence Level Sensitivity</p>
+                </div>
+                <p class="card-body">
+                    Try adjusting the confidence slider in the sidebar. A higher confidence level
+                    (e.g. 99%) reveals more extreme tail risks, while a lower level (e.g. 90%)
+                    shows more moderate, frequent losses.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    for i, insight in enumerate(insights, 1):
-        st.markdown(f"{i}. {insight}")
+    elif show_apple and ret_a is not None:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-blue">🍎</div>
+                <p class="card-title">Apple's Risk Profile</p>
+            </div>
+            <p class="card-body">
+                With a VaR of {v_a:.2%}, Apple shows the relatively moderate risk profile typical of a
+                mega-cap stock with diversified revenue streams (iPhone, Services, Mac, Wearables).
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif show_nvidia and ret_n is not None:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-green">🟢</div>
+                <p class="card-title">NVIDIA's Risk Profile</p>
+            </div>
+            <p class="card-body">
+                With a VaR of {v_n:.2%}, NVIDIA carries the higher volatility typical of a growth-oriented
+                semiconductor company at the center of the AI hardware boom.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # --- WHY DOES THIS MATTER ---
+    st.markdown("""
+    <div class="section-banner section-banner-blue">
+        <span class="section-icon">💡</span>
+        <p class="section-title">Why Does This Matter?</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("""
----
-**Why does this matter?**
-Understanding these risk metrics helps investors make informed decisions about portfolio
-allocation. A risk-averse investor might prefer a larger allocation to lower-VaR stocks,
-while a risk-tolerant investor might accept higher potential losses in exchange for
-higher expected returns. Banks and funds are legally required to calculate VaR daily
-to ensure they hold enough capital to survive worst-case scenarios.
-    """)
+    <div class="info-box">
+        Understanding these risk metrics helps investors make informed decisions about
+        <span class="hl">portfolio allocation</span>. A risk-averse investor might prefer a larger
+        allocation to lower-VaR stocks, while a risk-tolerant investor might accept higher potential
+        losses in exchange for higher expected returns.
+        <br><br>
+        Banks and funds are <span class="hl">legally required</span> to calculate VaR daily to ensure
+        they hold enough capital to survive worst-case scenarios — a regulation established after the
+        2008 financial crisis through the Basel III framework.
+    </div>
+    """, unsafe_allow_html=True)
 
 else:
     st.info("Please select at least one asset in the sidebar.")
