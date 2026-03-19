@@ -269,7 +269,10 @@ if df_stock is not None and df_vix is not None:
     .method-col:hover { border-color: #2563eb; transform: translateY(-2px); }
     .method-col-num {
         font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
-        color: #2563eb; opacity: 0.25; line-height: 1; margin-bottom: 10px;
+        color: #2563eb; opacity: 1; line-height: 1.2; margin-bottom: 10px;
+        background: rgba(37,99,235,0.1); border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 4px 12px;
     }
     .method-col-title {
         font-family: 'Syne', sans-serif; font-size: 1.0rem; font-weight: 700;
