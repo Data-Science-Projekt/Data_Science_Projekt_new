@@ -178,37 +178,11 @@ st.download_button(
     key="download_sector_comparison"
 )
 
-# --- 4. Key Insights ---
-st.subheader("4. Key Insights")
-
+# --- Compute values for styled sections below ---
 sig_stocks = [c["Stock"] for c in corr_data if c["Pearson p-value"] < 0.05]
 nonsig_stocks = [c["Stock"] for c in corr_data if c["Pearson p-value"] >= 0.05]
-
 strongest = max(corr_data, key=lambda c: abs(c["Pearson r"]))
 weakest = min(corr_data, key=lambda c: abs(c["Pearson r"]))
-
-summary = f"""
-**Analysis of {len(merged)} months** from {merged.index.min().strftime('%Y-%m')} to {merged.index.max().strftime('%Y-%m')}:
-
-- **Strongest correlation:** {strongest['Stock']} (r = {strongest['Pearson r']:.4f}, p = {strongest['Pearson p-value']:.4f})
-- **Weakest correlation:** {weakest['Stock']} (r = {weakest['Pearson r']:.4f}, p = {weakest['Pearson p-value']:.4f})
-- **Tech sector avg correlation:** {tech_avg:.4f}
-- **Financial sector avg correlation:** {fin_avg:.4f}
-"""
-
-if sig_stocks:
-    summary += f"\n- **Statistically significant (p < 0.05):** {', '.join(sig_stocks)}"
-if nonsig_stocks:
-    summary += f"\n- **Not significant (p >= 0.05):** {', '.join(nonsig_stocks)}"
-
-if abs(fin_avg) > abs(tech_avg):
-    summary += "\n\nFinancial stocks show a stronger sensitivity to consumer sentiment, consistent with their direct exposure to consumer spending and credit conditions."
-elif abs(tech_avg) > abs(fin_avg):
-    summary += "\n\nTech stocks show a stronger sensitivity to consumer sentiment, possibly reflecting their dependence on consumer demand for devices and services."
-else:
-    summary += "\n\nBoth sectors show similar sensitivity to consumer sentiment."
-
-st.markdown(summary)
 
 # --- STYLED ANALYSIS SECTIONS ---
 st.markdown("""
