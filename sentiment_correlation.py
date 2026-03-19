@@ -47,7 +47,7 @@ render_page_header(
     "How does the broader Consumer Sentiment Index (University of Michigan) correlate with selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
 )
 
-st.info("Use the sidebar to select which stocks to include in the analysis.")
+st.info("⬅️ Use the **sidebar** to select which stocks to include in the analysis.")
 
 # Load data
 sentiment_df = get_sentiment_local()

@@ -135,7 +135,7 @@ render_page_header(
     "How does the correlation between selected technology stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America) change during stable market periods compared to crisis periods (bear markets)?",
 )
 
-st.info("Use the sidebar to select assets and adjust Bull/Bear thresholds.")
+st.info("⬅️ Use the **sidebar** to select assets and adjust Bull/Bear thresholds.")
 
 if "selected_stocks_multiselect" not in st.session_state:
     st.session_state["selected_stocks_multiselect"] = ["Apple", "NVIDIA"]

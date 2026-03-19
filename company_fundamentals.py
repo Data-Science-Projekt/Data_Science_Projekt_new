@@ -16,7 +16,7 @@ render_page_header(
     "How does the quarterly sales volume of iPhone units statistically correlate with Apple's stock price returns in the month following the earnings release?",
 )
 
-st.info("Use the sidebar to adjust the quarter range for the analysis.")
+st.info("⬅️ Use the **sidebar** to adjust the quarter range for the analysis.")
 
 # --- Load iPhone Sales Data (includes pre-collected price data) ---
 @st.cache_data

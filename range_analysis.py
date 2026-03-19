@@ -53,6 +53,8 @@ render_page_header(
     "What are the differences in the daily trading range between selected tech stocks (Apple, Microsoft, NVIDIA) and selected financial stocks (J.P. Morgan, Goldman Sachs, Bank of America)?",
 )
 
+st.info("⬅️ Use the **sidebar** to select stocks and adjust the number of trading days.")
+
 # Sidebar for controls
 st.sidebar.header("Analysis Parameters")
 days = st.sidebar.slider("Number of Trading Days", min_value=10, max_value=100, value=100, step=10)
