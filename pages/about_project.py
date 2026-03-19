@@ -9,7 +9,6 @@ st.markdown("""
 :root { --accent-blue: #2563eb; --accent-green: #16a34a; }
 html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
-/* ── page hero ── */
 .page-hero {
     background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0.02) 60%, rgba(124,58,237,0.05) 100%);
     border: 1px solid rgba(37,99,235,0.2); border-radius: 16px;
@@ -41,7 +40,6 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     max-width: 580px; line-height: 1.6; opacity: 0.7;
 }
 
-/* ── section banners ── */
 .section-banner {
     display: flex; align-items: center; gap: 14px;
     padding: 14px 22px; border-radius: 10px;
@@ -54,7 +52,6 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 .section-icon  { font-size: 1.5rem; line-height: 1; }
 .section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
 
-/* ── info box ── */
 .info-box {
     background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.15);
     border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
@@ -62,7 +59,6 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 }
 .info-box .hl { color: #2563eb; font-weight: 600; }
 
-/* ── method card ── */
 .method-card {
     background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
     border-radius: 12px; padding: 20px 22px; margin-bottom: 14px;
@@ -72,7 +68,6 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 .method-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 4px 0; }
 .method-tags  { font-size: 0.95rem; opacity: 0.65; margin: 0; line-height: 1.5; }
 
-/* ── source pill row ── */
 .source-strip { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; margin-bottom: 8px; }
 .source-pill {
     display: inline-flex; align-items: center; gap: 6px;
@@ -81,7 +76,6 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
     font-weight: 600; color: #2563eb; letter-spacing: 0.3px;
 }
 
-/* ── rq card ── */
 .rq-card {
     background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
     border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
@@ -91,12 +85,14 @@ html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 .rq-card:hover { border-color: #2563eb; transform: translateX(3px); }
 .rq-number {
     font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
-    color: #2563eb; opacity: 0.4; min-width: 36px; line-height: 1.3;
+    color: #2563eb; opacity: 1; min-width: 44px; line-height: 1.2;
+    background: rgba(37,99,235,0.1); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px 8px; flex-shrink: 0;
 }
 .rq-title { font-family: 'Syne', sans-serif; font-size: 1.02rem; font-weight: 700; margin: 0 0 3px 0; }
 .rq-desc { font-size: 0.95rem; line-height: 1.5; margin: 0; opacity: 0.7; }
 
-/* ── tech row ── */
 .tech-row {
     display: flex; align-items: center; gap: 16px;
     padding: 14px 20px; border-radius: 8px; margin-bottom: 8px;
@@ -135,8 +131,8 @@ st.markdown("""
 <div class="info-box">
     The goal of this project is to systematically investigate <span class="hl">eight research questions</span>
     about stock market behavior using modern data science methods. We analyze
-    <span class="hl">six major U.S. stocks</span> across two sectors — Technology (Apple, Microsoft, NVIDIA)
-    and Financial (J.P. Morgan, Goldman Sachs, Bank of America) — to understand how these assets
+    <span class="hl">six major U.S. stocks</span> across two sectors: Technology (Apple, Microsoft, NVIDIA)
+    and Financial (J.P. Morgan, Goldman Sachs, Bank of America), to understand how these assets
     behave under different market conditions.
     <br><br>
     Each research question is addressed on its own dedicated page with interactive charts,
@@ -214,9 +210,9 @@ st.markdown("""
 
 st.markdown("""
 <div class="info-box">
-    Financial markets are complex systems where many assumptions from classical theory —
+    Financial markets are complex systems where many assumptions from classical theory
     such as normally distributed returns, constant correlations, or efficient pricing of
-    fundamental data — break down in practice. This project was motivated by the desire to:
+    fundamental data break down in practice. This project was motivated by the desire to:
     <br><br>
     <strong>1. Bridge theory and practice</strong> — apply academic concepts (VaR, OLS regression,
     Pearson correlation, Z-score anomaly detection) to real market data and examine where models
@@ -295,7 +291,7 @@ techs = [
     ("Python 3.13",         "Core programming language for all analysis and data processing"),
     ("Pandas / NumPy",      "Data manipulation, time series processing, numerical computing"),
     ("SciPy",               "Statistical tests (Pearson, Spearman, linregress, kurtosis, skew)"),
-    ("Plotly",              "Interactive charts — histograms, scatter plots, heatmaps, bar charts"),
+    ("Plotly",              "Interactive charts: histograms, scatter plots, heatmaps, bar charts"),
     ("Streamlit",           "Web application framework, multipage navigation, interactive widgets"),
     ("Alpha Vantage API",   "Daily stock price data (OHLCV) for all six stocks"),
     ("FRED API",            "S&P 500 index, VIX volatility index, Consumer Sentiment Index"),
@@ -366,19 +362,19 @@ st.table(pd.DataFrame({
 st.markdown("""
 <div class="info-box">
     <strong>Data fields per stock (OHLCV):</strong>
-    <br>• <span class="hl">Open</span> — opening price of the trading day
-    <br>• <span class="hl">High</span> — highest price during the day
-    <br>• <span class="hl">Low</span> — lowest price during the day
-    <br>• <span class="hl">Close</span> — closing price (used for return calculations)
-    <br>• <span class="hl">Volume</span> — number of shares traded (used for volume spike analysis)
+    <br>Open: opening price of the trading day
+    <br>High: highest price during the day
+    <br>Low: lowest price during the day
+    <br>Close: closing price (used for return calculations)
+    <br>Volume: number of shares traded (used for volume spike analysis)
     <br><br>
     <strong>Derived features:</strong>
-    <br>• Log-returns: ln(Close_t / Close_{t-1})
-    <br>• Daily trading range: (High − Low) / Close × 100%
-    <br>• Volume Z-score: (Volume − 20d avg) / 20d std
-    <br>• 30-day post-earnings return (Company Fundamentals)
-    <br>• Monthly returns (Sentiment Correlation)
+    <br>Log-returns: ln(Close_t / Close_t-1)
+    <br>Daily trading range: (High - Low) / Close x 100%
+    <br>Volume Z-score: (Volume - 20d avg) / 20d std
+    <br>30-day post-earnings return (Company Fundamentals)
+    <br>Monthly returns (Sentiment Correlation)
 </div>
 """, unsafe_allow_html=True)
 
-st.caption("StockInsight — Data Science Project, Europa-Universität Flensburg")
+st.caption("StockInsight — Data Science Project, Europa-Universitat Flensburg")
