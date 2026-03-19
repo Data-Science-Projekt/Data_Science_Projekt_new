@@ -6,7 +6,6 @@ st.set_page_config(page_title="StockInsight Dashboard", layout="wide", page_icon
 pages = {
     "": [
         st.Page("pages/home.py", title="Home", default=True),
-        st.Page("pages/daten_methodik.py", title="Data & Methodology"),
     ],
     "Stock Behavior": [
         st.Page("return_analysis.py", title="Return Analysis"),
