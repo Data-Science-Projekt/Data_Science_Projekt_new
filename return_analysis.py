@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import requests
 from scipy.stats import norm, kurtosis, skew
 import os
+from analysis.utils import render_page_header
 from utils.export import fig_to_pdf_bytes, figs_to_pdf_bytes
 
 # --- CONFIGURATION ---
@@ -50,8 +51,10 @@ def get_fred_benchmark(series_id="SP500"):
 
 
 # --- UI LAYOUT ---
-st.title("Return Distribution Analysis")
-st.markdown("**Research Question 1:** How do recent daily log-returns deviate from a normal distribution?")
+render_page_header(
+    "Return Analysis",
+    "To what extent do the daily log returns of Apple and NVIDIA deviate from a normal distribution?",
+)
 
 with st.sidebar:
     st.header("Settings")
