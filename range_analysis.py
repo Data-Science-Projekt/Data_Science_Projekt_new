@@ -203,45 +203,146 @@ num_days  = len(stock_data[list(stock_data.keys())[0]])
 diff_word = "significantly" if abs(diff) > 0.3 else "moderately"
 gap_word  = "This confirms that tech stocks exhibit meaningfully higher intraday volatility than their financial counterparts." if abs(diff) > 0.2 else "The difference is modest, suggesting relatively comparable intraday behavior across both sectors during this period."
 
-st.divider()
-st.subheader("01 — What does this analysis show?")
-st.write(f"""
-This analysis measures the **daily trading range** — the difference between the intraday high and low price,
-expressed as a percentage of the closing price — across {num_days} trading days for six stocks split into
-two sectors: Tech (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America).
-A higher relative trading range indicates greater intraday price volatility, meaning the stock moves more
-aggressively within a single session regardless of whether it closes up or down.
-""")
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+.section-banner {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 22px; border-radius: 10px;
+    margin-bottom: 20px; margin-top: 10px;
+}
+.section-banner-blue   { background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.01)); border-left: 3px solid #2563eb; }
+.section-banner-green  { background: linear-gradient(90deg, rgba(22,163,74,0.08), rgba(22,163,74,0.01)); border-left: 3px solid #16a34a; }
+.section-banner-orange { background: linear-gradient(90deg, rgba(217,119,6,0.08), rgba(217,119,6,0.01)); border-left: 3px solid #d97706; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
+.info-box {
+    background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.15);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+    line-height: 1.75; font-size: 1.05rem;
+}
+.info-box .hl { color: #2563eb; font-weight: 600; }
+.insight-card {
+    background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 12px; padding: 22px 22px 20px; margin-bottom: 16px;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.insight-card:hover { border-color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(37,99,235,0.1); }
+.card-icon-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.card-icon {
+    font-size: 1.4rem; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; flex-shrink: 0;
+}
+.icon-blue   { background: rgba(37,99,235,0.12); }
+.icon-green  { background: rgba(22,163,74,0.12); }
+.icon-orange { background: rgba(217,119,6,0.12); }
+.icon-purple { background: rgba(124,58,237,0.12); }
+.card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; margin: 0; }
+.card-body  { font-size: 1rem; line-height: 1.65; margin: 0; opacity: 0.75; }
+</style>
+""", unsafe_allow_html=True)
 
-st.divider()
-st.subheader("02 — Analysis and Interpretation")
-st.write(f"""
-Over the observed period, tech stocks averaged an intraday range of **{tech_avg_val:.2f}%** versus
-**{financial_avg_val:.2f}%** for financial stocks — a gap of **{abs(diff):.2f} percentage points**.
-{gap_word}
+# 01 — What does this analysis show?
+st.markdown("""
+<div class="section-banner section-banner-blue">
+    <p class="section-title">01 &mdash; What Does This Analysis Show?</p>
+</div>
+""", unsafe_allow_html=True)
 
-Tech stocks are inherently more reactive to news cycles, earnings surprises, analyst upgrades, and macro
-sentiment shifts — particularly NVIDIA, whose price action is heavily influenced by AI-related developments
-and supply chain headlines. Apple and Microsoft, while more stable, still respond sharply to product
-announcements and broader market moves.
+st.markdown(f"""
+<div class="info-box">
+    This analysis measures the <span class="hl">daily trading range</span> &mdash; the difference between
+    the intraday high and low price, expressed as a percentage of the closing price &mdash; across
+    <span class="hl">{num_days} trading days</span> for six stocks split into two sectors:
+    Tech (Apple, Microsoft, NVIDIA) and Financial (J.P. Morgan, Goldman Sachs, Bank of America).
+    A higher relative trading range indicates greater intraday price volatility, meaning the stock moves
+    more aggressively within a single session regardless of whether it closes up or down.
+</div>
+""", unsafe_allow_html=True)
 
-Financial stocks tend to exhibit tighter intraday ranges under normal market conditions, as their valuations
-are more anchored to interest rate expectations and macroeconomic data releases. However, during stress events
-such as Federal Reserve rate decisions or banking sector concerns, financial stocks can spike in volatility
-dramatically and temporarily exceed tech-sector ranges.
+# 02 — Analysis and Interpretation
+st.markdown("""
+<div class="section-banner section-banner-green">
+    <p class="section-title">02 &mdash; Analysis and Interpretation</p>
+</div>
+""", unsafe_allow_html=True)
 
-The boxplot further illustrates that tech stocks not only have a higher *median* range but also a wider
-*distribution* — meaning extreme volatile days are more frequent and more pronounced in tech than in finance.
-""")
+st.markdown(f"""
+<div class="info-box">
+    Over the observed period, tech stocks averaged an intraday range of <span class="hl">{tech_avg_val:.2f}%</span>
+    versus <span class="hl">{financial_avg_val:.2f}%</span> for financial stocks &mdash; a gap of
+    <span class="hl">{abs(diff):.2f} percentage points</span>. {gap_word}
+    <br><br>
+    Tech stocks are inherently more reactive to news cycles, earnings surprises, analyst upgrades, and macro
+    sentiment shifts &mdash; particularly NVIDIA, whose price action is heavily influenced by AI-related
+    developments and supply chain headlines. Apple and Microsoft, while more stable, still respond sharply
+    to product announcements and broader market moves.
+    <br><br>
+    Financial stocks tend to exhibit tighter intraday ranges under normal market conditions, as their
+    valuations are more anchored to interest rate expectations and macroeconomic data releases. However,
+    during stress events such as Federal Reserve rate decisions or banking sector concerns, financial stocks
+    can spike in volatility dramatically and temporarily exceed tech-sector ranges.
+    <br><br>
+    The boxplot further illustrates that tech stocks not only have a higher <em>median</em> range but also
+    a wider <em>distribution</em> &mdash; meaning extreme volatile days are more frequent and more
+    pronounced in tech than in finance.
+</div>
+""", unsafe_allow_html=True)
 
-st.divider()
-st.subheader("03 — Key Insights")
-st.write(f"""
-- **Tech stocks are more volatile intraday.** With an average range of {tech_avg_val:.2f}% vs. {financial_avg_val:.2f}% for financials, tech stocks move {diff_word} more within a single trading session.
+# 03 — Key Insights
+st.markdown("""
+<div class="section-banner section-banner-orange">
+    <p class="section-title">03 &mdash; Key Insights</p>
+</div>
+""", unsafe_allow_html=True)
 
-- **Volatility is sector-driven, not just stock-specific.** The consistent gap between sectors suggests structural differences in how tech and financial stocks are priced and how quickly markets reprice them in response to new information.
+col_i1, col_i2 = st.columns(2)
+with col_i1:
+    st.markdown(f"""
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-blue">📊</div>
+            <p class="card-title">Tech Stocks Are More Volatile Intraday</p>
+        </div>
+        <p class="card-body">
+            With an average range of {tech_avg_val:.2f}% vs. {financial_avg_val:.2f}% for financials,
+            tech stocks move {diff_word} more within a single trading session.
+        </p>
+    </div>
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-orange">⚡</div>
+            <p class="card-title">Volatility Is Sector-Driven</p>
+        </div>
+        <p class="card-body">
+            The consistent gap between sectors suggests structural differences in how tech and financial
+            stocks are priced and how quickly markets reprice them in response to new information.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-- **Higher range does not equal higher return.** A wide trading range reflects uncertainty among market participants — it is a measure of risk, not direction. Investors seeking lower intraday risk may prefer financial stocks under normal conditions.
-
-- **Context matters.** The analysis covers only {num_days} trading days. Extending the window to cover different market regimes would likely reveal periods where this relationship inverts — particularly during banking stress events.
-""")
+with col_i2:
+    st.markdown(f"""
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-green">📉</div>
+            <p class="card-title">Higher Range Does Not Equal Higher Return</p>
+        </div>
+        <p class="card-body">
+            A wide trading range reflects uncertainty among market participants &mdash; it is a measure
+            of risk, not direction. Investors seeking lower intraday risk may prefer financial stocks
+            under normal conditions.
+        </p>
+    </div>
+    <div class="insight-card">
+        <div class="card-icon-row">
+            <div class="card-icon icon-purple">🔍</div>
+            <p class="card-title">Context Matters</p>
+        </div>
+        <p class="card-body">
+            The analysis covers only {num_days} trading days. Extending the window to cover different
+            market regimes would likely reveal periods where this relationship inverts &mdash;
+            particularly during banking stress events.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
