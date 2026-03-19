@@ -22,9 +22,7 @@ CHART_STYLE = dict(
         gridcolor="#e2e8f0",
         linecolor="#cbd5e0",
     ),
-    legend=dict(
-        font=dict(color="#718096", size=13)
-    ),
+    legend=dict(font=dict(color="#718096", size=13)),
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
 )
@@ -61,13 +59,13 @@ render_page_header(
     "How do Apple and NVIDIA stock prices react during periods of extreme market volatility (when the VIX index exceeds a threshold of 30)?",
 )
 
-st.info("⬅️ Use the **sidebar** to select a stock and adjust the VIX panic threshold.")
+st.info("Use the sidebar to select a stock and adjust the VIX panic threshold.")
 
 with st.sidebar:
     st.header("Settings")
     selected_stock = st.selectbox("Select Stock:", list(STOCKS.keys()))
     vix_threshold = st.sidebar.slider("VIX Panic Threshold:", 10.0, 40.0, 20.0, step=0.5)
-    st.info("The red shaded areas represent days when the VIX > threshold.")
+    st.info("The red shaded areas represent days when the VIX exceeds the threshold.")
 
 # Process data
 df_vix = get_vix_data()
@@ -131,11 +129,8 @@ if df_stock is not None and df_vix is not None:
         template="plotly_white",
         hovermode="x unified",
         legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
+            orientation="h", yanchor="bottom", y=1.02,
+            xanchor="right", x=1,
             font=dict(color="#718096", size=13)
         ),
         font=dict(color="#718096", size=14),
@@ -146,7 +141,7 @@ if df_stock is not None and df_vix is not None:
     st.plotly_chart(fig, use_container_width=True)
 
     st.download_button(
-        label="📥 Graph als PNG herunterladen",
+        label="Graph als PNG herunterladen",
         data=fig_to_pdf_bytes(fig),
         file_name="marktstruktur.png",
         mime="image/png",
@@ -157,7 +152,7 @@ if df_stock is not None and df_vix is not None:
     st.subheader("Statistical Impact")
 
     normal_data = combined[~combined['Panic']]
-    panic_data = combined[combined['Panic']]
+    panic_data  = combined[combined['Panic']]
 
     col1, col2, col3 = st.columns(3)
 
@@ -174,85 +169,202 @@ if df_stock is not None and df_vix is not None:
         col3.metric("Days in Panic State", len(panic_data))
     else:
         col2.metric(f"Return during VIX > {vix_threshold}", "No data")
-        st.warning(f"No days found where the VIX was above {vix_threshold}. Please lower the threshold!")
+        st.warning(f"No days found where the VIX was above {vix_threshold}. Please lower the threshold.")
 
     # --- INTERPRETATION ---
-    st.divider()
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    .section-banner {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 22px; border-radius: 10px;
+        margin-bottom: 20px; margin-top: 24px;
+    }
+    .section-banner-blue   { background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(37,99,235,0.01)); border-left: 3px solid #2563eb; }
+    .section-banner-green  { background: linear-gradient(90deg, rgba(22,163,74,0.08), rgba(22,163,74,0.01)); border-left: 3px solid #16a34a; }
+    .section-banner-purple { background: linear-gradient(90deg, rgba(124,58,237,0.08), rgba(124,58,237,0.01)); border-left: 3px solid #7c3aed; }
+    .section-banner-orange { background: linear-gradient(90deg, rgba(217,119,6,0.08), rgba(217,119,6,0.01)); border-left: 3px solid #d97706; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
+    .info-box {
+        background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.15);
+        border-radius: 12px; padding: 24px 28px; margin-bottom: 16px;
+        line-height: 1.75; font-size: 1.05rem;
+    }
+    .info-box .hl { color: #2563eb; font-weight: 600; }
+    .step-card {
+        background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+        display: flex; gap: 16px; align-items: flex-start;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .step-card:hover { border-color: #2563eb; transform: translateX(3px); }
+    .step-number {
+        font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
+        color: #2563eb; opacity: 0.35; min-width: 32px; line-height: 1.3;
+    }
+    .step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 3px 0; }
+    .step-desc  { font-size: 0.98rem; line-height: 1.55; margin: 0; opacity: 0.7; }
+    .insight-card {
+        background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 12px; padding: 22px 22px 20px; margin-bottom: 16px;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .insight-card:hover { border-color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(37,99,235,0.1); }
+    .card-icon-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .card-icon {
+        font-size: 1.4rem; width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; flex-shrink: 0;
+    }
+    .icon-blue   { background: rgba(37,99,235,0.12); }
+    .icon-green  { background: rgba(22,163,74,0.12); }
+    .icon-orange { background: rgba(217,119,6,0.12); }
+    .icon-purple { background: rgba(124,58,237,0.12); }
+    .icon-red    { background: rgba(220,38,38,0.12); }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; margin: 0; }
+    .card-body  { font-size: 1rem; line-height: 1.65; margin: 0; opacity: 0.75; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # 01. What does this analysis show?
+    st.markdown("""
+    <div class="section-banner section-banner-blue">
+        <p class="section-title">01. What Does This Analysis Show?</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="info-box">
+        This page examines how <span class="hl">Apple</span> and <span class="hl">NVIDIA</span> stock
+        prices behave during periods of elevated market volatility, measured by the
+        <span class="hl">VIX index</span>. The VIX is often referred to as the fear index. When it rises
+        above a certain threshold, it signals increased uncertainty and stress in financial markets.
+        In the chart above, these high-volatility periods are highlighted in red.
+        <br><br>
+        A key feature of this analysis is the interactive <span class="hl">VIX threshold slider</span>,
+        which allows you to define what level of volatility should be considered a panic state.
+        By adjusting this threshold, you can explore how stock behavior changes under different
+        levels of market stress.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 02. Method
+    st.markdown("""
+    <div class="section-banner section-banner-purple">
+        <p class="section-title">02. Method</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("""
-### What Does This Analysis Show?
+    <div class="step-card">
+        <div class="step-number">01</div>
+        <div>
+            <p class="step-title">Define the Panic Threshold</p>
+            <p class="step-desc">The VIX panic threshold is controlled by the sidebar slider. All days where the VIX exceeds this threshold are classified as high-volatility periods and highlighted in red.</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">02</div>
+        <div>
+            <p class="step-title">Split into Normal and Panic Periods</p>
+            <p class="step-desc">Daily returns are split into two groups: days with normal market conditions (VIX below threshold) and days in a panic state (VIX above threshold).</p>
+        </div>
+    </div>
+    <div class="step-card">
+        <div class="step-number">03</div>
+        <div>
+            <p class="step-title">Compare Average Returns</p>
+            <p class="step-desc">We compare average log-returns during normal conditions versus high-volatility periods to quantify how much market stress affects each stock.</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-This page examines how Apple and NVIDIA stock prices behave during periods of elevated market volatility, measured by the VIX index.
+    # 03. Analysis and Interpretation
+    st.markdown("""
+    <div class="section-banner section-banner-green">
+        <p class="section-title">03. Analysis and Interpretation</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-The VIX is often referred to as the fear index - when it rises above a certain threshold, it indicates increased uncertainty and stress in financial markets. In the charts above, these high-volatility periods are highlighted in red.
+    st.markdown(f"""
+    <div class="info-box">
+        The results show a clear difference in stock behavior between normal and high-volatility environments.
+        During normal market conditions, both Apple and NVIDIA tend to generate stable or slightly positive returns.
+        During periods of elevated volatility, however, returns typically decline.
+        <br><br>
+        <span class="hl">Apple</span> shows a moderate decrease in performance during high-volatility periods,
+        indicating some sensitivity to market stress but relatively stable behavior overall.
+        <br><br>
+        <span class="hl">NVIDIA</span>, in contrast, exhibits a stronger negative reaction. Its returns tend to
+        decrease more significantly when volatility increases, suggesting a higher sensitivity to changes
+        in market sentiment.
+        <br><br>
+        The extent of these effects depends on the selected threshold. A lower threshold captures more frequent,
+        moderate volatility periods, while a higher threshold isolates fewer but more extreme market stress events.
+        This allows for a more nuanced analysis of how each stock behaves under different market conditions.
+    </div>
+    """, unsafe_allow_html=True)
 
-A key feature of this analysis is the interactive VIX threshold slider, which allows you to define what level of volatility should be considered a panic state. By adjusting this threshold, you can explore how stock behavior changes under different levels of market stress.
+    # 04. Key Insights
+    st.markdown("""
+    <div class="section-banner section-banner-orange">
+        <p class="section-title">04. Key Insights</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-### Method
-
-We use historical daily data for both stocks and the VIX index.
-
-The VIX panic threshold (controlled by the slider) determines when the market is classified as being in a high-volatility state.
-
-All days where the VIX exceeds this threshold are marked as panic periods and highlighted in red.
-
-We then compare:
-
-- Average returns during normal conditions
-- Average returns during high-volatility periods
-
-By adjusting the threshold, you can analyze how stock performance responds to mild vs. extreme market stress.
-
-### Analysis and Interpretation
-
-The results show a clear difference in stock behavior between normal and high-volatility environments.
-
-During normal market conditions, both Apple and NVIDIA tend to generate stable or slightly positive returns. However, during periods of elevated volatility, returns typically decline.
-
-Apple shows a moderate decrease in performance during high-volatility periods, indicating some sensitivity to market stress but relatively stable behavior overall.
-
-NVIDIA, in contrast, exhibits a stronger negative reaction. Its returns tend to decrease more significantly when volatility increases, suggesting a higher sensitivity to changes in market sentiment.
-
-The extent of these effects depends on the selected threshold:
-
-- A lower threshold captures more frequent, moderate volatility periods
-- A higher threshold isolates fewer but more extreme market stress events
-
-This allows for a more nuanced analysis of how each stock behaves under different market conditions.
-
-### Key Insights
-
-- Market Stress Impact: Both stocks tend to perform worse during periods of elevated volatility.
-- Threshold Sensitivity: The definition of a panic state matters - changing the VIX threshold can significantly affect the results and interpretation.
-- Stronger Reaction of NVIDIA: NVIDIA generally reacts more strongly to volatility spikes, showing larger performance declines.
-- Stability of Apple: Apple tends to be more resilient, with smaller changes in performance during stressful market periods.
-
-### Why does this matter?
-
-Financial markets do not react the same way to all levels of volatility.
-
-By adjusting the VIX threshold, investors can:
-
-- distinguish between normal fluctuations and true crisis periods
-- better understand how assets behave under different stress levels
-- make more informed decisions about diversification and risk exposure
-
-In simple terms:
-The definition of market stress is flexible - and different stocks react differently depending on how severe that stress is.
-""")
-
-    st.markdown(
-        """
-        <section class="research-header">
-            <p class="research-header__eyebrow">Answer to the Research Question</p>
-            <p class="research-header__question">
-                Both Apple and NVIDIA show weaker performance during periods of elevated market volatility, with the effect becoming more pronounced as the VIX threshold increases. NVIDIA reacts more strongly to these conditions, indicating higher sensitivity to market stress, while Apple remains comparatively more stable.
+    col_i1, col_i2 = st.columns(2)
+    with col_i1:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-red">📉</div>
+                <p class="card-title">Market Stress Hurts Both Stocks</p>
+            </div>
+            <p class="card-body">
+                Both Apple and NVIDIA tend to perform worse during periods of elevated volatility.
+                A VIX above {vix_threshold:.0f} is associated with below-average returns for both stocks.
             </p>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
+        </div>
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-orange">⚡</div>
+                <p class="card-title">NVIDIA Reacts More Strongly</p>
+            </div>
+            <p class="card-body">
+                NVIDIA generally reacts more strongly to volatility spikes, showing larger performance
+                declines. Its higher sensitivity to market sentiment makes it more vulnerable during
+                periods of uncertainty.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_i2:
+        st.markdown(f"""
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-green">🛡️</div>
+                <p class="card-title">Apple Is More Resilient</p>
+            </div>
+            <p class="card-body">
+                Apple tends to be more resilient, with smaller changes in performance during stressful
+                market periods. Its diversified revenue base and strong balance sheet provide a buffer
+                against short-term sentiment shifts.
+            </p>
+        </div>
+        <div class="insight-card">
+            <div class="card-icon-row">
+                <div class="card-icon icon-blue">🎚️</div>
+                <p class="card-title">Threshold Sensitivity Matters</p>
+            </div>
+            <p class="card-body">
+                The definition of a panic state matters. Changing the VIX threshold can significantly
+                affect the results and interpretation. Try adjusting it in the sidebar to explore
+                mild versus extreme market stress scenarios.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.caption("Data sources: Alpha Vantage (Stock Prices) and FRED (CBOE Volatility Index - VIX).")
+
 else:
     st.info("Please wait while the local data is being loaded.")
