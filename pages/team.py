@@ -133,7 +133,7 @@ st.markdown(
         transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
         display: flex;
         flex-direction: column;
-        height: 580px;
+        height: 680px;
     }
 
     .team-card:hover {
