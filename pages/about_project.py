@@ -302,22 +302,5 @@ st.table(pd.DataFrame({
     ],
 }))
 
-st.markdown("""
-<div class="info-box">
-    <strong>Data fields per stock (OHLCV):</strong>
-    <br>Open: opening price of the trading day
-    <br>High: highest price during the day
-    <br>Low: lowest price during the day
-    <br>Close: closing price (used for return calculations)
-    <br>Volume: number of shares traded (used for volume spike analysis)
-    <br><br>
-    <strong>Derived features:</strong>
-    <br>Log-returns: ln(Close_t / Close_t-1)
-    <br>Daily trading range: (High - Low) / Close x 100%
-    <br>Volume Z-score: (Volume - 20d avg) / 20d std
-    <br>30-day post-earnings return (Company Fundamentals)
-    <br>Monthly returns (Sentiment Correlation)
-</div>
-""", unsafe_allow_html=True)
 
 st.caption("StockInsight — Data Science Project, Christian-Albrechts-Universität zu Kiel")
