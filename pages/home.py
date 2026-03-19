@@ -240,11 +240,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ── Key Findings ──────────────────────────────────────────────────────────────
+# ── Research Questions ─────────────────────────────────────────────────────────
 st.markdown("""
 <div class="section-banner section-banner-green">
     <span class="section-icon">🔍</span>
-    <p class="section-title">Key Findings</p>
+    <p class="section-title">Research Questions</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -258,9 +258,8 @@ with col1:
             <p class="card-title">RQ1 — Return Analysis</p>
         </div>
         <p class="card-body">
-            Both Apple and NVIDIA deviate significantly from a normal distribution.
-            Their returns exhibit fat tails (leptokurtosis) — extreme price movements
-            occur more frequently than standard Gaussian models predict.
+            Are the daily returns of Apple and NVIDIA normally distributed, or do they
+            deviate significantly from the Gaussian assumption?
         </p>
     </div>
 
@@ -270,9 +269,8 @@ with col1:
             <p class="card-title">RQ2 — Volatility</p>
         </div>
         <p class="card-body">
-            Tech stocks show consistently higher daily trading ranges than financial stocks.
-            NVIDIA leads in intraday volatility, while financial stocks exhibit tighter ranges
-            under normal conditions but can spike during rate decisions or banking stress.
+            How do the intraday trading ranges of tech stocks compare to those of
+            financial stocks over time?
         </p>
     </div>
 
@@ -282,9 +280,8 @@ with col1:
             <p class="card-title">RQ3 — Technical Analysis</p>
         </div>
         <p class="card-body">
-            Volume spike patterns differ measurably between sectors. Tech stocks experience
-            more frequent and intense volume anomalies, driven by earnings, AI news, and
-            analyst activity. The two sectors respond to fundamentally different market drivers.
+            Do volume spike patterns differ systematically between the technology
+            and financial sectors?
         </p>
     </div>
 
@@ -294,9 +291,8 @@ with col1:
             <p class="card-title">RQ4 — Market Phases</p>
         </div>
         <p class="card-body">
-            Bull and bear phases can be systematically identified using rolling 20-day windows.
-            Technology stocks react more dynamically to changing conditions, while financial stocks
-            behave more steadily — leading to different co-movement patterns across market regimes.
+            Can bull and bear market phases be systematically identified, and how do
+            individual stocks behave across these regimes?
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -309,9 +305,8 @@ with col2:
             <p class="card-title">RQ5 — Market Structure</p>
         </div>
         <p class="card-body">
-            Both Apple and NVIDIA show weaker performance during periods of elevated VIX.
-            NVIDIA reacts more strongly to market stress, indicating higher sensitivity
-            to volatility spikes, while Apple remains comparatively more stable.
+            How do Apple and NVIDIA react to periods of elevated market stress
+            as measured by the VIX index?
         </p>
     </div>
 
@@ -321,9 +316,8 @@ with col2:
             <p class="card-title">RQ6 — Risk Management</p>
         </div>
         <p class="card-body">
-            NVIDIA carries significantly higher risk than Apple — its Value-at-Risk and Expected
-            Shortfall are substantially larger. The Expected Shortfall consistently exceeds the VaR
-            for both stocks, confirming that tail-risk-aware models are essential.
+            What are the Value-at-Risk and Expected Shortfall levels for Apple and
+            NVIDIA, and how do their risk profiles compare?
         </p>
     </div>
 
@@ -333,9 +327,8 @@ with col2:
             <p class="card-title">RQ7 — Company Fundamentals</p>
         </div>
         <p class="card-body">
-            No statistically significant correlation was found between quarterly iPhone unit sales
-            and Apple's 30-day post-earnings return. The market prices in expected sales before
-            earnings — only surprises relative to consensus drive the reaction.
+            Does the quarterly iPhone sales volume statistically correlate with
+            Apple's stock price returns in the month following earnings?
         </p>
     </div>
 
@@ -345,9 +338,8 @@ with col2:
             <p class="card-title">RQ8 — Sentiment Correlation</p>
         </div>
         <p class="card-body">
-            No statistically significant linear correlation was found between the Consumer Sentiment
-            Index and monthly stock returns over the observed period. Consumer confidence alone
-            is not a reliable predictor of short-term stock returns for either sector.
+            How does the Consumer Sentiment Index correlate with the monthly
+            returns of tech and financial stocks?
         </p>
     </div>
     """, unsafe_allow_html=True)
