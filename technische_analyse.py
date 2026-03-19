@@ -205,19 +205,44 @@ if df_tech is not None and df_fin is not None:
     .icon-red    { background: rgba(220,38,38,0.12); }
     .card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; margin: 0; }
     .card-body  { font-size: 1rem; line-height: 1.65; margin: 0; opacity: 0.75; }
-    .step-card {
+    /* ── process flow ── */
+    .process-flow {
+        display: flex; gap: 0; margin-bottom: 24px;
+        position: relative;
+    }
+    .process-step {
+        flex: 1; text-align: center; padding: 24px 16px 20px;
+        position: relative;
         background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
-        display: flex; gap: 16px; align-items: flex-start;
-        transition: border-color 0.2s, transform 0.2s;
+        border-radius: 12px; margin: 0 6px;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    .step-card:hover { border-color: #2563eb; transform: translateX(3px); }
-    .step-number {
-        font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
-        color: #2563eb; opacity: 0.35; min-width: 32px; line-height: 1.3;
+    .process-step:hover {
+        border-color: #2563eb; transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(37,99,235,0.1);
     }
-    .step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 3px 0; }
-    .step-desc  { font-size: 0.98rem; line-height: 1.55; margin: 0; opacity: 0.7; }
+    .process-circle {
+        width: 48px; height: 48px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 12px; font-size: 1.2rem;
+        font-family: 'Syne', sans-serif; font-weight: 800;
+        color: white;
+    }
+    .circle-1 { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+    .circle-2 { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+    .circle-3 { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .circle-4 { background: linear-gradient(135deg, #16a34a, #22c55e); }
+    .process-title {
+        font-family: 'Syne', sans-serif; font-size: 0.95rem;
+        font-weight: 700; margin: 0 0 6px 0;
+    }
+    .process-desc {
+        font-size: 0.88rem; line-height: 1.5; margin: 0; opacity: 0.65;
+    }
+    .process-arrow {
+        position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+        font-size: 1.2rem; color: #cbd5e0; z-index: 2;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -257,32 +282,29 @@ if df_tech is not None and df_fin is not None:
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="step-content">
-            <p class="step-title">Calculate Rolling Average</p>
-            <p class="step-desc">For each stock, we compute a 20-day rolling average of daily trading volume. This represents "normal" volume for that period.</p>
+    <div class="process-flow">
+        <div class="process-step">
+            <div class="process-circle circle-1">01</div>
+            <p class="process-title">Rolling Average</p>
+            <p class="process-desc">20-day rolling average of daily volume establishes what "normal" looks like.</p>
+            <span class="process-arrow">→</span>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="step-content">
-            <p class="step-title">Compute Z-Score</p>
-            <p class="step-desc">Each day's volume is compared to its rolling average: Z = (Today's Volume − 20-day Average) / 20-day Std. Deviation. This standardizes the comparison across stocks with very different absolute volumes.</p>
+        <div class="process-step">
+            <div class="process-circle circle-2">02</div>
+            <p class="process-title">Z-Score</p>
+            <p class="process-desc">Each day's volume is standardized: Z = (Volume − Avg) / Std. Dev.</p>
+            <span class="process-arrow">→</span>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="step-content">
-            <p class="step-title">Aggregate by Sector</p>
-            <p class="step-desc">When "All (sector average)" is selected, we average the Z-scores of all stocks within a sector to get a single representative signal per day.</p>
+        <div class="process-step">
+            <div class="process-circle circle-3">03</div>
+            <p class="process-title">Sector Aggregation</p>
+            <p class="process-desc">Z-scores are averaged across stocks within each sector for comparison.</p>
+            <span class="process-arrow">→</span>
         </div>
-    </div>
-    <div class="step-card">
-        <div class="step-number">04</div>
-        <div class="step-content">
-            <p class="step-title">Detect Spikes</p>
-            <p class="step-desc">Any day where the Z-score exceeds the threshold (the red dashed line) is counted as a volume spike — an anomaly that warrants attention.</p>
+        <div class="process-step">
+            <div class="process-circle circle-4">04</div>
+            <p class="process-title">Spike Detection</p>
+            <p class="process-desc">Days exceeding the threshold (red dashed line) are flagged as anomalies.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
