@@ -448,13 +448,29 @@ if df_tech is not None and df_fin is not None:
         drives those moves. Together, they provide a more complete picture of market activity.
     </div>
     """, unsafe_allow_html=True)
+    more_volatile = tech_label if tech_mean_z > fin_mean_z else fin_label
+    less_volatile = fin_label if tech_mean_z > fin_mean_z else tech_label
+    more_spikes_label = tech_label if tech_spikes > fin_spikes else fin_label
+    less_spikes_label = fin_label if tech_spikes > fin_spikes else tech_label
+    extreme_label = tech_label if tech_max_z > fin_max_z else fin_label
+
+    conclusion = (
+        f"Trading volume patterns differ measurably between tech and financial stocks. "
+        f"{more_spikes_label} experienced more frequent volume spikes ({max(tech_spikes, fin_spikes)} days "
+        f"vs. {min(tech_spikes, fin_spikes)} days above the Z = {spike_threshold:.1f} threshold), "
+        f"while {more_volatile} showed a higher average Z-score ({max(tech_mean_z, fin_mean_z):.2f}), "
+        f"indicating more consistently elevated trading activity. "
+        f"The most extreme single-day anomaly belonged to {extreme_label} "
+        f"(Z = {max(tech_max_z, fin_max_z):.2f}), suggesting that {extreme_label.split()[0]} stocks "
+        f"are more susceptible to sudden, event-driven volume surges. "
+        f"These differences confirm that the two sectors respond to fundamentally different market drivers."
+    )
+
     st.markdown(
-        """
+        f"""
         <section class="research-header">
             <p class="research-header__eyebrow">Answer to the Research Question</p>
-            <p class="research-header__question">
-                Trading volume patterns differ measurably between tech and financial stocks. Tech stocks tend to experience more frequent and more intense volume spikes, reflecting their higher sensitivity to news cycles, earnings surprises, and AI-related developments. Financial stocks show fewer but more clustered volume anomalies, typically triggered by interest rate decisions or sector-wide regulatory events. These differences in volume behavior confirm that the two sectors respond to fundamentally different market drivers.
-            </p>
+            <p class="research-header__question">{conclusion}</p>
         </section>
         """,
         unsafe_allow_html=True,
