@@ -33,10 +33,27 @@ def load_earnings_dataset():
 
 
 # --- Main RQ7 Section ---
-merged = load_earnings_dataset()
+merged_full = load_earnings_dataset()
 
-if merged.empty:
+if merged_full.empty:
     st.error("The file data/iphone_sales.csv was not found or is empty. Please maintain data manually.")
+    st.stop()
+
+# --- Interactive quarter range filter ---
+st.sidebar.header("Analysis Parameters")
+all_quarters = merged_full["quarter"].tolist()
+quarter_range = st.sidebar.select_slider(
+    "Select quarter range",
+    options=all_quarters,
+    value=(all_quarters[0], all_quarters[-1]),
+    help="Filter the analysis to a specific range of quarters.",
+)
+start_idx = all_quarters.index(quarter_range[0])
+end_idx = all_quarters.index(quarter_range[1])
+merged = merged_full.iloc[start_idx:end_idx + 1].reset_index(drop=True)
+
+if len(merged) < 3:
+    st.warning(f"Only {len(merged)} quarters selected. Please select at least 3 for a meaningful analysis.")
     st.stop()
 
 st.write(f"**Analysis Period:** {merged['quarter'].iloc[0]} to {merged['quarter'].iloc[-1]} ({len(merged)} quarters)")

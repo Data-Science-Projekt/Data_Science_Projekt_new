@@ -81,12 +81,26 @@ if len(merged) < 3:
     st.stop()
 
 st.sidebar.header("Analysis Parameters")
+
+# --- Interactive stock selection ---
+available_stocks = [n for n in ALL_STOCKS.keys() if n in merged.columns]
+selected_stocks = st.sidebar.multiselect(
+    "Select stocks to include",
+    options=available_stocks,
+    default=available_stocks,
+    help="Choose which stocks to include in the correlation analysis.",
+)
+
+if not selected_stocks:
+    st.warning("Please select at least one stock from the sidebar.")
+    st.stop()
+
 st.sidebar.info(f"Analysis is based on {len(merged)} months of available data.")
 
 st.write(f"**Period:** {merged.index.min().strftime('%Y-%m')} to {merged.index.max().strftime('%Y-%m')} ({len(merged)} months)")
 
 # --- Stock names for iteration ---
-stock_names = [n for n in ALL_STOCKS.keys() if n in merged.columns]
+stock_names = selected_stocks
 
 # --- 1. Correlation Heatmap ---
 st.subheader("1. Correlation Matrix: Sentiment vs Stock Returns")
