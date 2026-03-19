@@ -54,6 +54,18 @@ def render_page_header(title, research_question):
         unsafe_allow_html=True,
     )
 
+    # Auto-scroll past header so interactive content is immediately visible
+    st.components.v1.html("""
+    <script>
+        const main = window.parent.document.querySelector('section.main');
+        if (main) {
+            main.scrollTo({ top: 300, behavior: 'smooth' });
+        }
+    </script>
+    """, height=0)
+
+    st.info("⬅️ Use the **sidebar** to adjust settings and interact with the analysis.")
+
 def simple_cache(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
