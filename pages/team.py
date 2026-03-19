@@ -260,10 +260,10 @@ st.markdown(
 IMG_DIR = Path(__file__).parent.parent / "static" / "img"
 
 team = [
-    {"name": "Tom Steinke", "role": "Project Coordination", "focus": "Project organization, research alignment, and analytical framing.", "img": "IMG_1174.JPG", "quote": "Data doesn't lie — but you have to ask the right questions.", "icon": "◆"},
-    {"name": "Jakob Puchert", "role": "Data Engineering & Processing", "focus": "Data collection, preprocessing, and reliable analytical data structures.", "img": "IMG_2725.jpg", "quote": "Clean data is half the analysis.", "icon": "●"},
-    {"name": "Ole Schweckendiek", "role": "Machine Learning & Modeling", "focus": "Model development, feature engineering, and statistical analysis.", "img": "IMG_8812.jpg", "quote": "A model is only as good as its feature engineering.", "icon": "▲"},
-    {"name": "Balduin Makko", "role": "Data Visualization & Frontend", "focus": "Visual communication, interface design, and presentation of analytical results.", "img": "IMG_8813.jpg", "quote": "A good visualization says more than a thousand tables.", "icon": "■"},
+    {"name": "Tom Steinke", "role": "Project Lead (The Architect)", "focus": "Gesamtleitung, Zeitmanagement und Koordination zwischen den technischen Modulen. Sicherstellung des roten Fadens über alle Research Questions hinweg.", "img": "IMG_1174.JPG", "quote": "Data doesn't lie — but you have to ask the right questions.", "icon": "◆"},
+    {"name": "Jakob Puchert", "role": "Data & DevOps Engineer (The Engine)", "focus": "Backend-Struktur, API-Management und Automatisierung. Betreuung der ETL-Pipeline, GitHub Actions und Sicherstellung der Datenintegrität.", "img": "IMG_2725.jpg", "quote": "Clean data is half the analysis.", "icon": "●"},
+    {"name": "Ole Schweckendiek", "role": "Quantitative Analyst (The Brain)", "focus": "Statistische Modelle und mathematische Korrektheit. Entwicklung der Return Analysis, Risikometriken (VaR/ES) und Regressionsmodelle.", "img": "IMG_8812.jpg", "quote": "A model is only as good as its feature engineering.", "icon": "▲"},
+    {"name": "Balduin Makko", "role": "Full-Stack Developer / UI-Designer (The Interface)", "focus": "Streamlit-Frontend und Visualisierung. Gestaltung der interaktiven Plotly-Charts, CSS-Stylings und User Experience.", "img": "IMG_8813.jpg", "quote": "A good visualization says more than a thousand tables.", "icon": "■"},
 ]
 
 columns = st.columns(len(team), gap="medium")
