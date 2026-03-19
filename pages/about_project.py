@@ -342,7 +342,7 @@ st.table(pd.DataFrame({
 st.markdown("**Data Sources:**")
 
 st.table(pd.DataFrame({
-    "Source": ["Alpha Vantage", "FRED", "FRED", "FRED", "Apple IR / Statista"],
+    "Source": ["Alpha Vantage", "FRED", "FRED", "FRED", "Statista"],
     "Dataset": [
         "Daily stock prices (OHLCV)",
         "S&P 500 Index",
