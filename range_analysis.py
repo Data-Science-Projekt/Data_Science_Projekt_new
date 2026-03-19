@@ -259,8 +259,8 @@ st.markdown(f"""
     <p class="interp-section-label">01</p>
     <p class="interp-section-title">What does this analysis show?</p>
     <p class="interp-body">
-        This analysis measures the <strong>daily trading range</strong> — the difference between the intraday high
-        and low price, expressed as a percentage of the closing price — across {num_days} trading days
+        This analysis measures the <strong>daily trading range</strong> &mdash; the difference between the intraday high
+        and low price, expressed as a percentage of the closing price &mdash; across {num_days} trading days
         for six stocks split into two sectors: Tech (Apple, Microsoft, NVIDIA) and Financial
         (J.P. Morgan, Goldman Sachs, Bank of America).
         A higher relative trading range indicates greater intraday price volatility, meaning the stock moves
@@ -273,12 +273,12 @@ st.markdown(f"""
     <p class="interp-section-title">Analysis and Interpretation</p>
     <p class="interp-body">
         Over the observed period, tech stocks averaged an intraday range of <strong>{tech_avg_val:.2f}%</strong>
-        versus <strong>{financial_avg_val:.2f}%</strong> for financial stocks — a gap of
+        versus <strong>{financial_avg_val:.2f}%</strong> for financial stocks &mdash; a gap of
         <strong>{abs(diff):.2f} percentage points</strong>. {gap_word}
     </p>
     <p class="interp-body">
         Tech stocks are inherently more reactive to news cycles, earnings surprises, analyst upgrades, and macro
-        sentiment shifts — particularly NVIDIA, whose price action is heavily influenced by AI-related developments
+        sentiment shifts &mdash; particularly NVIDIA, whose price action is heavily influenced by AI-related developments
         and supply chain headlines. Apple and Microsoft, while more stable, still respond sharply to product
         announcements and broader market moves.
     </p>
@@ -290,7 +290,7 @@ st.markdown(f"""
     </p>
     <p class="interp-body">
         The boxplot further illustrates that tech stocks not only have a higher <em>median</em> range but also a
-        wider <em>distribution</em> — meaning extreme volatile days are more frequent and pronounced in tech.
+        wider <em>distribution</em> &mdash; meaning extreme volatile days are more frequent and pronounced in tech.
     </p>
 
     <hr class="interp-divider"/>
@@ -313,14 +313,14 @@ st.markdown(f"""
     <div class="interp-insight-row">
         <div class="interp-insight-dot"></div>
         <p class="interp-body"><strong>Higher range does not equal higher return.</strong>
-        A wide trading range reflects uncertainty among market participants — it is a measure of risk,
+        A wide trading range reflects uncertainty among market participants &mdash; it is a measure of risk,
         not direction. Investors seeking lower intraday risk may prefer financial stocks under normal conditions.</p>
     </div>
     <div class="interp-insight-row">
         <div class="interp-insight-dot"></div>
         <p class="interp-body"><strong>Context matters.</strong>
         The analysis covers only {num_days} trading days. Extending the window to cover different market regimes
-        would likely reveal periods where this relationship inverts — particularly during banking stress events.</p>
+        would likely reveal periods where this relationship inverts &mdash; particularly during banking stress events.</p>
     </div>
 
 </div>
