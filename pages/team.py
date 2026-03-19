@@ -133,7 +133,7 @@ st.markdown(
         transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
         display: flex;
         flex-direction: column;
-        min-height: 520px;
+        min-height: 600px;
     }
 
     .team-card:hover {
@@ -145,7 +145,7 @@ st.markdown(
     .team-card__media {
         position: relative;
         overflow: hidden;
-        height: 240px;
+        height: 320px;
         flex-shrink: 0;
         background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.08));
     }
@@ -256,15 +256,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="team-grid-note">
-        <strong>Core Team</strong><br>
-        Four team members contributing to data acquisition, processing, statistical analysis, modeling, and visual communication.
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
 
 IMG_DIR = Path(__file__).parent.parent / "static" / "img"
 
