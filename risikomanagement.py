@@ -154,15 +154,143 @@ if (show_apple and ret_a is not None) or (show_nvidia and ret_n is not None):
         c2.metric("Value-at-Risk", f"{v_n:.2%}")
         c2.metric("Expected Shortfall", f"{e_n:.2%}")
 
-    # --- INTERPRETATION ---
+    # --- WHAT IS THIS? ---
     st.markdown("---")
+    st.subheader("What Does This Analysis Show?")
+    st.markdown(f"""
+    This page measures **how much money you could lose on a single bad day** when investing in Apple or NVIDIA stock.
+    We use two well-established risk metrics from financial risk management:
+
+    - **Value-at-Risk (VaR)** answers the question: *"What is the worst daily loss I can expect
+      under normal conditions?"* At a **{conf_level*100:.1f}% confidence level**, the VaR tells you
+      that on {conf_level*100:.0f} out of 100 trading days, your loss will **not** exceed this value.
+      Only on the remaining {(1-conf_level)*100:.0f} out of 100 days could losses be larger.
+    - **Expected Shortfall (ES)**, also called Conditional VaR, goes one step further: *"If the worst
+      case does happen — if the loss exceeds the VaR — how bad does it get on average?"*
+      It is the average loss on those very worst days.
+
+    **Method:** We use **Historical Simulation** — instead of assuming a mathematical distribution,
+    we look at the actual historical daily returns and simply read off the worst percentiles.
+    The histogram above shows every daily return that occurred in our dataset. The dashed vertical
+    lines mark the VaR threshold for each stock.
+    """)
+
+    # --- ANALYSIS WITH ACTUAL NUMBERS ---
     st.subheader("Analysis and Interpretation")
-    st.info(f"Historical simulation at a {conf_level * 100:.1f}% confidence level.")
-    
+
+    if show_apple and ret_a is not None and show_nvidia and ret_n is not None:
+        riskier = "NVIDIA" if v_n < v_a else "Apple"
+        safer = "Apple" if riskier == "NVIDIA" else "NVIDIA"
+        riskier_var = v_n if riskier == "NVIDIA" else v_a
+        safer_var = v_a if riskier == "NVIDIA" else v_n
+        riskier_es = e_n if riskier == "NVIDIA" else e_a
+        safer_es = e_a if riskier == "NVIDIA" else e_n
+
+        st.markdown(f"""
+    At the **{conf_level*100:.1f}% confidence level**, the results show:
+
+    | Metric | Apple (AAPL) | NVIDIA (NVDA) |
+    |--------|-------------|---------------|
+    | **Value-at-Risk** | {v_a:.2%} | {v_n:.2%} |
+    | **Expected Shortfall** | {e_a:.2%} | {e_n:.2%} |
+    | **Volatility (Std. Dev.)** | {ret_a.std():.2%} | {ret_n.std():.2%} |
+    | **Trading Days Analyzed** | {len(ret_a):,} | {len(ret_n):,} |
+
+    **{riskier} carries significantly more risk than {safer}.** A VaR of **{riskier_var:.2%}** means
+    that on the worst {(1-conf_level)*100:.0f}% of trading days, {riskier} loses more than
+    {abs(riskier_var):.2%} of its value in a single day. For {safer}, this threshold is
+    {abs(safer_var):.2%}.
+
+    The Expected Shortfall paints an even clearer picture: when {riskier} does have a bad day
+    beyond its VaR, the average loss is **{riskier_es:.2%}** — compared to **{safer_es:.2%}** for {safer}.
+
+    **In practical terms:** If you invested **$10,000** in each stock, on a bad day
+    (beyond the {conf_level*100:.0f}% threshold):
+    - **{safer}** would lose on average **${abs(safer_es) * 10000:.0f}**
+    - **{riskier}** would lose on average **${abs(riskier_es) * 10000:.0f}**
+        """)
+
+    elif show_apple and ret_a is not None:
+        st.markdown(f"""
+    At the **{conf_level*100:.1f}% confidence level**, Apple's results:
+
+    | Metric | Apple (AAPL) |
+    |--------|-------------|
+    | **Value-at-Risk** | {v_a:.2%} |
+    | **Expected Shortfall** | {e_a:.2%} |
+    | **Volatility (Std. Dev.)** | {ret_a.std():.2%} |
+    | **Trading Days Analyzed** | {len(ret_a):,} |
+
+    On {(1-conf_level)*100:.0f} out of 100 trading days, Apple could lose more than **{abs(v_a):.2%}**
+    of its value. When those worst days occur, the average loss is **{e_a:.2%}**.
+    On a **$10,000 investment**, that translates to an average worst-case loss of **${abs(e_a) * 10000:.0f}**.
+        """)
+
+    elif show_nvidia and ret_n is not None:
+        st.markdown(f"""
+    At the **{conf_level*100:.1f}% confidence level**, NVIDIA's results:
+
+    | Metric | NVIDIA (NVDA) |
+    |--------|---------------|
+    | **Value-at-Risk** | {v_n:.2%} |
+    | **Expected Shortfall** | {e_n:.2%} |
+    | **Volatility (Std. Dev.)** | {ret_n.std():.2%} |
+    | **Trading Days Analyzed** | {len(ret_n):,} |
+
+    On {(1-conf_level)*100:.0f} out of 100 trading days, NVIDIA could lose more than **{abs(v_n):.2%}**
+    of its value. When those worst days occur, the average loss is **{e_n:.2%}**.
+    On a **$10,000 investment**, that translates to an average worst-case loss of **${abs(e_n) * 10000:.0f}**.
+        """)
+
+    # --- KEY INSIGHTS ---
+    st.subheader("Key Insights")
+
+    insights = []
+
+    if show_apple and ret_a is not None and show_nvidia and ret_n is not None:
+        insights.append(
+            f"**Risk Comparison:** {riskier} is the riskier asset — its VaR is "
+            f"{abs(riskier_var/safer_var):.1f}x larger than {safer}'s, meaning the potential "
+            f"for extreme daily losses is substantially higher."
+        )
+        insights.append(
+            f"**Volatility Gap:** NVIDIA's daily volatility ({ret_n.std():.2%}) vs. Apple's "
+            f"({ret_a.std():.2%}) reflects NVIDIA's nature as a high-growth semiconductor stock "
+            f"with larger price swings driven by AI demand cycles, earnings surprises, and sector rotation."
+        )
+        insights.append(
+            "**Tail Risk Matters:** The Expected Shortfall is always worse than the VaR. "
+            "This means that when a truly bad day happens, losses don't just barely cross the "
+            "VaR line — they tend to go significantly beyond it. Risk models that only look at "
+            "VaR underestimate the true downside."
+        )
+        insights.append(
+            f"**Confidence Level Sensitivity:** Try adjusting the confidence slider in the sidebar. "
+            f"A higher confidence level (e.g. 99%) reveals more extreme tail risks, while a lower "
+            f"level (e.g. 90%) shows more moderate, frequent losses."
+        )
+    elif show_apple and ret_a is not None:
+        insights.append(
+            f"**Apple's Risk Profile:** With a VaR of {v_a:.2%}, Apple shows the relatively "
+            f"moderate risk profile typical of a mega-cap stock with diversified revenue streams."
+        )
+    elif show_nvidia and ret_n is not None:
+        insights.append(
+            f"**NVIDIA's Risk Profile:** With a VaR of {v_n:.2%}, NVIDIA carries the higher "
+            f"volatility typical of a growth-oriented semiconductor company."
+        )
+
+    for i, insight in enumerate(insights, 1):
+        st.markdown(f"{i}. {insight}")
+
     st.markdown("""
-    ### Key Insights:
-    * **Tail Risk Assessment:** The Value-at-Risk (VaR) indicates the threshold of the worst-case returns.
-    * **Alignment:** Both labels are now perfectly aligned at the top of the chart for better readability.
+---
+**Why does this matter?**
+Understanding these risk metrics helps investors make informed decisions about portfolio
+allocation. A risk-averse investor might prefer a larger allocation to lower-VaR stocks,
+while a risk-tolerant investor might accept higher potential losses in exchange for
+higher expected returns. Banks and funds are legally required to calculate VaR daily
+to ensure they hold enough capital to survive worst-case scenarios.
     """)
 
 else:
