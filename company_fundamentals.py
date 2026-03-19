@@ -482,4 +482,4 @@ if len(merged) >= 3:
 else:
     st.warning("Not enough data points to perform a meaningful analysis.")
 
-st.caption("Data source: Apple Investor Relations / Statista (unit estimates). Manual updates required in data/iphone_sales.csv.")
+st.caption("Data source: Statista (unit estimates). Manual updates required in data/iphone_sales.csv.")
