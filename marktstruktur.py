@@ -199,8 +199,11 @@ if df_stock is not None and df_vix is not None:
     }
     .step-card:hover { border-color: #2563eb; transform: translateX(3px); }
     .step-number {
-        font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
-        color: #2563eb; opacity: 0.35; min-width: 32px; line-height: 1.3;
+        font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+        color: #2563eb; opacity: 1; min-width: 44px; line-height: 1.2;
+        background: rgba(37,99,235,0.1); border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        padding: 4px 8px; flex-shrink: 0;
     }
     .step-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin: 0 0 3px 0; }
     .step-desc  { font-size: 0.98rem; line-height: 1.55; margin: 0; opacity: 0.7; }
