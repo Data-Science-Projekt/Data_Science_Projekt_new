@@ -16,7 +16,7 @@ STOCKS = {"Apple": "AAPL", "NVIDIA": "NVDA"}
 # --- FUNCTION: LOAD DATA (LOCAL CSV) ---
 @st.cache_data(show_spinner="Loading stock data...")
 def get_stock_data_local(symbol):
-    file_path = os.path.join(os.path.dirname(__file__), "data", f"stock_{symbol}.csv")
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", f"stock_{symbol}.csv")
     if not os.path.exists(file_path):
         st.warning(f"No data file found for {symbol}.")
         return None

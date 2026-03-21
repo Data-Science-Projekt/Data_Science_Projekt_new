@@ -21,7 +21,7 @@ st.info("⬅️ Use the **sidebar** to adjust the quarter range for the analysis
 # --- Load iPhone Sales Data (includes pre-collected price data) ---
 @st.cache_data
 def load_earnings_dataset():
-    csv_path = os.path.join(os.path.dirname(__file__), "data", "iphone_sales.csv")
+    csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "iphone_sales.csv")
     if not os.path.exists(csv_path):
         return pd.DataFrame()
     df = pd.read_csv(csv_path)

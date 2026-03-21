@@ -8,22 +8,22 @@ pages = {
         st.Page("pages/home.py", title="Home", default=True),
     ],
     "Stock Behavior": [
-        st.Page("return_analysis.py", title="Return Analysis"),
-        st.Page("range_analysis.py", title="Volatility"),
-        st.Page("technische_analyse.py", title="Technical Analysis"),
+        st.Page("analysis/return_analysis.py", title="Return Analysis"),
+        st.Page("analysis/range_analysis.py", title="Volatility"),
+        st.Page("analysis/technische_analyse.py", title="Technical Analysis"),
     ],
     "Market Environment": [
-        st.Page("marktphasen.py", title="Market Phases"),
-        st.Page("marktstruktur.py", title="Market Structure"),
+        st.Page("analysis/marktphasen.py", title="Market Phases"),
+        st.Page("analysis/marktstruktur.py", title="Market Structure"),
     ],
     "Risk Analysis": [
-        st.Page("risikomanagement.py", title="Risk Management"),
+        st.Page("analysis/risikomanagement.py", title="Risk Management"),
     ],
     "Sentiment & Macro": [
-        st.Page("sentiment_correlation.py", title="Sentiment Correlation"),
+        st.Page("analysis/sentiment_correlation.py", title="Sentiment Correlation"),
     ],
     "Fundamentals": [
-        st.Page("company_fundamentals.py", title="Company Fundamentals"),
+        st.Page("analysis/company_fundamentals.py", title="Company Fundamentals"),
     ],
     "About": [
         st.Page("pages/about_project.py", title="About the Project"),
