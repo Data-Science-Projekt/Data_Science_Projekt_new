@@ -206,13 +206,7 @@ streamlit run app.py
 ## LLM Attribution
 
 All code in this project was developed with the assistance of Claude Opus 4.6
-and Gemini 2.5 Pro. LLM-generated or LLM-assisted code is marked directly in
-the source files with inline comments, e.g.:
-```
-# Generated with Claude Opus 4.6
-```
-Each file header in `/analysis/` and `/pages/` also notes which model(s) assisted
-in its creation.
+and Gemini 3 Pro.
 
 ---
 
