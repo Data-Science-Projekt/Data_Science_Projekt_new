@@ -96,22 +96,22 @@ Manual iPhone Data ──────> /data/iphone_sales.csv
 ├── requirements.txt          # Python dependencies
 │
 ├── analysis/                 # Analysis page modules
-│   ├── return_analysis.py    # RQ1: Return distributions
-│   ├── range_analysis.py     # RQ2: Volatility comparison
-│   ├── technische_analyse.py # RQ3: Volume spike analysis
-│   ├── marktphasen.py        # RQ4: Bull/bear phase detection
-│   ├── marktstruktur.py      # RQ5: VIX stress testing
-│   ├── risikomanagement.py   # RQ6: VaR & Expected Shortfall
-│   ├── company_fundamentals.py # RQ7: iPhone sales vs. stock returns
-│   ├── sentiment_correlation.py # RQ8: Consumer sentiment vs. returns
-│   └── utils.py              # Shared helpers (page header, caching, API)
+│   ├── return_analysis.py    # RQ1: Return distributions — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── range_analysis.py     # RQ2: Volatility comparison — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── technische_analyse.py # RQ3: Volume spike analysis — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── marktphasen.py        # RQ4: Bull/bear phase detection — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── marktstruktur.py      # RQ5: VIX stress testing — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── risikomanagement.py   # RQ6: VaR & Expected Shortfall — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── company_fundamentals.py # RQ7: iPhone sales vs. stock returns — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── sentiment_correlation.py # RQ8: Consumer sentiment vs. returns — built with Claude Opus 4.6 & Gemini 3 Pro
+│   └── utils.py              # Shared helpers (page header, caching, API) — built with Claude Opus 4.6 & Gemini 3 Pro
 │
 ├── pages/                    # Informational pages
-│   ├── home.py               # Landing page with project overview
-│   ├── about_project.py      # Goals, methodology, dataset description
-│   ├── fazit.py              # Conclusion & key findings
-│   ├── team.py               # Team members
-│   └── imprint.py            # Legal information
+│   ├── home.py               # Landing page with project overview — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── about_project.py      # Goals, methodology, dataset description — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── fazit.py              # Conclusion & key findings — built with Claude Opus 4.6 & Gemini 3 Pro
+│   ├── team.py               # Team members — built with Claude Opus 4.6 & Gemini 3 Pro
+│   └── imprint.py            # Legal information — built with Claude Opus 4.6 & Gemini 3 Pro
 │
 ├── utils/
 │   └── export.py             # PDF/PNG export utilities
