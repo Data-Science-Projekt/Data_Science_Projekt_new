@@ -91,8 +91,8 @@ Manual iPhone Data ──────> /data/iphone_sales.csv
 ### Project Structure
 
 ```
-├── app.py                    # Entry point & navigation config
-├── data_update.py            # Automated data fetching script
+├── app.py                    # Entry point & navigation config — built with Claude Opus 4.6 & Gemini 3 Pro
+├── data_update.py            # Automated data fetching script — built with Claude Opus 4.6 & Gemini 3 Pro
 ├── requirements.txt          # Python dependencies
 │
 ├── analysis/                 # Analysis page modules
@@ -114,7 +114,7 @@ Manual iPhone Data ──────> /data/iphone_sales.csv
 │   └── imprint.py            # Legal information — built with Claude Opus 4.6 & Gemini 3 Pro
 │
 ├── utils/
-│   └── export.py             # PDF/PNG export utilities
+│   └── export.py             # PDF/PNG export utilities — built with Claude Opus 4.6 & Gemini 3 Pro
 │
 ├── data/                     # Auto-updated CSV data files
 │   ├── stock_AAPL.csv        # Daily OHLCV per stock
